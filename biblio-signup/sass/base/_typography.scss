@@ -1,0 +1,40 @@
+@use "../abstracts/variables";
+
+body {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+  color: variables.$color-grey-dark;
+  padding: 3rem;
+}
+
+.heading-primary {
+  color: variables.$color-primary-dark;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 3rem;
+  font-size: 2rem;
+}
+
+.heading-secondary {
+  color: variables.$color-primary-dark;
+  font-weight: 700;
+  font-size: 3.5rem;
+  letter-spacing: 0.3rem;
+}
+
+.heading-tertiary {
+  color: variables.$color-primary-dark;
+  font-size: variables.$default-font-size;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+}
+
+.paragraph {
+  font-size: variables.$default-font-size;
+
+  &:not(:last-child) {
+    margin-bottom: 3rem;
+  }
+}
