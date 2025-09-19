@@ -1,11 +1,13 @@
-<script setup></script>
+<script setup>
+import Signup from "./Signup.vue";
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-</template>
+  <header class="header">
+    <h1 class="header-primary">Biblio App</h1>
+    <h2 class="header-secondary">Signup</h2>
+    <h3 class="header-tertiary">Only admin</h3>
+  </header>
 
-<style scoped></style>
+  <main class="main"><Signup /></main>
+</template>
