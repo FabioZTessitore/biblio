@@ -4,7 +4,7 @@ import { useColorScheme } from '~/lib/useColorScheme';
 
 function ActivityIndicator(props: React.ComponentPropsWithoutRef<typeof RNActivityIndicator>) {
   const { colors } = useColorScheme();
-  return <RNActivityIndicator color={colors.primary} {...props} />;
+  return <RNActivityIndicator color={colors.primary[0]} {...props} />;
 }
 
 export { ActivityIndicator };

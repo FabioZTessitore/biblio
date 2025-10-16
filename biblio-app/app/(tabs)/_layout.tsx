@@ -1,32 +1,40 @@
-import { Link, Tabs } from 'expo-router';
-import { HeaderButton } from '../../components/HeaderButton';
-import { TabBarIcon } from '../../components/TabBarIcon';
+import { Tabs, Href, Redirect } from 'expo-router';
+import { TabBarIcon } from '~/components/TabBarIcon';
+import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { useUserStore } from '~/store/user';
+
+type TabsProps = BottomTabNavigationOptions & {
+  href?: Href | null;
+};
 
 export default function TabLayout() {
+  const { colors } = useColorScheme();
+
+  const { isAuthenticated } = useUserStore();
+
+  const SCREEN_OPTIONS = {
+    headerStyle: {
+      backgroundColor: colors.background,
+    },
+    headerShown: true,
+    headerShadowVisible: false,
+    headerTitleContainerStyle: { marginLeft: 24 },
+  } as TabsProps;
+
+  const INDEX_OPTIONS = {
+    ...SCREEN_OPTIONS,
+    title: 'Home',
+    tabBarIcon: ({ focused, size }) => <TabBarIcon name="home" color={colors.primary} />,
+  } as TabsProps;
+
+  if (!isAuthenticated) {
+    return <Redirect href="/sign-up" />;
+  }
+
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: 'black',
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <HeaderButton />
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="two"
-        options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-        }}
-      />
+    <Tabs>
+      <Tabs.Screen name="index" options={INDEX_OPTIONS} />
     </Tabs>
   );
 }

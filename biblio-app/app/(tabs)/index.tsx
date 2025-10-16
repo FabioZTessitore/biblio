@@ -1,19 +1,19 @@
-import { Text, View, StyleSheet } from "react-native";
-import Signup from "~/components/SignUp";
+import { View, StyleSheet } from 'react-native';
+import { Text } from '~/components/Text';
 
 export default function Index() {
   return (
-    <View style={styles.main}>
+    // <View style={styles.main}>
+    <View className="flex-1 items-center justify-center">
       <Text>Biblio app here</Text>
-      <Signup />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+// const styles = StyleSheet.create({
+//   main: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+// });
