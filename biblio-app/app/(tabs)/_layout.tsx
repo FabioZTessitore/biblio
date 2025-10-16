@@ -25,7 +25,17 @@ export default function TabLayout() {
   const INDEX_OPTIONS = {
     ...SCREEN_OPTIONS,
     title: 'Home',
-    tabBarIcon: ({ focused, size }) => <TabBarIcon name="home" color={colors.primary} />,
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon name="home" color={focused ? colors.primary : colors.grey2} />
+    ),
+  } as TabsProps;
+
+  const OTHER_OPTIONS = {
+    ...SCREEN_OPTIONS,
+    title: 'Other',
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon name="ellipsis-h" color={focused ? colors.primary : colors.grey2} />
+    ),
   } as TabsProps;
 
   if (!isAuthenticated) {
@@ -35,6 +45,7 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
+      <Tabs.Screen name="other" options={OTHER_OPTIONS} />
     </Tabs>
   );
 }
