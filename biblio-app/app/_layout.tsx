@@ -6,6 +6,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
@@ -29,12 +30,14 @@ export default function RootLayout() {
       {/* <ExampleProvider> */}
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <NavThemeProvider value={NAV_THEME[colorScheme]}>
-          <Stack screenOptions={SCREEN_OPTIONS}>
-            <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
-            <Stack.Screen name="sign-up" options={SIGN_UP_OPTIONS} />
-          </Stack>
-        </NavThemeProvider>
+        <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+          <NavThemeProvider value={NAV_THEME[colorScheme]}>
+            <Stack screenOptions={SCREEN_OPTIONS}>
+              <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
+              <Stack.Screen name="sign-up" options={SIGN_UP_OPTIONS} />
+            </Stack>
+          </NavThemeProvider>
+        </KeyboardProvider>
       </GestureHandlerRootView>
 
       {/* </ExampleProvider> */}
