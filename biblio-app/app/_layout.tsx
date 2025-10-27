@@ -30,7 +30,7 @@ export default function RootLayout() {
       {/* <ExampleProvider> */}
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <KeyboardProvider>
           <NavThemeProvider value={NAV_THEME[colorScheme]}>
             <Stack screenOptions={SCREEN_OPTIONS}>
               <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
