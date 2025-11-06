@@ -1,14 +1,10 @@
-// import { useInfoStore } from './info';
 import { useUserStore } from './user';
-// import { useSlotStore } from './slot';
-// import { useLanguageStore } from './language';
-// import { useAudioStore } from './audio';
-// import { useShopStore } from './shop';
-// import { useAdStore } from './ad';
+import { useBookStore } from './book';
+import { useSchoolStore } from './school';
+
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 
 export interface TRootState {
   loading: boolean;
@@ -22,7 +18,6 @@ export interface TRootMutations {
 }
 
 export interface TRootAction {
-  resetGame: () => void;
   resetApp: () => void;
 }
 
@@ -62,4 +57,4 @@ export const useRootStore = create<TRootStore>()(
   )
 );
 
-export { useUserStore };
+export { useUserStore, useBookStore, useSchoolStore };
