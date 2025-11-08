@@ -26,15 +26,11 @@ export default function RootLayout() {
         key={`root-status-bar-${isDarkColorScheme ? 'light' : 'dark'}`}
         style={isDarkColorScheme ? 'light' : 'dark'}
       />
-      {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
-      {/* <ExampleProvider> */}
-
       <GestureHandlerRootView style={{ flex: 1 }}>
         <KeyboardProvider>
           <NavThemeProvider value={NAV_THEME[colorScheme]}>
             <Stack screenOptions={SCREEN_OPTIONS}>
-              <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
-              <Stack.Screen name="sign-up" options={SIGN_UP_OPTIONS} />
+              <Stack.Screen name="(drawer)" options={{ headerTitle: 'test' }} />
             </Stack>
           </NavThemeProvider>
         </KeyboardProvider>
@@ -47,14 +43,5 @@ export default function RootLayout() {
 
 const SCREEN_OPTIONS = {
   animation: 'ios_from_right', // for android
-} as const;
-
-const TABS_OPTIONS = {
   headerShown: false,
-} as const;
-
-const SIGN_UP_OPTIONS = {
-  headerShown: true,
-  title: 'Create Account',
-  headerBackTitleVisible: false,
 } as const;
