@@ -1,11 +1,13 @@
 import { router } from 'expo-router';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Book } from './book';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface TUserState {
   username: string;
   isAuthenticated: boolean;
+  library: Book[];
 }
 
 export interface TUserMutations {}
@@ -19,6 +21,7 @@ export type TUserStore = TUserState & TUserMutations & TUserAction;
 const profileState = <TUserState>{
   username: '',
   isAuthenticated: false,
+  library: [],
 };
 
 const profileMutations = <TUserMutations>{};

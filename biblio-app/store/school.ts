@@ -19,7 +19,12 @@ export interface TSchoolAction {}
 export type TSchoolStore = TSchoolState & TSchoolMutations & TSchoolAction;
 
 const schoolState = <TSchoolState>{
-  schools: [],
+  schools: [
+    {
+      id: '1234',
+      name: 'Istituto Tecnicio Commerciale "G. Marconi"',
+    },
+  ],
 };
 
 const schoolMutations = <TSchoolMutations>{};
