@@ -37,7 +37,7 @@ export default function TabLayout() {
 
   return (
     <Tabs>
-      <Tabs.Screen name="home" options={INDEX_OPTIONS} />
+      <Tabs.Screen name="index" options={INDEX_OPTIONS} />
       <Tabs.Screen name="other" options={OTHER_OPTIONS} />
     </Tabs>
   );

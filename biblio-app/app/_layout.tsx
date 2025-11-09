@@ -30,7 +30,7 @@ export default function RootLayout() {
         <KeyboardProvider>
           <NavThemeProvider value={NAV_THEME[colorScheme]}>
             <Stack screenOptions={SCREEN_OPTIONS}>
-              <Stack.Screen name="(drawer)" options={{ headerTitle: 'test' }} />
+              <Stack.Screen name="(drawer)" />
             </Stack>
           </NavThemeProvider>
         </KeyboardProvider>
