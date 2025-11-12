@@ -35,6 +35,14 @@ export default function TabLayout() {
     ),
   } as TabsProps;
 
+  const ADD_BOOK = {
+    ...SCREEN_OPTIONS,
+    title: 'Aggiungi Libro',
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon name="ellipsis-h" color={focused ? colors.primary : colors.grey2} />
+    ),
+  } as TabsProps;
+
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />

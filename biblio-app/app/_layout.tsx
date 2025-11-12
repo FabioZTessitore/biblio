@@ -1,7 +1,8 @@
 import '../global.css';
 import 'expo-dev-client';
 import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '~/lib/toastConfig';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
@@ -34,6 +35,7 @@ export default function RootLayout() {
             </Stack>
           </NavThemeProvider>
         </KeyboardProvider>
+        <Toast config={toastConfig} />
       </GestureHandlerRootView>
 
       {/* </ExampleProvider> */}
