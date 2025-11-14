@@ -7,11 +7,13 @@ import type { SearchInputProps } from './types';
 import { Button } from '~/components/nativewindui/Button';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 export const SearchInput = memo(
-  forwardRef<React.ComponentRef<typeof TextInput>, SearchInputProps>(
+  forwardRef<React.ComponentRef<typeof TextInput | typeof BottomSheetTextInput>, SearchInputProps>(
     (
       {
+        variant,
         value: valueProp,
         onChangeText: onChangeTextProp,
         placeholder,
@@ -50,6 +52,8 @@ export const SearchInput = memo(
         inputRef?.current?.focus();
       }, [inputRef]);
 
+      const InputComponent = variant === 'bottom-sheet' ? BottomSheetTextInput : TextInput;
+
       return (
         <Button
           variant="plain"
@@ -67,7 +71,7 @@ export const SearchInput = memo(
             />
           </View>
           <View className="flex-1" pointerEvents="none">
-            <TextInput
+            <InputComponent
               ref={inputRef as any}
               placeholder={placeholder ?? 'Cerca'}
               className={cn('text-baseds flex-1 rounded-r-full p-2 text-foreground', className)}

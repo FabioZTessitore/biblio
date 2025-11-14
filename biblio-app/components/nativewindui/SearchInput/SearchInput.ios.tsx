@@ -20,6 +20,7 @@ import { type SearchInputProps } from './types';
 import { Text } from '~/components/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 // import { useTranslation } from "react-i18next"
 
 // Add as class when possible: https://github.com/marklawlor/nativewind/issues/522
@@ -28,9 +29,10 @@ export const BORDER_CURVE: ViewStyle = {
 };
 
 export const SearchInput = memo(
-  forwardRef<React.ComponentRef<typeof TextInput>, SearchInputProps>(
+  forwardRef<React.ComponentRef<typeof TextInput | typeof BottomSheetTextInput>, SearchInputProps>(
     (
       {
+        variant,
         value: valueProp,
         onChangeText: onChangeTextProp,
         onFocus: onFocusProp,
@@ -143,6 +145,8 @@ export const SearchInput = memo(
         setShowCancel(false);
       }, [onChangeText, inputRef, setShowCancel]);
 
+      const InputComponent = variant === 'bottom-sheet' ? BottomSheetTextInput : TextInput;
+
       return (
         <Animated.View className="flex-row items-center" style={rootStyle}>
           <Animated.View
@@ -160,8 +164,8 @@ export const SearchInput = memo(
                 size={22}
               />
             </View>
-            <TextInput
-              ref={inputRef}
+            <InputComponent
+              ref={inputRef as any}
               placeholder={placeholder ?? 'Cerca'}
               className={cn(
                 !showCancel && 'active:bg-muted/5 dark:active:bg-muted/20',
