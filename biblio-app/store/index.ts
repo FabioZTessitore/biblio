@@ -1,6 +1,7 @@
 import { useUserStore } from './user';
 import { useBookStore } from './book';
 import { useSchoolStore } from './school';
+import { useFiltersStore } from './filters';
 
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
@@ -57,4 +58,4 @@ export const useRootStore = create<TRootStore>()(
   )
 );
 
-export { useUserStore, useBookStore, useSchoolStore };
+export { useUserStore, useBookStore, useSchoolStore, useFiltersStore };

@@ -4,6 +4,7 @@ import { Text } from '~/components/Text';
 import { useBookStore, useUserStore } from '~/store';
 import { Icon } from '~/components/Icon';
 import { Book } from '~/store/book';
+import { FiltersSheetModal } from '~/components/FiltersSheetModal';
 // import { LinearGradient } from 'expo-linear-gradient';
 
 const ListItem = ({
@@ -113,6 +114,8 @@ export default function Index() {
           }}
           pointerEvents="none"
         /> */}
+
+        <FiltersSheetModal />
       </View>
     </View>
   );

@@ -6,6 +6,7 @@ import { Platform, Pressable, PressableProps, View, ViewStyle } from 'react-nati
 import { TextClassContext } from '~/components/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { convertToRGBA } from '~/lib/utils';
 import { COLORS } from '~/theme/colors';
 
 const buttonVariants = cva('flex-row items-center justify-center gap-2', {
@@ -67,20 +68,6 @@ const buttonTextVariants = cva('font-medium', {
     size: 'md',
   },
 });
-
-function convertToRGBA(rgb: string, opacity: number): string {
-  const rgbValues = rgb.match(/\d+/g);
-  if (!rgbValues || rgbValues.length !== 3) {
-    throw new Error('Invalid RGB color format');
-  }
-  const red = parseInt(rgbValues[0], 10);
-  const green = parseInt(rgbValues[1], 10);
-  const blue = parseInt(rgbValues[2], 10);
-  if (opacity < 0 || opacity > 1) {
-    throw new Error('Opacity must be a number between 0 and 1');
-  }
-  return `rgba(${red},${green},${blue},${opacity})`;
-}
 
 const ANDROID_RIPPLE = {
   dark: {

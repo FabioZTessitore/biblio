@@ -3,6 +3,10 @@ import { TabBarIcon } from '~/components/TabBarIcon';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { useUserStore } from '~/store/user';
+import { Button } from '~/components/nativewindui/Button';
+import { Text } from '~/components/Text';
+import { Icon } from '~/components/Icon';
+import { useFiltersStore } from '~/store';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
@@ -29,6 +33,20 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon name="home" color={focused ? colors.primary : colors.grey2} />
     ),
+    headerRight: () => {
+      const { openFiltersModal } = useFiltersStore();
+
+      return (
+        <Button
+          onPress={openFiltersModal}
+          variant="plain"
+          size={'none'}
+          className="mr-6 bg-transparent">
+          <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
+          <Text color={'primary'}>Filters</Text>
+        </Button>
+      );
+    },
   } as TabsProps;
 
   const OTHER_OPTIONS = {
