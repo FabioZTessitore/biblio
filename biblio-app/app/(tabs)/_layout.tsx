@@ -24,7 +24,8 @@ export default function TabLayout() {
 
   const INDEX_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Home',
+    title: 'Lista dei libri',
+    headerTitleStyle: { fontSize: 24 },
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon name="home" color={focused ? colors.primary : colors.grey2} />
     ),
