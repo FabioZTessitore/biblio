@@ -2,12 +2,14 @@ import { Tabs, Href } from 'expo-router';
 import { TabBarIcon } from '~/components/TabBarIcon';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { useUserStore } from '~/store';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
 };
 
 export default function TabLayout() {
+  const { id } = useUserStore();
   const { colors } = useColorScheme();
 
   const SCREEN_OPTIONS = {
@@ -46,8 +48,8 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
-      <Tabs.Screen name="other" options={OTHER_OPTIONS} />
-      <Tabs.Screen name="addBook" options={ADD_BOOK} />
+      {!id && <Tabs.Screen name="other" options={OTHER_OPTIONS} />}
+      {id && <Tabs.Screen name="addBook" options={ADD_BOOK} />}
     </Tabs>
   );
 }

@@ -1,45 +1,27 @@
-import { router } from 'expo-router';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export interface TUserState {
-  username: string;
-  isAuthenticated: boolean;
+interface userStore {
+  id: string;
+  name: string;
+  surname: string;
+  email: string;
+  schoolsId: string[];
+  booksId: string[];
+  updateUser: (id: string, name: string, surname: string, image: string, email: string) => void;
+  addSchool: (newSchoolId: string) => void;
+  addBook: (newBookId: string) => void;
 }
 
-export interface TUserMutations {}
-
-export interface TUserAction {
-  login: () => void;
-}
-
-export type TUserStore = TUserState & TUserMutations & TUserAction;
-
-const profileState = <TUserState>{
-  username: '',
-  isAuthenticated: false,
-};
-
-const profileMutations = <TUserMutations>{};
-
-const profileAction = <TUserAction>{
-  login: () => {
-    useUserStore.setState({ isAuthenticated: true });
-    router.replace('/(tabs)');
-  },
-};
-
-export const useUserStore = create<TUserStore>()(
-  persist(
-    () => ({
-      ...profileState,
-      ...profileMutations,
-      ...profileAction,
-    }),
-    {
-      name: 'profileStore',
-      // storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);
+export const useUserStore = create<userStore>()((set) => ({
+  id: '',
+  name: '',
+  surname: '',
+  image: '',
+  email: '',
+  schoolsId: [],
+  booksId: [],
+  updateUser: (id, name, surname, image, email) => set(() => ({ id, name, surname, image, email })),
+  addSchool: (newSchoolId: string) =>
+    set((state) => ({ schoolsId: [...state.schoolsId, newSchoolId] })),
+  addBook: (newBookId: string) => set((state) => ({ booksId: [...state.booksId, newBookId] })),
+}));
