@@ -39,7 +39,7 @@ export default function TabLayout() {
     ...SCREEN_OPTIONS,
     title: 'Aggiungi Libro',
     tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon name="ellipsis-h" color={focused ? colors.primary : colors.grey2} />
+      <TabBarIcon name="book" color={focused ? colors.primary : colors.grey2} />
     ),
   } as TabsProps;
 
@@ -47,6 +47,7 @@ export default function TabLayout() {
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
       <Tabs.Screen name="other" options={OTHER_OPTIONS} />
+      <Tabs.Screen name="addBook" options={ADD_BOOK} />
     </Tabs>
   );
 }
