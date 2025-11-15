@@ -1,11 +1,13 @@
 <script setup>
-import { db } from "../db_config";
+import { db } from "./firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, doc, setDoc } from "firebase/firestore";
-
+import { auth } from "./firebase";
 import { ref } from "vue";
 
 const email = ref("");
+const name = ref("");
+const surname = ref("");
 const password = ref("Cambiami");
 const scuolaId = ref("");
 
@@ -14,13 +16,17 @@ const signupHandler = () => {
 };
 
 function signUpAndLogin(email, password) {
-  const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       const user = userCredential.user;
       console.log(user);
+
       await setDoc(doc(db, "users", user.uid), {
-        scuolaId: scuolaId.value,
+        email: email,
+        name: name.value,
+        surname: surname.value,
+        books: [],
+        schoolId: scuolaId.value,
       });
     })
     .catch((error) => {
@@ -55,33 +61,23 @@ readScuoleData();
     </p>
     <form class="form" @submit.prevent="signupHandler">
       <div class="form__group">
-        <input
-          type="email"
-          id="email"
-          name="email"
-          class="form__input"
-          v-model="email"
-          placeholder="email"
-        />
+        <input type="text" id="name" name="name" class="form__input" v-model="name" placeholder="Nome" />
+        <label for="name" class="form__label">Nome</label>
+      </div>
+      <div class="form__group">
+        <input type="text" id="surname" name="surname" class="form__input" v-model="surname" placeholder="Cognome" />
+        <label for="surname" class="form__label">surname</label>
+      </div>
+      <div class="form__group">
+        <input type="email" id="email" name="email" class="form__input" v-model="email" placeholder="email" />
         <label for="email" class="form__label">Email</label>
       </div>
       <div class="form__group">
-        <input
-          type="text"
-          id="password"
-          name="password"
-          class="form__input"
-          v-model="password"
-        />
+        <input type="text" id="password" name="password" class="form__input" v-model="password" />
         <label for="password" class="form__label">Password</label>
       </div>
       <div class="form__group">
-        <select
-          name="scuola"
-          id="scuola"
-          class="form__input"
-          v-model="scuolaId"
-        >
+        <select name="scuola" id="scuola" class="form__input" v-model="scuolaId">
           <option v-for="scuola in scuole" :value="scuola.id">
             {{ scuola.data.nome }}, {{ scuola.data.loc }}
           </option>
