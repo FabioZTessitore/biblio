@@ -66,8 +66,7 @@ const ListItem = ({
 
 export default function Index() {
   const { books } = useBookStore();
-
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { library } = useUserStore();
 
   const handlePress = (item: Book) => {
     console.log('Pressed:', item.title);

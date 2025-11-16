@@ -1,14 +1,12 @@
 import { Text } from './Text';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BottomSheetModal, BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useFiltersStore } from '~/store';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
-import { SearchInput } from './nativewindui/SearchInput';
 import { Pressable, View } from 'react-native';
 import { Icon } from './Icon';
-import { Filter } from '~/store/filters';
-import { cn } from '~/lib/cn';
+import { Button } from './nativewindui/Button';
 
 const FiltersSheetModal = () => {
   const { filters, filtersModal, setFiltersModal } = useFiltersStore();
@@ -71,6 +69,10 @@ const FiltersSheetModal = () => {
             </View>
           ))}
         </View>
+        {/* 
+        <Button variant="primary">
+          <Text>Applica</Text>
+        </Button> */}
       </BottomSheetView>
     </BottomSheetModal>
   );
