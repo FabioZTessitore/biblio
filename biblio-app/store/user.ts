@@ -1,16 +1,30 @@
-import { router } from 'expo-router';
 import { create } from 'zustand';
+import { router } from 'expo-router';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { Book } from './book';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export interface TUserState {
-  username: string;
-  isAuthenticated: boolean;
-  library: Book[];
+interface Profile {
+  name: string;
+  surname: string;
+  email: string;
+  booksId: string[];
+  schoolsId: string[];
 }
 
-export interface TUserMutations {}
+export interface TUserState {
+  library: Book[];
+
+  profile: Profile | null;
+
+  uid: string | null;
+}
+
+export interface TUserMutations {
+  addBookToLibrary: (book: Book) => void;
+  setProfile: (profile: Profile) => void;
+  setUid: (uid: string) => void;
+}
 
 export interface TUserAction {
   login: () => void;
@@ -19,18 +33,24 @@ export interface TUserAction {
 export type TUserStore = TUserState & TUserMutations & TUserAction;
 
 const profileState = <TUserState>{
-  username: '',
-  isAuthenticated: false,
   library: [],
+
+  profile: null,
+
+  uid: null,
 };
 
-const profileMutations = <TUserMutations>{};
+const profileMutations = <TUserMutations>{
+  setProfile: (profile: Profile) => useUserStore.setState({ profile }),
+};
 
 const profileAction = <TUserAction>{
   login: () => {
-    useUserStore.setState({ isAuthenticated: true });
+    // fetch profile from db
     router.replace('/(tabs)');
   },
+
+  // addBook: (newBookId: string) => set((state) => ({ booksId: [...state.booksId, newBookId] })),
 };
 
 export const useUserStore = create<TUserStore>()(
@@ -42,7 +62,7 @@ export const useUserStore = create<TUserStore>()(
     }),
     {
       name: 'profileStore',
-      // storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );

@@ -1,7 +1,6 @@
-import { router } from 'expo-router';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Book {
   id: string;
@@ -49,7 +48,7 @@ export const useBookStore = create<TBookStore>()(
     }),
     {
       name: 'bookStore',
-      // storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );

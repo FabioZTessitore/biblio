@@ -1,6 +1,5 @@
-import { router } from 'expo-router';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface School {
