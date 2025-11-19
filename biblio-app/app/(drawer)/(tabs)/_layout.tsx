@@ -6,6 +6,7 @@ import { Button } from '~/components/nativewindui/Button';
 import { Text } from '~/components/Text';
 import { Icon } from '~/components/Icon';
 import { useFiltersStore, useUserStore } from '~/store';
+import { Alert } from 'react-native';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
@@ -51,6 +52,40 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
+    headerRight: () => {
+      const { library, setLibrary } = useUserStore();
+
+      const isEmpty = library.length <= 0;
+
+      return (
+        <Button
+          variant="plain"
+          className="mr-6"
+          size={'icon'}
+          disabled={isEmpty}
+          onPress={() => {
+            Alert.alert('Attenzione!', 'Vuoi eliminare tutta la libreria?', [
+              {
+                text: 'Annulla',
+                style: 'cancel',
+                isPreferred: true,
+              },
+              {
+                text: 'Sì',
+                style: 'destructive',
+                onPress: () => {
+                  setLibrary([]);
+                },
+              },
+            ]);
+          }}>
+          <Icon
+            type="MaterialCommunityIcons"
+            name={isEmpty ? 'delete-empty-outline' : 'delete-outline'}
+          />
+        </Button>
+      );
+    },
   } as TabsProps;
 
   // const ADD_BOOK = {
