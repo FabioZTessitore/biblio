@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Text } from '~/components/ui';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +7,10 @@ import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
 import Toast from 'react-native-toast-message';
-
+import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
+import loginHelper from '~/lib/loginHelper';
+import { router } from 'expo-router';
+import { auth } from '~/lib/firebase';
 export default function LogIn() {
   const insets = useSafeAreaInsets();
   const [currentEmail, setCurrentEmail] = useState('');
@@ -19,42 +22,49 @@ export default function LogIn() {
     //   return false;
     // }
     // Controllo password sia lunga almeno 8 caratteri
-    if (!currentPassword || currentPassword.length <= 8) {
+    if (!currentPassword || currentPassword.length < 8) {
       return false;
     }
     return true;
   };
 
   const loginHandler = async () => {
+    console.log('in login');
+
     if (currentEmail.trim().length === 0 || currentPassword.length === 0) {
-      Alert.alert(
-        'Authentication failed!',
-        'Could not log you in. Please check your credentials or try again later!'
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Authentication failed!',
+        text2: 'Could not log you in. Please check your credentials or try again later!',
+      });
       return;
     }
+    // setIsLoading(true);
     try {
-      Toast.show({
-        type: 'success',
-        text1: 'Logging!',
-        text2: 'You must verify your email address to gain access.',
-      });
-      // const user = await signInWithEmailAndPassword(auth, currentEmail, currentPassword);
-      // if (user) {
-      //   const userId = user.user.uid;
-      //   const token = await user.user.getIdToken();
-      //   await fetchRoutes(userId);
-      //   await fetchCountryCodes();
-      //   await fetchTags();
-      //   await fetchOwnRewiew(userId);
-      //   await loginHelper(token, userId);
+      const userCredential = await signInWithEmailAndPassword(auth, currentEmail, currentPassword);
+      const user = userCredential.user;
+
+      // if (user.emailVerified) {
+      const userId = userCredential.user.uid;
+      const token = await userCredential.user.getIdToken();
+      await loginHelper(token, userId, true);
+      router.push('/(drawer)/(tabs)/homeBibliotecaio');
+      // } else {
+      // Toast.show({
+      //   type: 'error',
+      //   text1: 'Email has not been verified!',
+      //   text2: 'You must verify your email address to gain access.',
+      // });
       // }
     } catch (err) {
       console.log(err);
-      Alert.alert(
-        'Authentication failed!',
-        'Could not log you in. Please check your credentials or try again later!'
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Authentication failed!',
+        text2: 'Could not log you in. Please check your credentials or try again later!',
+      });
+    } finally {
+      // setIsLoading(false);
     }
   };
 

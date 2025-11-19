@@ -16,7 +16,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
 import { useEffect } from 'react';
-import { useBookStore, useUserStore } from '~/store';
+import { useBookStore } from '~/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -59,7 +59,7 @@ export default function RootLayout() {
               </Stack>
             </NavThemeProvider>
           </KeyboardProvider>
-          {/* <Toast config={toastConfig} /> */}
+          <Toast config={toastConfig} />
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
 

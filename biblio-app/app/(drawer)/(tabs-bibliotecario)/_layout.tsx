@@ -108,7 +108,7 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
-      <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
+      <Tabs.Screen name="addBook" />
     </Tabs>
   );
 }
