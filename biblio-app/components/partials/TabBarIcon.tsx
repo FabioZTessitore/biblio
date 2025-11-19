@@ -2,7 +2,7 @@ import { Icon, IconType } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 
 interface TabBarIconProps {
-  size?: number | 26;
+  size?: 'display' | 'heading' | 'body' | 'label' | number;
   type?: IconType; // se non lo metti, default = 'MaterialIcons'
   name: string; // accetta string generica
   active: boolean;
@@ -14,7 +14,7 @@ export const TabBarIcon = (props: TabBarIconProps) => {
 
   return (
     <Icon
-      size={28}
+      size={props.size ?? 'heading'}
       color={props.active ? colors.primary : colors.grey2}
       className="mb-1"
       {...props}

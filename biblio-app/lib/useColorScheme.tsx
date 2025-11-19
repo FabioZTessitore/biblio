@@ -8,6 +8,8 @@ import { COLORS } from '~/theme/colors';
 function useColorScheme() {
   const { colorScheme, setColorScheme: setNativeWindColorScheme } = useNativewindColorScheme();
 
+  setColorScheme('dark'); // TODO: forzatura ui dark, da testare anche i colori light
+
   async function setColorScheme(colorScheme: 'light' | 'dark') {
     setNativeWindColorScheme(colorScheme);
     if (Platform.OS !== 'android') return;

@@ -38,8 +38,8 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
     headerLeft: () => {
       return (
-        <Button onPress={openDrawer} variant="plain" size={'md'} className="bg-transparent">
-          <Icon color={colors.primary} type="MaterialCommunityIcons" name="menu" />
+        <Button onPress={openDrawer} variant="plain" size={'icon'}>
+          <Icon color={colors.grey2} type="MaterialCommunityIcons" name="menu" />
         </Button>
       );
     },
