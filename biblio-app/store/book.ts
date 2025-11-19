@@ -1,43 +1,75 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { db } from '~/lib/firebase';
+import { useUserStore } from './user';
 
 export interface Book {
   id: string;
   title: string;
-  schoolId: string;
-  author?: string;
+  schoolId?: string;
+  author: string;
   qty?: number | 1;
+  availbale: boolean;
 }
 
 export interface TBookState {
   books: Book[];
+  bookModal: boolean;
 }
 
 export interface TBookMutations {
   setBooks: (books: Book[]) => void;
+  setBookModal: (isOpen: boolean) => void;
 }
 
-export interface TBookAction {}
+export interface TBookAction {
+  loadBooks: () => void;
+  saveBook: () => void;
+}
 
 export type TBookStore = TBookState & TBookMutations & TBookAction;
 
 const bookState = <TBookState>{
   books: [
-    { id: '1', title: '1984', author: 'George Orwell' },
-    { id: '2', title: 'To Kill a Mockingbird', author: 'Harper Lee' },
-    { id: '3', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald' },
-    { id: '4', title: 'Moby Dick', author: 'Herman Melville' },
-    { id: '5', title: 'Fahrenheit 451', author: 'Ray Bradbury' },
-    { id: '6', title: 'Brave New World', author: 'Aldous Huxley' },
+    { id: '1', title: '1984', author: 'George Orwell', availbale: true },
+    { id: '2', title: 'To Kill a Mockingbird', author: 'Harper Lee', availbale: true },
+    { id: '3', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', availbale: true },
+    { id: '4', title: 'Moby Dick', author: 'Herman Melville', availbale: true },
+    { id: '5', title: 'Fahrenheit 451', author: 'Ray Bradbury', availbale: true },
+    { id: '6', title: 'Brave New World', author: 'Aldous Huxley', availbale: true },
   ],
 };
 
 const bookMutations = <TBookMutations>{
   setBooks: (books) => useBookStore.setState({ books }),
+
+  setBookModal: (isOpen: boolean) => useBookStore.setState({ bookModal: isOpen }),
 };
 
-const bookAction = <TBookAction>{};
+const bookAction = <TBookAction>{
+  loadBooks: async () => {
+    const { uid } = useUserStore.getState();
+    const { setBooks } = useBookStore.getState();
+
+    const q = query(collection(db, 'books'), where('userId', '==', uid));
+    const querySnapshot = await getDocs(q);
+
+    const newBooks: Book[] = [];
+
+    querySnapshot.forEach((doc) => {
+      newBooks.push({
+        id: doc.id,
+        ...doc.data(),
+      } as Book);
+    });
+
+    setBooks(newBooks);
+  },
+
+  saveBook: async () => {},
+};
 
 export const useBookStore = create<TBookStore>()(
   persist(
