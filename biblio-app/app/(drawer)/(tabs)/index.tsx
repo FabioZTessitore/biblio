@@ -2,13 +2,17 @@ import { View, FlatList } from 'react-native';
 import { useBookStore, useFiltersStore, useUserStore } from '~/store';
 import { Book } from '~/store/book';
 import { FiltersSheetModal } from '~/components/partials/FiltersSheetModal';
+import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials/BookCard';
 import { AddBookSheetModal } from '~/components/partials/AddBookSheetModal';
 import { Button } from '~/components/nativewindui/Button';
 import { Icon } from '~/components/Icon';
-
+import { useColorScheme } from '~/lib/useColorScheme';
+import { convertToRGBA } from '~/lib/utils';
 
 export default function Index() {
+  const { colors } = useColorScheme();
+
   const { books, setBookModal } = useBookStore();
   const { library, addBookToLibrary } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
@@ -58,16 +62,18 @@ export default function Index() {
           </View>
         )}
 
+        <LinearGradient
+          colors={[colors.background, convertToRGBA(colors.background, 0)]}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
-            height: 40,
+            height: 10,
             zIndex: 10,
           }}
           pointerEvents="none"
-        /> */}
+        />
 
         <FiltersSheetModal />
         {true && <AddBookSheetModal />}
