@@ -1,19 +1,28 @@
 import { Alert } from 'react-native';
-import { Tabs, Href } from 'expo-router';
+import { Tabs, Href, useNavigation } from 'expo-router';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { Text, Icon } from '~/components/ui';
 import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import { useFiltersStore, useUserStore } from '~/store';
+import { DrawerActions } from '@react-navigation/native';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
 };
 
 export default function TabLayout() {
-  const { uid } = useUserStore();
+  const navigation = useNavigation();
+  const { openFiltersModal } = useFiltersStore();
+  const { library, setLibrary } = useUserStore();
   const { colors } = useColorScheme();
+
+  // const { uid } = useUserStore();
+
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
 
   const SCREEN_OPTIONS = {
     headerStyle: {
@@ -29,9 +38,14 @@ export default function TabLayout() {
     title: 'Lista dei libri',
     headerTitleStyle: { fontSize: 24 },
     tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
+    headerLeft: () => {
+      return (
+        <Button onPress={openDrawer} variant="plain" size={'md'} className="bg-transparent">
+          <Icon color={colors.primary} type="MaterialCommunityIcons" name="menu" />
+        </Button>
+      );
+    },
     headerRight: () => {
-      const { openFiltersModal } = useFiltersStore();
-
       return (
         <Button
           onPress={openFiltersModal}
@@ -52,8 +66,6 @@ export default function TabLayout() {
       <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
     headerRight: () => {
-      const { library, setLibrary } = useUserStore();
-
       const isEmpty = library.length <= 0;
 
       return (
