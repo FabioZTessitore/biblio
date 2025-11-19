@@ -1,28 +1,38 @@
 import { router } from 'expo-router';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Book } from './book';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export interface Filter {
-  group: string;
-  items: {
-    id: string;
-    name: string;
-    value: string;
-  }[];
+export interface FilterItem {
+  id: string;
+  name: string;
+  value: string;
+  type: 'text' | 'select';
+  options?: string[];
 }
 
+export interface FilterGroups {
+  group: string;
+  items: FilterItem[];
+}
+
+type Filters = FilterGroups[];
+
 export interface TFiltersState {
-  filters: Filter[];
+  filters: Filters;
   filtersModal: boolean;
 }
 
 export interface TFiltersMutations {
+  resetFilters: () => void;
   setFiltersModal: (isOpen: boolean) => void;
+  updateFilterValue: (group: string, id: string, value: string) => void;
 }
 
 export interface TFiltersAction {
   openFiltersModal: () => void;
+  applyFilters: (books: Book[], filters: Filters) => Book[];
 }
 
 export type TFiltersStore = TFiltersState & TFiltersMutations & TFiltersAction;
@@ -32,20 +42,55 @@ const filtersState = <TFiltersState>{
     {
       group: 'libro',
       items: [
-        { id: '1', name: 'Autore', value: 'Geronimo Stilton' },
-        { id: '2', name: 'Titolo', value: 'Le avventure...' },
+        {
+          id: 'title',
+          name: 'Titolo',
+          value: '',
+          type: 'text',
+        },
+        {
+          id: 'author',
+          name: 'Autore',
+          value: '',
+          type: 'text',
+        },
       ],
     },
     {
       group: 'altro',
-      items: [{ id: '3', name: 'Disponibilità', value: 'Tutti' }],
+      items: [
+        {
+          id: 'availbale',
+          name: 'Disponibilità',
+          value: 'Tutti',
+          type: 'select',
+          options: ['Tutti', 'Si', 'No'],
+        },
+      ],
     },
   ],
+
   filtersModal: false,
 };
 
 const filtersMutations = <TFiltersMutations>{
-  setFiltersModal: (isOpen: boolean) => useFiltersStore.setState({ filtersModal: isOpen }),
+  resetFilters: () => useFiltersStore.setState(() => ({ ...filtersState })),
+
+  setFiltersModal: (isOpen) => useFiltersStore.setState({ filtersModal: isOpen }),
+
+  updateFilterValue: (group, id, value) =>
+    useFiltersStore.setState((state) => {
+      const newFilters = state.filters.map((section) => {
+        if (section.group !== group) return section;
+
+        return {
+          ...section,
+          items: section.items.map((f) => (f.id === id ? { ...f, value } : f)),
+        };
+      });
+
+      return { filters: newFilters };
+    }),
 };
 
 const filtersAction = <TFiltersAction>{
@@ -53,6 +98,43 @@ const filtersAction = <TFiltersAction>{
     const { setFiltersModal } = useFiltersStore.getState();
 
     setFiltersModal(true);
+  },
+
+  applyFilters: (books, filters) => {
+    let filtered = books;
+
+    filters.forEach((group) => {
+      group.items.forEach((filter) => {
+        if (!filter.value || filter.value === '') return;
+
+        switch (filter.id) {
+          case 'title':
+            filtered = filtered.filter((book) =>
+              book.title.toLowerCase().includes(filter.value.toLowerCase())
+            );
+            break;
+
+          case 'author':
+            filtered = filtered.filter((book) =>
+              book.author.toLowerCase().includes(filter.value.toLowerCase())
+            );
+            break;
+
+          case 'availbale':
+            if (filter.value === 'Tutti') return;
+            if (filter.value === 'Si')
+              filtered = filtered.filter((book) => book.availbale === true);
+            if (filter.value === 'No')
+              filtered = filtered.filter((book) => book.availbale === false);
+            break;
+
+          default:
+            break;
+        }
+      });
+    });
+
+    return filtered;
   },
 };
 

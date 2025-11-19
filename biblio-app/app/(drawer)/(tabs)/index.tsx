@@ -1,4 +1,7 @@
 import { View, FlatList } from 'react-native';
+import { useBookStore, useFiltersStore, useUserStore } from '~/store';
+import { Book } from '~/store/book';
+import { FiltersSheetModal } from '~/components/partials/FiltersSheetModal';
 import { BookCard } from '~/components/partials/BookCard';
 import { Button } from '~/components/nativewindui/Button';
 import { Text } from '~/components/Text';
@@ -7,7 +10,9 @@ import { Icon } from '~/components/Icon';
 
 
 export default function Index() {
+  const { books, setBookModal } = useBookStore();
   const { library, addBookToLibrary } = useUserStore();
+  const { filters, applyFilters } = useFiltersStore();
 
   const handlePress = (item: Book) => {
     console.log('Pressed:', item.title);
@@ -16,6 +21,8 @@ export default function Index() {
   };
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
+
+  const filteredBooks = applyFilters(books, filters);
 
   return (
     <View className="flex-1 gap-4 px-4">
@@ -30,7 +37,7 @@ export default function Index() {
 
       <View className="flex-1">
         <FlatList
-          data={books}
+          data={filteredBooks}
           keyExtractor={(item) => item.id}
           contentContainerClassName="gap-14 py-8"
           className="rounded-md"
