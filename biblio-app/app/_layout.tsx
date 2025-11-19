@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from '~/lib/toastConfig';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import * as SecureStore from 'expo-secure-store';
+// import * as SecureStore from 'expo-secure-store';
 
 import { StatusBar } from 'expo-status-bar';
 
@@ -15,8 +15,8 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
-import { useCallback, useEffect, useState } from 'react';
-import loginHelper from '~/lib/loginHelper';
+import { useEffect } from 'react';
+import { useBookStore, useUserStore } from '~/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -24,46 +24,22 @@ export {
 } from 'expo-router';
 
 export default function RootLayout() {
-  const [appIsReady, setAppIsReady] = useState(false);
-
-  // TODO: da vedere se le nuove versioni lo richiedono ancora
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
-      await SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
-
-  // TODO: da vedere se le nuove versioni lo richiedono ancora
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await SplashScreen.preventAutoHideAsync();
-        const storedToken = await SecureStore.getItemAsync('token');
-        const storedUid = await SecureStore.getItemAsync('uid');
-        // const storedTheme = await SecureStore.getItemAsync('theme');
-        // if (storedTheme) {
-        //   Appearance.setColorScheme(theme);
-        // }
-
-        if (storedToken && storedUid) {
-          await loginHelper(storedToken, storedUid, true);
-        }
-        // else {
-        //   // se non è loggato nessun utente, imposto le preferenze di default
-        //   await setDefaultPreferences();
-        // }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setAppIsReady(true);
-      }
-    }
-
-    prepare();
-  }, []);
-
   useInitialAndroidBarSync();
+  SplashScreen.preventAutoHideAsync();
+
   const { colorScheme, isDarkColorScheme } = useColorScheme();
+  // const { uid } = useUserStore();
+  const { loadBooks } = useBookStore();
+
+  useEffect(() => {
+    async function init() {
+      // loadBooks()
+      // loadPrifile()
+      SplashScreen.hideAsync();
+    }
+
+    init();
+  }, []);
 
   return (
     <>
@@ -74,7 +50,7 @@ export default function RootLayout() {
       {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
       {/* <ExampleProvider> */}
 
-      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
           <KeyboardProvider>
             <NavThemeProvider value={NAV_THEME[colorScheme]}>
@@ -83,7 +59,7 @@ export default function RootLayout() {
               </Stack>
             </NavThemeProvider>
           </KeyboardProvider>
-          <Toast config={toastConfig} />
+          {/* <Toast config={toastConfig} /> */}
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
 

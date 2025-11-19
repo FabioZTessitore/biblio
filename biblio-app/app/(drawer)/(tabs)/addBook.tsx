@@ -8,7 +8,7 @@ import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
 import Toast from 'react-native-toast-message';
 
-export default function AddBook() {
+function AddBook() {
   const insets = useSafeAreaInsets();
   const [currentEmail, setCurrentEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');

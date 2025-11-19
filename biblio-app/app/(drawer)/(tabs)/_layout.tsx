@@ -19,7 +19,7 @@ export default function TabLayout() {
     headerStyle: {
       backgroundColor: colors.background,
     },
-    headerShown: false,
+    headerShown: true,
     headerShadowVisible: false,
     headerTitleContainerStyle: { marginLeft: 24 },
   } as TabsProps;
@@ -47,27 +47,27 @@ export default function TabLayout() {
     },
   } as TabsProps;
 
-  const OTHER_OPTIONS = {
+  const LIBRARY_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Other',
+    title: 'Libreria',
     tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon name="ellipsis-h" color={focused ? colors.primary : colors.grey2} />
+      <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
   } as TabsProps;
 
-  const ADD_BOOK = {
-    ...SCREEN_OPTIONS,
-    title: 'Aggiungi Libro',
-    tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon name="book" color={focused ? colors.primary : colors.grey2} />
-    ),
-  } as TabsProps;
+  // const ADD_BOOK = {
+  //   ...SCREEN_OPTIONS,
+  //   title: 'Aggiungi Libro',
+  //   tabBarIcon: ({ focused, size }) => (
+  //     <TabBarIcon name="book" color={focused ? colors.primary : colors.grey2} />
+  //   ),
+  // } as TabsProps;
 
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
-      {!uid && <Tabs.Screen name="other" options={OTHER_OPTIONS} />}
-      {uid && <Tabs.Screen name="addBook" options={ADD_BOOK} />}
+      <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
+      {/* {uid && <Tabs.Screen name="addBook" options={ADD_BOOK} />} */}
     </Tabs>
   );
 }
