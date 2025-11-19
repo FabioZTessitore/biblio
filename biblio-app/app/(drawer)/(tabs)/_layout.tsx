@@ -28,9 +28,7 @@ export default function TabLayout() {
     ...SCREEN_OPTIONS,
     title: 'Lista dei libri',
     headerTitleStyle: { fontSize: 24 },
-    tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon name="home" color={focused ? colors.primary : colors.grey2} />
-    ),
+    tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
     headerRight: () => {
       const { openFiltersModal } = useFiltersStore();
 
