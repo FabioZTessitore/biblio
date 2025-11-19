@@ -31,7 +31,7 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
             <Icon name="star" size={'body'} color="#ca8a04" />
             <Text variant="label">4,6</Text>
             {/*TODO: fix colors tailwind css 'muted'*/}
-            <Text variant="label" className="color-gray-400">
+            <Text variant="label" color={'muted'}>
               {'(+150 reviews)'}
             </Text>
           </View>
@@ -39,10 +39,8 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
 
         {/* Titolo e Autore */}
         <View className="gap-2">
-          <Text variant="body" className="text-wrap">
-            {item.title}
-          </Text>
-          <Text variant="label" className="text-wrap text-gray-400">
+          <Text>{item.title}</Text>
+          <Text variant="label" color={'muted'}>
             di {item.author}
           </Text>
         </View>
@@ -67,9 +65,9 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
             </Button>
           ) : (
             <Button
-              android_ripple={{ foreground: true, color: '#fed7aa' }}
+              android_ripple={{ foreground: true, color: '#ffffff30' }}
               onPress={onPress}
-              className={'bg-primary-test bg-orange-600'}>
+              className={'bg-secondary'}>
               <Icon size={'body'} name="add" />
               <Text>{'Libreria'}</Text>
             </Button>
