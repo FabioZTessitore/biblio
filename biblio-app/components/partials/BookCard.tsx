@@ -1,7 +1,6 @@
 import { View, Image } from 'react-native';
-import { Text } from '~/components/Text';
+import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/book';
-import { Icon } from '~/components/Icon';
 import { cn } from '~/lib/cn';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';

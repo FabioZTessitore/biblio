@@ -1,12 +1,12 @@
 import { View, FlatList } from 'react-native';
 import { useBookStore, useFiltersStore, useUserStore } from '~/store';
 import { Book } from '~/store/book';
-import { FiltersSheetModal } from '~/components/partials/FiltersSheetModal';
+import { FiltersSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BookCard } from '~/components/partials/BookCard';
-import { AddBookSheetModal } from '~/components/partials/AddBookSheetModal';
+import { BookCard } from '~/components/partials';
+import { AddBookSheetModal } from '~/components';
 import { Button } from '~/components/nativewindui/Button';
-import { Icon } from '~/components/Icon';
+import { Icon } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 

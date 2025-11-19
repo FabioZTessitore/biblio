@@ -1,5 +1,5 @@
 import { useAugmentedRef, useControllableState } from '@rn-primitives/hooks';
-import { Icon } from '~/components/Icon';
+import { Icon } from '~/components/ui';
 import { cva } from 'class-variance-authority';
 import * as React from 'react';
 import {

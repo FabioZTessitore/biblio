@@ -1,5 +1,5 @@
 import { useAugmentedRef, useControllableState } from '@rn-primitives/hooks';
-import { Icon } from '~/components/Icon';
+import { Text, Icon } from '~/components/ui';
 import { memo, forwardRef, useState, useCallback, useMemo } from 'react';
 import {
   Pressable,
@@ -17,7 +17,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { type SearchInputProps } from './types';
-import { Text } from '~/components/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
