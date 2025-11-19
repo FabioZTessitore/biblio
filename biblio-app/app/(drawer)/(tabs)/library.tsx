@@ -7,6 +7,8 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 import Reanimated, { FadeOutLeft, SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { Icon } from '~/components/Icon';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { convertToRGBA } from '~/lib/utils';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => {
   const { colors } = useColorScheme();
@@ -112,18 +114,18 @@ const Library = () => {
           )}
         />
 
-        {/* <LinearGradient
-          colors={['#050507', 'rgba(245,245,247,0)']}
+        <LinearGradient
+          colors={[colors.background, convertToRGBA(colors.background, 0)]}
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
-            height: 40,
+            height: 10,
             zIndex: 10,
           }}
           pointerEvents="none"
-        /> */}
+        />
       </View>
 
       {!isAuthenticated && library.length > 0 && (
