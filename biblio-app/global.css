@@ -18,8 +18,10 @@
     --muted-foreground: 142 142 147;
     --accent: 255 40 84;
     --accent-foreground: 255 255 255;
-    --destructive: 255 56 43;
+    --destructive: 188 47 47;
     --destructive-foreground: 255 255 255;
+    --success: 74, 222, 128;
+    --success-foreground: 255 255 255;
     --border: 230 230 235;
     --input: 210 210 215;
     --ring: 230 230 235;
@@ -38,8 +40,10 @@
     --android-muted-foreground: 65 71 84;
     --android-accent: 169 73 204;
     --android-accent-foreground: 255 255 255;
-    --android-destructive: 186 26 26;
+    --android-destructive: 188 47 47;
     --android-destructive-foreground: 255 255 255;
+    --android-success: 74, 222, 128;
+    --android-success-foreground: 255 255 255;
     --android-border: 215 217 228;
     --android-input: 210 210 215;
     --android-ring: 215 217 228;
@@ -61,8 +65,10 @@
       --muted-foreground: 142 142 147;
       --accent: 255 52 95;
       --accent-foreground: 255 255 255;
-      --destructive: 254 67 54;
+      --destructive: 188 47 47;
       --destructive-foreground: 255 255 255;
+      --success: 74, 222, 128;
+      --success-foreground: 255 255 255;
       --border: 40 40 42;
       --input: 55 55 57;
       --ring: 40 40 42;
@@ -81,8 +87,10 @@
       --android-muted-foreground: 139 144 160;
       --android-accent: 83 0 111;
       --android-accent-foreground: 238 177 255;
-      --android-destructive: 147 0 10;
+      --android-destructive: 188 47 47;
       --android-destructive-foreground: 255 255 255;
+      --android-success: 74, 222, 128;
+      --android-success-foreground: 255 255 255;
       --android-border: 39 42 50;
       --android-input: 55 55 57;
       --android-ring: 39 42 50;

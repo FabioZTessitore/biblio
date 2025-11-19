@@ -26,6 +26,10 @@ module.exports = {
           DEFAULT: withOpacity('destructive'),
           foreground: withOpacity('destructive-foreground'),
         },
+        success: {
+          DEFAULT: withOpacity('success'),
+          foreground: withOpacity('success-foreground'),
+        },
         muted: {
           DEFAULT: withOpacity('muted'),
           foreground: withOpacity('muted-foreground'),
