@@ -1,12 +1,11 @@
+import { Alert } from 'react-native';
 import { Tabs, Href } from 'expo-router';
-import { TabBarIcon } from '~/components/TabBarIcon';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { Text, Icon } from '~/components/ui';
+import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
-import { Text } from '~/components/Text';
-import { Icon } from '~/components/Icon';
 import { useFiltersStore, useUserStore } from '~/store';
-import { Alert } from 'react-native';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;

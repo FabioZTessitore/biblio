@@ -1,4 +1,4 @@
-import { Icon, IconType } from './Icon';
+import { Icon, IconType } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 
 interface TabBarIconProps {

@@ -1,15 +1,12 @@
-import { Text } from '~/components/Text';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { Text, Icon } from '~/components/ui';
+import { useState } from 'react';
+import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useFiltersStore } from '~/store';
-import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA, truncateText } from '~/lib/utils';
+import { truncateText } from '~/lib/utils';
 import { FlatList, Pressable, View } from 'react-native';
-import { Icon } from '~/components/Icon';
-import { SearchInput } from '../nativewindui/SearchInput';
+import { SearchInput } from './nativewindui/SearchInput';
 import { FilterItem } from '~/store/filters';
-import { Toggle } from '../nativewindui/Toggle';
-import { SheetModal } from '~/components/ui';
+import { SheetModal } from '~/components/partials';
 
 const FiltersSheetModal = () => {
   const { filters, filtersModal, setFiltersModal, resetFilters, updateFilterValue } =

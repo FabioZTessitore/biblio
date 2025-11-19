@@ -1,11 +1,8 @@
-import { FlatList, View, Image, StyleSheet, Pressable } from 'react-native';
-import { Text } from '~/components/Text';
+import { FlatList, View, Image, Pressable } from 'react-native';
+import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/book';
 import { useUserStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
-import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import Reanimated, { FadeOutLeft, SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import { Icon } from '~/components/Icon';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';

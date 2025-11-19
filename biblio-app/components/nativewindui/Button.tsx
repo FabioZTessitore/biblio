@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform, Pressable, PressableProps, View, ViewStyle } from 'react-native';
 
-import { TextClassContext } from '~/components/Text';
+import { TextClassContext } from '~/components/ui';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';

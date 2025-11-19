@@ -1,1 +1,2 @@
-export * from './SheetModal';
+export * from './Text';
+export * from './Icon';

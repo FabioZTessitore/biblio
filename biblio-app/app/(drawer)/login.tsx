@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Alert } from 'react-native';
-import { Text } from '~/components/Text';
+import { Text } from '~/components/ui';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keyboard-controller';

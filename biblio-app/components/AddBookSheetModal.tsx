@@ -1,17 +1,14 @@
-import { Text } from '~/components/Text';
+import { Text } from '~/components/ui';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { BottomSheetModal, BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { useBookStore, useFiltersStore } from '~/store';
+import { useBookStore } from '~/store';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA, truncateText } from '~/lib/utils';
-import { Pressable, View } from 'react-native';
-import { Icon } from '~/components/Icon';
-import { SearchInput } from '../nativewindui/SearchInput';
-import { Form, FormItem, FormSection } from '../nativewindui/Form';
-import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keyboard-controller';
-import { TextField } from '../nativewindui/TextField';
-import { Button } from '../nativewindui/Button';
-import { Toggle } from '../nativewindui/Toggle';
+import { convertToRGBA } from '~/lib/utils';
+import { View } from 'react-native';
+import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
+import { TextField } from '~/components/nativewindui/TextField';
+import { Button } from '~/components/nativewindui/Button';
+import { Toggle } from '~/components/nativewindui/Toggle';
 
 const AddBookSheetModal = () => {
   const { colors } = useColorScheme();
