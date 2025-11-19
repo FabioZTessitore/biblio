@@ -3,9 +3,8 @@ import { useBookStore, useFiltersStore, useUserStore } from '~/store';
 import { Book } from '~/store/book';
 import { FiltersSheetModal } from '~/components/partials/FiltersSheetModal';
 import { BookCard } from '~/components/partials/BookCard';
+import { AddBookSheetModal } from '~/components/partials/AddBookSheetModal';
 import { Button } from '~/components/nativewindui/Button';
-import { Text } from '~/components/Text';
-import { useBookStore, useUserStore } from '~/store';
 import { Icon } from '~/components/Icon';
 
 
@@ -51,8 +50,14 @@ export default function Index() {
           )}
         />
 
-        {/* <LinearGradient
-          colors={['#050507', 'rgba(245,245,247,0)']}
+        {true && (
+          <View className="absolute bottom-0 right-2 z-10 h-20">
+            <Button className="rounded-2xl p-4" size={'none'} onPress={() => setBookModal(true)}>
+              <Icon name="add" />
+            </Button>
+          </View>
+        )}
+
           style={{
             position: 'absolute',
             top: 0,
@@ -65,6 +70,7 @@ export default function Index() {
         /> */}
 
         <FiltersSheetModal />
+        {true && <AddBookSheetModal />}
       </View>
     </View>
   );

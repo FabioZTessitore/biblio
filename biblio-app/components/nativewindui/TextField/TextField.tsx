@@ -23,6 +23,7 @@ import type { TextFieldProps, TextFieldRef } from './types';
 
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
   (
@@ -46,6 +47,7 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
       materialVariant = 'outlined',
       materialRingColor,
       materialHideActionIcons,
+      type,
       ...props
     },
     ref
@@ -82,6 +84,8 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
     }
 
     const InputWrapper = materialVariant === 'filled' ? FilledWrapper : FilledWrapper;
+
+    const InputComponent = type === 'bottom-sheet' ? BottomSheetTextInput : TextInput;
 
     return (
       <Pressable
@@ -121,8 +125,8 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
                 hasError={!!errorMessage}
               />
             )}
-            <TextInput
-              ref={inputRef}
+            <InputComponent
+              ref={inputRef as any}
               testID="text-field-input"
               accessible={true}
               accessibilityRole="search" // prima era 'textbox'
@@ -133,8 +137,8 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
                 className
               )}
               placeholder={isFocused || !label ? placeholder : ''}
-              onFocus={onFocus}
-              onBlur={onBlur}
+              onFocus={onFocus as any}
+              onBlur={onBlur as any}
               onChangeText={onChangeText}
               value={value}
               accessibilityHint={accessibilityHint ?? errorMessage}
@@ -314,7 +318,12 @@ function MaterialClearIcon(props: MaterialClearIconProps) {
         disabled={props.editable === false}
         className="flex-1 justify-center px-2 active:opacity-65"
         onPress={props.clearText}>
-        <Icon color={colors.muted} type="AntDesign" name="closecircleo" size={24} />
+        <Icon
+          className="bg-muted"
+          type="MaterialCommunityIcons"
+          name="close-circle-outline"
+          size={24}
+        />
       </Pressable>
     </Animated.View>
   );
@@ -329,7 +338,12 @@ function MaterialErrorIcon() {
       entering={FadeIn.duration(200)}
       exiting={FadeOut.duration(200)}
       className="justify-center pr-2">
-      <Icon color={colors.destructive} type="AntDesign" name="closecircleo" size={24} />
+      <Icon
+        color={colors.destructive}
+        type="MaterialCommunityIcons"
+        name="close-circle-outline"
+        size={24}
+      />
     </Animated.View>
   );
 }

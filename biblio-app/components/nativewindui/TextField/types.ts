@@ -22,6 +22,7 @@ type TextFieldProps = TextInputProps & {
   materialRingColor?: string;
   materialHideActionIcons?: boolean;
   icon?: React.ReactNode;
+  type?: 'base' | 'bottom-sheet';
 };
 
 type TextFieldRef = TextInput;

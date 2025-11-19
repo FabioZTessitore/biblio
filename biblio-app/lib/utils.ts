@@ -11,3 +11,7 @@ export function convertToRGBA(rgb: string, opacity: number): string {
   }
   return `rgba(${red},${green},${blue},${opacity})`;
 }
+
+export const truncateText = (text: string, max: number = 40) => {
+  return text.length > max ? text.substring(0, max - 3) + '...' : text;
+};
