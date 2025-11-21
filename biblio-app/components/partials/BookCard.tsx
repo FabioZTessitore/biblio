@@ -1,9 +1,8 @@
 import { View, Image } from 'react-native';
 import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/book';
-import { cn } from '~/lib/cn';
 import { Button } from '~/components/nativewindui/Button';
-import { useColorScheme } from '~/lib/useColorScheme';
+// import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
 
 interface BookCardProps {
@@ -13,7 +12,7 @@ interface BookCardProps {
 }
 
 const BookCard = ({ item, selected, onPress }: BookCardProps) => {
-  const { colors } = useColorScheme();
+  // const { colors } = useColorScheme();
 
   const { isAuthenticated } = useUserStore();
 
@@ -54,12 +53,12 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
             <Icon
               size={'label'}
               name="circle"
-              color={item.availbale ? '#4ade80' : '#BC2F2F'}></Icon>
+              color={item.available ? '#4ade80' : '#BC2F2F'}></Icon>
             <Text
               weight={'light'}
               style={{ includeFontPadding: false }}
               className="flex-shrink uppercase">
-              {item.availbale ? 'Disponibile' : 'Non Disponibile'}
+              {item.available ? 'Disponibile' : 'Non Disponibile'}
             </Text>
           </View>
           {isAuthenticated ? (

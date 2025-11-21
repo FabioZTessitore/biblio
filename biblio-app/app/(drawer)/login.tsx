@@ -43,8 +43,12 @@ export default function LogIn() {
 
     try {
       login(currentEmail, currentPassword, true);
+      // non carica il profilo dopo il login perché asincrono
+      // ancora non è settatp l'uid quando viene chiamato
+      // ma perché login non è async?
       loadProfile();
-      console.log('profilo: ', profile);
+      // setCurrentEmail('');
+      // setCurrentPassword('');
     } catch (err) {
       console.log(err);
       Toast.show({

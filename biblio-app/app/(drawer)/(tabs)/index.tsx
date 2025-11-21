@@ -11,8 +11,7 @@ import { convertToRGBA } from '~/lib/utils';
 
 export default function Index() {
   const { colors } = useColorScheme();
-
-  const { books, setBookModal } = useBookStore();
+  const { books, bookModal, setBookModal } = useBookStore();
   const { library, addBookToLibrary, isAuthenticated } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
 
@@ -79,7 +78,7 @@ export default function Index() {
         />
 
         <FiltersSheetModal />
-        {true && <AddBookSheetModal />}
+        {bookModal && <AddBookSheetModal />}
       </View>
     </View>
   );
