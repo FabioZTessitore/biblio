@@ -6,7 +6,7 @@ import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keybo
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
-import Toast from 'react-native-toast-message';
+// import Toast from 'react-native-toast-message';
 
 export default function LogIn() {
   const insets = useSafeAreaInsets();
@@ -34,11 +34,11 @@ export default function LogIn() {
       return;
     }
     try {
-      Toast.show({
-        type: 'success',
-        text1: 'Logging!',
-        text2: 'You must verify your email address to gain access.',
-      });
+      // Toast.show({
+      //   type: 'success',
+      //   text1: 'Logging!',
+      //   text2: 'You must verify your email address to gain access.',
+      // });
       // const user = await signInWithEmailAndPassword(auth, currentEmail, currentPassword);
       // if (user) {
       //   const userId = user.user.uid;
@@ -85,11 +85,7 @@ export default function LogIn() {
                 value={currentPassword}
               />
               <TouchableOpacity className="self-end" onPress={() => {}}>
-                <Text
-                  style={{ fontFamily: 'TripSans' }}
-                  className="text-right text-base text-black">
-                  Forgot your password?
-                </Text>
+                <Text>Forgot your password?</Text>
               </TouchableOpacity>
             </FormItem>
           </FormSection>
