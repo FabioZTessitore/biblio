@@ -15,7 +15,7 @@ type TabsProps = BottomTabNavigationOptions & {
 export default function TabLayout() {
   const navigation = useNavigation();
   const { openFiltersModal } = useFiltersStore();
-  const { library, setLibrary } = useUserStore();
+  const { library, setLibrary, isAuthenticated } = useUserStore();
   const { colors } = useColorScheme();
 
   const openDrawer = () => {
@@ -97,18 +97,23 @@ export default function TabLayout() {
     },
   } as TabsProps;
 
-  // const ADD_BOOK = {
-  //   ...SCREEN_OPTIONS,
-  //   title: 'Aggiungi Libro',
-  //   tabBarIcon: ({ focused, size }) => (
-  //     <TabBarIcon name="book" color={focused ? colors.primary : colors.grey2} />
-  //   ),
-  // } as TabsProps;
+  const ADD_BOOK = {
+    ...SCREEN_OPTIONS,
+    title: 'Prenotazioni',
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon type="MaterialCommunityIcons" name="hand-extended" active={focused} />
+    ),
+  } as TabsProps;
 
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
-      <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
+      <Tabs.Protected guard={!isAuthenticated}>
+        <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
+      </Tabs.Protected>
+      <Tabs.Protected guard={isAuthenticated}>
+        <Tabs.Screen name="reservation" options={ADD_BOOK} />
+      </Tabs.Protected>
     </Tabs>
   );
 }

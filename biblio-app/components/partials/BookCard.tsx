@@ -4,6 +4,7 @@ import { Book } from '~/store/book';
 import { cn } from '~/lib/cn';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { useUserStore } from '~/store';
 
 interface BookCardProps {
   item: Book;
@@ -13,6 +14,8 @@ interface BookCardProps {
 
 const BookCard = ({ item, selected, onPress }: BookCardProps) => {
   const { colors } = useColorScheme();
+
+  const { isAuthenticated } = useUserStore();
 
   return (
     <View className={'flex-1 rounded-2xl bg-card p-4'}>
@@ -59,7 +62,15 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
               {item.availbale ? 'Disponibile' : 'Non Disponibile'}
             </Text>
           </View>
-          {selected ? (
+          {isAuthenticated ? (
+            <Button
+              android_ripple={{ foreground: true, color: '#ffffff30' }}
+              onPress={onPress}
+              className={'bg-secondary'}>
+              <Icon size={'body'} type="MaterialCommunityIcons" name="pencil" />
+              <Text>{'Modifica'}</Text>
+            </Button>
+          ) : selected ? (
             <Button className="bg-transparent">
               <Text className="text-success">{'Aggiunto'}</Text>
             </Button>

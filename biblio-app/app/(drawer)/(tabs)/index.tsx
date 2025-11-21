@@ -13,13 +13,17 @@ export default function Index() {
   const { colors } = useColorScheme();
 
   const { books, setBookModal } = useBookStore();
-  const { library, addBookToLibrary } = useUserStore();
+  const { library, addBookToLibrary, isAuthenticated } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
 
   const handlePress = (item: Book) => {
     console.log('Pressed:', item.title);
-    if (library.includes(item)) return; // Error: Libro già aggiunto alla libreria
-    addBookToLibrary(item);
+    if (isAuthenticated) {
+      // Modifica
+    } else {
+      if (library.includes(item)) return; // Error: Libro già aggiunto alla libreria
+      addBookToLibrary(item);
+    }
   };
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
@@ -53,7 +57,7 @@ export default function Index() {
           )}
         />
 
-        {true && (
+        {isAuthenticated && (
           <View className="absolute bottom-0 right-2 z-10 h-20">
             <Button className="rounded-2xl p-4" size={'none'} onPress={() => setBookModal(true)}>
               <Icon name="add" />

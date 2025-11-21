@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { Text } from '~/components/ui';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,42 +6,19 @@ import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keybo
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
-// import Toast from 'react-native-toast-message';
+import Toast from 'react-native-toast-message';
 
-export default function LogIn() {
+export default function AddBook() {
   const insets = useSafeAreaInsets();
   const [currentEmail, setCurrentEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
 
-  const allFieldsValid = (currentEmail: string, currentPassword: string) => {
-    // Controllo che la email inserita contenga una '@'
-    // if (!currentEmail || !currentEmail.includes('@')) {
-    //   return false;
-    // }
-    // Controllo password sia lunga almeno 8 caratteri
-    if (!currentPassword || currentPassword.length < 8) {
-      return false;
-    }
-    return true;
-  };
-
-  const loginHandler = async () => {
-    console.log('in login');
-
-    if (currentEmail.trim().length === 0 || currentPassword.length === 0) {
-      Toast.show({
-        type: 'error',
-        text1: 'Authentication failed!',
-        text2: 'Could not log you in. Please check your credentials or try again later!',
-      });
-      return;
-    }
+  const AddBookHandler = async () => {
     try {
-      // Toast.show({
-      //   type: 'success',
-      //   text1: 'Logging!',
-      //   text2: 'You must verify your email address to gain access.',
-      // });
+      Toast.show({
+        type: 'success',
+        text1: 'Libro aggiunto!',
+      });
       // const user = await signInWithEmailAndPassword(auth, currentEmail, currentPassword);
       // if (user) {
       //   const userId = user.user.uid;
@@ -54,13 +31,10 @@ export default function LogIn() {
       // }
     } catch (err) {
       console.log(err);
-      Toast.show({
-        type: 'error',
-        text1: 'Authentication failed!',
-        text2: 'Could not log you in. Please check your credentials or try again later!',
-      });
-    } finally {
-      // setIsLoading(false);
+      Alert.alert(
+        'Authentication failed!',
+        'Could not log you in. Please check your credentials or try again later!'
+      );
     }
   };
 
@@ -91,15 +65,16 @@ export default function LogIn() {
                 value={currentPassword}
               />
               <TouchableOpacity className="self-end" onPress={() => {}}>
-                <Text>Forgot your password?</Text>
+                <Text
+                  style={{ fontFamily: 'TripSans' }}
+                  className="text-right text-base text-black">
+                  Forgot your password?
+                </Text>
               </TouchableOpacity>
             </FormItem>
           </FormSection>
           <View className="items-end">
-            <Button
-              onPress={loginHandler}
-              disabled={allFieldsValid(currentEmail, currentPassword) ? false : true}
-              className="px-6">
+            <Button onPress={AddBookHandler} className="px-6">
               <Text>Login</Text>
             </Button>
           </View>
