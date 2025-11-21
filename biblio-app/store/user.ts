@@ -4,7 +4,10 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { Book } from './book';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '~/lib/firebase';
+import { auth, db } from '~/lib/firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import * as SecureStore from 'expo-secure-store';
+import Toast from 'react-native-toast-message';
 
 interface Profile {
   name: string;
@@ -31,12 +34,14 @@ export interface TUserMutations {
 }
 
 export interface TUserAction {
-  login: () => void;
+  login: (email: string, password: string, remember: boolean) => void;
+  loadProfile: () => void;
+  logout: () => void;
 }
 
 export type TUserStore = TUserState & TUserMutations & TUserAction;
 
-const profileState = <TUserState>{
+const profileState = {
   library: [],
 
   profile: null,
@@ -44,9 +49,9 @@ const profileState = <TUserState>{
   uid: null,
 
   isAuthenticated: false, // aggiunto perché un uid potrebbe averlo anche uno studente
-};
+} as TUserState;
 
-const profileMutations = <TUserMutations>{
+const profileMutations = {
   setProfile: (profile: Profile) => useUserStore.setState({ profile }),
 
   setLibrary: (library) => useUserStore.setState({ library }),
@@ -54,23 +59,44 @@ const profileMutations = <TUserMutations>{
   addBookToLibrary: (book: Book) =>
     useUserStore.setState((state) => ({ library: [...state.library, book] })),
 
+  setUid: (uid: string) => {
+    useUserStore.setState({ uid });
+  },
+
   removeBookFromLibrary: (book: Book) =>
     useUserStore.setState((state) => ({
       library: state.library.filter((b) => b.id !== book.id),
     })),
 
   setIsAuthenticated: (value) => useUserStore.setState({ isAuthenticated: value }),
-};
+} as TUserMutations;
 
-const profileAction = <TUserAction>{
-  login: async () => {
-    const { setIsAuthenticated } = useUserStore.getState();
+const profileAction = {
+  login: async (email, password, remember) => {
+    const { setIsAuthenticated, setUid } = useUserStore.getState();
 
     // fetch profile from db
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+      const userId = user.user.uid;
+      const token = await user.user.getIdToken();
+      if (remember) {
+        SecureStore.setItemAsync('token', token);
+        SecureStore.setItemAsync('uid', userId);
+      }
+      setIsAuthenticated(true);
+      setUid(userId);
 
-    setIsAuthenticated(true);
-
-    // router.replace('/(tabs)');
+      router.replace('/(drawer)/(tabs)');
+    } catch (error) {
+      console.log('Login error: ', error);
+      setIsAuthenticated(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Authentication failed!',
+        text2: 'Could not log you in. Please check your credentials or try again later!',
+      });
+    }
   },
 
   loadProfile: async () => {
@@ -82,16 +108,30 @@ const profileAction = <TUserAction>{
       const docRef = doc(db, 'users', uid);
       // info sullo user
       const docSnap = await getDoc(docRef);
-
       const newProfile = docSnap.data() as Profile;
-
       // set stato utente
       setProfile(newProfile);
     } catch (error) {
       console.log('loginHelper error: ', error);
     }
   },
-};
+
+  logout: async () => {
+    const { setIsAuthenticated, setUid, setProfile, setLibrary } = useUserStore.getState();
+    try {
+      await signOut(auth);
+      await SecureStore.deleteItemAsync('token');
+      await SecureStore.deleteItemAsync('uid');
+      setIsAuthenticated(false);
+      setUid('');
+      setProfile({ name: '', surname: '', email: '', booksId: [], schoolsId: [] });
+      setLibrary([]);
+      router.replace('/(drawer)/login');
+    } catch (error) {
+      console.log('Logout error: ', error);
+    }
+  },
+} as TUserAction;
 
 export const useUserStore = create<TUserStore>()(
   persist(

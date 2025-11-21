@@ -26,7 +26,7 @@ export default function TabLayout() {
     headerStyle: {
       backgroundColor: colors.background,
     },
-    headerShown: true,
+    headerShown: false,
     headerShadowVisible: false,
     headerTitleContainerStyle: { marginLeft: 24 },
   } as TabsProps;

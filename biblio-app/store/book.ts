@@ -31,7 +31,7 @@ export interface TBookAction {
 
 export type TBookStore = TBookState & TBookMutations & TBookAction;
 
-const bookState = <TBookState>{
+const bookState = {
   books: [
     { id: '1', title: '1984', author: 'George Orwell', availbale: true },
     { id: '2', title: 'To Kill a Mockingbird', author: 'Harper Lee', availbale: true },
@@ -40,15 +40,15 @@ const bookState = <TBookState>{
     { id: '5', title: 'Fahrenheit 451', author: 'Ray Bradbury', availbale: true },
     { id: '6', title: 'Brave New World', author: 'Aldous Huxley', availbale: true },
   ],
-};
+} as TBookState;
 
-const bookMutations = <TBookMutations>{
+const bookMutations = {
   setBooks: (books) => useBookStore.setState({ books }),
 
   setBookModal: (isOpen: boolean) => useBookStore.setState({ bookModal: isOpen }),
-};
+} as TBookMutations;
 
-const bookAction = <TBookAction>{
+const bookAction = {
   loadBooks: async () => {
     const { uid } = useUserStore.getState();
     const { setBooks } = useBookStore.getState();
@@ -69,7 +69,7 @@ const bookAction = <TBookAction>{
   },
 
   saveBook: async () => {},
-};
+} as TBookAction;
 
 export const useBookStore = create<TBookStore>()(
   persist(

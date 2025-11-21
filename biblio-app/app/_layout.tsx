@@ -17,6 +17,8 @@ import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
 import { useEffect } from 'react';
 import { useBookStore } from '~/store';
+import { useUserStore } from '~/store';
+import * as SecureStore from 'expo-secure-store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -29,13 +31,18 @@ export default function RootLayout() {
 
   const { colorScheme, isDarkColorScheme } = useColorScheme();
   // const { uid } = useUserStore();
-  const { loadBooks } = useBookStore();
+  const { login } = useUserStore();
 
   useEffect(() => {
     async function init() {
       // loadBooks()
       // loadPrifile()
-      SplashScreen.hideAsync();
+      // const storedToken = await SecureStore.getItemAsync('token');
+      // const storedUid = await SecureStore.getItemAsync('uid');
+      // if (storedToken && storedUid) {
+      //   login(storedToken, storedUid, true);
+      //   SplashScreen.hideAsync();
+      // }
     }
 
     init();

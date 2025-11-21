@@ -6,12 +6,16 @@ import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keybo
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
-// import Toast from 'react-native-toast-message';
+import { useUserStore } from '~/store';
+import Toast from 'react-native-toast-message';
+import { signOut } from 'firebase/auth';
+import { auth } from '~/lib/firebase';
 
 export default function LogIn() {
   const insets = useSafeAreaInsets();
   const [currentEmail, setCurrentEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
+  const { login, loadProfile, profile, logout, isAuthenticated } = useUserStore();
 
   const allFieldsValid = (currentEmail: string, currentPassword: string) => {
     // Controllo che la email inserita contenga una '@'
@@ -36,22 +40,11 @@ export default function LogIn() {
       });
       return;
     }
+
     try {
-      // Toast.show({
-      //   type: 'success',
-      //   text1: 'Logging!',
-      //   text2: 'You must verify your email address to gain access.',
-      // });
-      // const user = await signInWithEmailAndPassword(auth, currentEmail, currentPassword);
-      // if (user) {
-      //   const userId = user.user.uid;
-      //   const token = await user.user.getIdToken();
-      //   await fetchRoutes(userId);
-      //   await fetchCountryCodes();
-      //   await fetchTags();
-      //   await fetchOwnRewiew(userId);
-      //   await loginHelper(token, userId);
-      // }
+      login(currentEmail, currentPassword, true);
+      loadProfile();
+      console.log('profilo: ', profile);
     } catch (err) {
       console.log(err);
       Toast.show({
@@ -104,6 +97,9 @@ export default function LogIn() {
             </Button>
           </View>
         </Form>
+        <Button onPress={logout} disabled={isAuthenticated ? false : true} className="mt-5 px-6">
+          <Text>Logout</Text>
+        </Button>
       </KeyboardAwareScrollView>
     </KeyboardGestureArea>
   );
