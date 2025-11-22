@@ -78,7 +78,7 @@ export default function Index() {
         />
 
         <FiltersSheetModal />
-        {bookModal && <AddBookSheetModal />}
+        {isAuthenticated && <AddBookSheetModal />}
       </View>
     </View>
   );
