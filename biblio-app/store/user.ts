@@ -29,7 +29,7 @@ interface Profile {
 
 export interface TUserState {
   library: Book[];
-  profile: Profile | null;
+  profile: Profile;
   uid: string | null;
   isAuthenticated: boolean;
 }
@@ -44,8 +44,9 @@ export interface TUserMutations {
 }
 
 export interface TUserAction {
-  login: (email: string, password: string, remember: boolean) => void;
-  loadProfile: () => void;
+  addBook: (book: Book) => void;
+  login: (email: string, password: string, remember: boolean) => Promise<void>;
+  loadProfile: () => Promise<void>;
   logout: () => void;
 }
 
@@ -54,32 +55,38 @@ export type TUserStore = TUserState & TUserMutations & TUserAction;
 const profileState = {
   library: [],
 
-  profile: null,
+  profile: {
+    name: '',
+    surname: '',
+    email: '',
+    booksId: [],
+    schoolsId: [],
+  },
 
   uid: null,
 
   isAuthenticated: false, // aggiunto perché un uid potrebbe averlo anche uno studente
-} as TUserState;
+} satisfies TUserState;
 
 const profileMutations = {
-  setProfile: (profile: Profile) => useUserStore.setState({ profile }),
+  setProfile: (profile): void => useUserStore.setState({ profile }),
 
-  setLibrary: (library) => useUserStore.setState({ library }),
+  setLibrary: (library): void => useUserStore.setState({ library }),
 
-  // addBookToLibrary: (book: Book) =>
-  //   useUserStore.setState((state) => ({ library: [...state.library, book] })),
+  addBookToLibrary: (book: Book): void =>
+    useUserStore.setState((state: TUserState) => ({ library: [...state.library, book] })),
 
   setUid: (uid: string) => {
     useUserStore.setState({ uid });
   },
 
-  removeBookFromLibrary: (book: Book) =>
+  removeBookFromLibrary: (book: Book): void =>
     useUserStore.setState((state) => ({
       library: state.library.filter((b) => b.id !== book.id),
     })),
 
   setIsAuthenticated: (value) => useUserStore.setState({ isAuthenticated: value }),
-} as TUserMutations;
+} satisfies TUserMutations;
 
 const profileAction = {
   login: async (email, password, remember) => {
@@ -133,11 +140,10 @@ const profileAction = {
     const { setIsAuthenticated, setUid, setProfile, setLibrary } = useUserStore.getState();
     try {
       await signOut(auth);
-      await SecureStore.deleteItemAsync('token');
-      await SecureStore.deleteItemAsync('uid');
+      // await SecureStore.deleteItemAsync('token');
+      // await SecureStore.deleteItemAsync('uid');
       setIsAuthenticated(false);
-      setUid('');
-      setProfile({ name: '', surname: '', email: '', booksId: [], schoolsId: [] });
+      setProfile(profileState.profile);
       setLibrary([]);
       router.replace('/(drawer)/(tabs)');
     } catch (error) {
@@ -145,7 +151,7 @@ const profileAction = {
     }
   },
 
-  addBookToLibrary: async (book: Book) => {
+  addBook: async (book: Book) => {
     const { uid } = useUserStore.getState();
 
     try {
@@ -174,10 +180,10 @@ const profileAction = {
       console.log('Add book to library error: ', error);
     }
   },
-} as TUserAction;
+} satisfies TUserAction;
 
 export const useUserStore = create<TUserStore>()(
-  persist(
+  persist<TUserStore>(
     () => ({
       ...profileState,
       ...profileMutations,

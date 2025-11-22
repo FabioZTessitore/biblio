@@ -42,11 +42,11 @@ export default function LogIn() {
     }
 
     try {
-      login(currentEmail, currentPassword, true);
+      await login(currentEmail, currentPassword, true);
       // non carica il profilo dopo il login perché asincrono
       // ancora non è settatp l'uid quando viene chiamato
       // ma perché login non è async?
-      loadProfile();
+      await loadProfile();
       // setCurrentEmail('');
       // setCurrentPassword('');
     } catch (err) {
