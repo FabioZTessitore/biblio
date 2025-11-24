@@ -1,6 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface School {
   id: string;
@@ -39,7 +39,10 @@ export const useSchoolStore = create<TSchoolStore>()(
     }),
     {
       name: 'schoolStore',
-      // storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        // Non salviamo niente, ma rimaniamolo come scheletro
+      }),
     }
   )
 );

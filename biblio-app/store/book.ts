@@ -108,16 +108,12 @@ const bookAction = {
   saveBook: async () => {},
 } as TBookAction;
 
-export const useBookStore = create<TBookStore>()(
-  persist(
-    () => ({
-      ...bookState,
-      ...bookMutations,
-      ...bookAction,
-    }),
-    {
-      name: 'bookStore',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);
+export const useBookStore = create<TBookStore>(() => ({
+  ...bookState,
+  ...bookMutations,
+  ...bookAction,
+  /* Non utilizziamo il persist perché non vogliamo salvare
+   * i libri nello store del dispositivo, se poi è necessario
+   * ricaricarli ogni volta che l'app viene riaperta.
+   */
+}));

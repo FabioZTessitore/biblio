@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { Book } from './book';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface FilterItem {
   id: string;
@@ -147,7 +147,11 @@ export const useFiltersStore = create<TFiltersStore>()(
     }),
     {
       name: 'filtersStore',
-      // storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        filters: state.filters,
+        // Salviamo in modo persistente solo filters.
+      }),
     }
   )
 );
