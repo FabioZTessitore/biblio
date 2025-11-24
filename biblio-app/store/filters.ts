@@ -30,7 +30,7 @@ export interface TFiltersMutations {
 }
 
 export interface TFiltersAction {
-  getFilterItem: (group: string, id: string) => FilterItem;
+  getFilterItem: (group: string, id: string) => FilterItem | undefined;
   openFiltersModal: () => void;
   applyFilters: (books: Book[], filters: Filters) => Book[];
 }

@@ -1,5 +1,5 @@
 import { Text, Icon } from '~/components/ui';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useFiltersStore } from '~/store';
 import { truncateText } from '~/lib/utils';
@@ -26,6 +26,38 @@ const FiltersSheetModal = () => {
   };
 
   const currentFilter = getFilterItem(activeFilter?.group ?? '', activeFilter?.filterId ?? '');
+
+  const justSyncedRef = useRef(false);
+
+  useEffect(() => {
+    if (activeFilter && currentFilter) {
+      // Evitiamo che l'effetto che osserva `searchText` interpreti
+      // il valore inizializzato come un'azione dell'utente.
+      justSyncedRef.current = true;
+      setSearchText(currentFilter.value ?? '');
+    }
+
+    if (!activeFilter) {
+      setSearchText('');
+    }
+  }, [activeFilter, currentFilter]);
+
+  // Se l'utente svuota l'input (premendo la 'x' o cancellando),
+  // aggiorniamo anche lo store per azzerare il valore del filtro corrente.
+  useEffect(() => {
+    if (!activeFilter || !currentFilter) return;
+
+    // Se abbiamo appena sincronizzato `searchText` dall'apertura del filtro,
+    // ignoriamo questa esecuzione (evitiamo il clear immediato).
+    if (justSyncedRef.current) {
+      justSyncedRef.current = false;
+      return;
+    }
+
+    if (currentFilter.type === 'text' && searchText === '' && currentFilter.value !== '') {
+      updateFilterValue(activeFilter.group, currentFilter.id, '');
+    }
+  }, [searchText, activeFilter, currentFilter, updateFilterValue]);
 
   return (
     <SheetModal visible={filtersModal} onClose={onClose}>
@@ -84,17 +116,17 @@ const FiltersSheetModal = () => {
 
               {/* Titolo al centro */}
               <Text variant="heading" className="text-center">
-                {currentFilter.name}
+                {currentFilter?.name ?? ''}
               </Text>
             </View>
 
             {/* Contenuto dinamico */}
-            {currentFilter.type === 'text' && (
+            {currentFilter?.type === 'text' && (
               <View>
                 <SearchInput
                   variant="bottom-sheet"
                   containerClassName="bg-background"
-                  value={searchText ?? currentFilter.value}
+                  value={searchText !== '' ? searchText : (currentFilter?.value ?? '')}
                   onChangeText={(txt) => setSearchText(txt)}
                 />
                 <FlatList
@@ -112,7 +144,7 @@ const FiltersSheetModal = () => {
                       <Pressable
                         className="rounded-xl bg-background p-4"
                         onPress={() => {
-                          updateFilterValue(activeFilter.group, currentFilter.id, item.name);
+                          updateFilterValue(activeFilter.group, currentFilter?.id ?? '', item.name);
                           setActiveFilter(null);
                         }}>
                         <Text>{item.name}</Text>
@@ -125,10 +157,10 @@ const FiltersSheetModal = () => {
               </View>
             )}
 
-            {currentFilter.type === 'select' && (
+            {currentFilter?.type === 'select' && (
               <View className="gap-4">
                 <FlatList
-                  data={currentFilter.options}
+                  data={currentFilter?.options}
                   keyExtractor={(item) => item}
                   contentContainerClassName="gap-2 py-8"
                   className="rounded-md"
@@ -138,14 +170,15 @@ const FiltersSheetModal = () => {
                       <Pressable
                         key={item}
                         className={`rounded-xl p-4 ${
-                          currentFilter.value === item ? 'bg-primary' : 'bg-background'
+                          currentFilter?.value === item ? 'bg-primary' : 'bg-background'
                         }`}
-                        onPress={() =>
-                          updateFilterValue(activeFilter.group, currentFilter.id, item)
-                        }>
+                        onPress={() => {
+                          updateFilterValue(activeFilter.group, currentFilter?.id ?? '', item);
+                          setActiveFilter(null);
+                        }}>
                         <Text
                           className={
-                            currentFilter.value === item ? 'text-white' : 'text-foreground'
+                            currentFilter?.value === item ? 'text-white' : 'text-foreground'
                           }>
                           {item}
                         </Text>

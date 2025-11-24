@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '~/lib/firebase';
 import { useUserStore } from './user';
