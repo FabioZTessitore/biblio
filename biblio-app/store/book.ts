@@ -12,6 +12,7 @@ export interface Book {
   author: string;
   qty?: number | 1;
   available: boolean;
+  imageUrl?: string;
   bibliotecarioId: string;
 }
 
@@ -33,50 +34,8 @@ export interface TBookAction {
 export type TBookStore = TBookState & TBookMutations & TBookAction;
 
 const bookState = {
-  books: [
-    {
-      id: '1',
-      title: '1984',
-      author: 'George Orwell',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-    {
-      id: '2',
-      title: 'To Kill a Mockingbird',
-      author: 'Harper Lee',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-    {
-      id: '3',
-      title: 'The Great Gatsby',
-      author: 'F. Scott Fitzgerald',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-    {
-      id: '4',
-      title: 'Moby Dick',
-      author: 'Herman Melville',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-    {
-      id: '5',
-      title: 'Fahrenheit 451',
-      author: 'Ray Bradbury',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-    {
-      id: '6',
-      title: 'Brave New World',
-      author: 'Aldous Huxley',
-      available: true,
-      schoolId: 'tSkHlDpJXQBXLMQjlZMm',
-    },
-  ],
+  books: [],
+  bookModal: false,
 } as TBookState;
 
 const bookMutations = {
@@ -87,10 +46,20 @@ const bookMutations = {
 
 const bookAction = {
   loadBooks: async () => {
-    const { uid } = useUserStore.getState();
+    const { uid, setUid } = useUserStore.getState();
     const { setBooks } = useBookStore.getState();
 
-    const q = query(collection(db, 'books'), where('userId', '==', uid));
+    if (uid === null) setUid('Vjv3oMJC6zUfW3B9hqOlwf9JCyo2');
+    const docRef = doc(db, 'users', uid!);
+    const docSnap = await getDoc(docRef);
+    const schoolsId = docSnap.data()?.schoolsId || [];
+
+    if (schoolsId.length === 0) {
+      setBooks([]);
+      return;
+    }
+
+    const q = query(collection(db, 'books'), where('schoolId', 'in', schoolsId));
     const querySnapshot = await getDocs(q);
 
     const newBooks: Book[] = [];

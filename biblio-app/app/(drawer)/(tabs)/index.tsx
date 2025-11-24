@@ -8,12 +8,19 @@ import { Button } from '~/components/nativewindui/Button';
 import { Icon } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
+import { useEffect } from 'react';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, bookModal, setBookModal } = useBookStore();
+  const { books, bookModal, setBookModal, loadBooks } = useBookStore();
   const { library, addBookToLibrary, isAuthenticated } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
+
+  useEffect(() => {
+    // Load books when component mounts
+    loadBooks();
+    console.log(books);
+  }, []);
 
   const handlePress = (item: Book) => {
     console.log('Pressed:', item.title);

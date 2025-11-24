@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { Book } from './book';
@@ -38,7 +37,7 @@ export interface TFiltersAction {
 
 export type TFiltersStore = TFiltersState & TFiltersMutations & TFiltersAction;
 
-const filtersState = <TFiltersState>{
+const filtersState = {
   filters: [
     {
       group: 'libro',
@@ -72,9 +71,9 @@ const filtersState = <TFiltersState>{
   ],
 
   filtersModal: false,
-};
+} as TFiltersState;
 
-const filtersMutations = <TFiltersMutations>{
+const filtersMutations = {
   resetFilters: () => useFiltersStore.setState(() => ({ ...filtersState })),
 
   setFiltersModal: (isOpen) => useFiltersStore.setState({ filtersModal: isOpen }),
@@ -92,9 +91,9 @@ const filtersMutations = <TFiltersMutations>{
 
       return { filters: newFilters };
     }),
-};
+} as TFiltersMutations;
 
-const filtersAction = <TFiltersAction>{
+const filtersAction = {
   getFilterItem: (group, id) => {
     const { filters } = useFiltersStore.getState();
     const groupObj = filters.find((f) => f.group === group);
@@ -144,7 +143,7 @@ const filtersAction = <TFiltersAction>{
 
     return filtered;
   },
-};
+} as TFiltersAction;
 
 export const useFiltersStore = create<TFiltersStore>()(
   persist(

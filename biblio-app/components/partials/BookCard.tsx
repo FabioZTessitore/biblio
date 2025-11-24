@@ -24,9 +24,11 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
           <Image
             className="h-32 rounded-2xl"
             resizeMethod="resize"
-            resizeMode="cover"
+            resizeMode="stretch"
             source={{
-              uri: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ym9vayUyMGNvdmVyfGVufDB8fDB8fHww',
+              uri: item.imageUrl
+                ? item.imageUrl
+                : 'https://islandpress.org/files/default_book_cover_2015.jpg',
             }}></Image>
 
           <View className="flex-row items-center gap-1">

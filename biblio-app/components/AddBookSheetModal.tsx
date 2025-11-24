@@ -40,6 +40,9 @@ const AddBookSheetModal = () => {
     };
 
     addBookToLibrary(newBook);
+    setCurrentAuthor('');
+    setCurrentTitle('');
+    setCurrentIsAvailable(true);
     setBookModal(false);
   };
 
