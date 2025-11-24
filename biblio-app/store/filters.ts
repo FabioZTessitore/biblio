@@ -12,12 +12,12 @@ export interface FilterItem {
   options?: string[];
 }
 
-export interface FilterGroups {
+export interface Filter {
   group: string;
   items: FilterItem[];
 }
 
-type Filters = FilterGroups[];
+type Filters = Filter[];
 
 export interface TFiltersState {
   filters: Filters;
@@ -31,6 +31,7 @@ export interface TFiltersMutations {
 }
 
 export interface TFiltersAction {
+  getFilterItem: (group: string, id: string) => FilterItem;
   openFiltersModal: () => void;
   applyFilters: (books: Book[], filters: Filters) => Book[];
 }
@@ -94,6 +95,13 @@ const filtersMutations = <TFiltersMutations>{
 };
 
 const filtersAction = <TFiltersAction>{
+  getFilterItem: (group, id) => {
+    const { filters } = useFiltersStore.getState();
+    const groupObj = filters.find((f) => f.group === group);
+
+    return groupObj?.items.find((v) => v.id === id);
+  },
+
   openFiltersModal: () => {
     const { setFiltersModal } = useFiltersStore.getState();
 

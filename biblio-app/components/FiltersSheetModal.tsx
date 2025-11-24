@@ -9,14 +9,14 @@ import { FilterItem } from '~/store/filters';
 import { SheetModal } from '~/components/partials';
 
 const FiltersSheetModal = () => {
-  const { filters, filtersModal, setFiltersModal, resetFilters, updateFilterValue } =
+  const { filters, filtersModal, setFiltersModal, resetFilters, updateFilterValue, getFilterItem } =
     useFiltersStore();
 
   const [searchText, setSearchText] = useState('');
 
   const [activeFilter, setActiveFilter] = useState<null | {
     group: string;
-    filter: FilterItem;
+    filterId: string;
   }>(null);
 
   const onClose = () => {
@@ -24,6 +24,8 @@ const FiltersSheetModal = () => {
     setActiveFilter(null);
     setFiltersModal(false);
   };
+
+  const currentFilter = getFilterItem(activeFilter?.group ?? '', activeFilter?.filterId ?? '');
 
   return (
     <SheetModal visible={filtersModal} onClose={onClose}>
@@ -48,7 +50,9 @@ const FiltersSheetModal = () => {
                   {section.items.map((filter, idx) => (
                     <Pressable
                       key={filter.id}
-                      onPress={() => setActiveFilter({ group: section.group, filter })}>
+                      onPress={() =>
+                        setActiveFilter({ group: section.group, filterId: filter.id })
+                      }>
                       {idx !== 0 && <View className="mx-4 h-px bg-border" />}
 
                       <View className="flex-row items-center justify-between p-4">
@@ -80,17 +84,17 @@ const FiltersSheetModal = () => {
 
               {/* Titolo al centro */}
               <Text variant="heading" className="text-center">
-                {activeFilter.filter.name}
+                {currentFilter.name}
               </Text>
             </View>
 
             {/* Contenuto dinamico */}
-            {activeFilter.filter.type === 'text' && (
+            {currentFilter.type === 'text' && (
               <View>
                 <SearchInput
                   variant="bottom-sheet"
                   containerClassName="bg-background"
-                  value={searchText ?? activeFilter.filter.value}
+                  value={searchText ?? currentFilter.value}
                   onChangeText={(txt) => setSearchText(txt)}
                 />
                 <FlatList
@@ -108,7 +112,7 @@ const FiltersSheetModal = () => {
                       <Pressable
                         className="rounded-xl bg-background p-4"
                         onPress={() => {
-                          updateFilterValue(activeFilter.group, activeFilter.filter.id, item.name);
+                          updateFilterValue(activeFilter.group, currentFilter.id, item.name);
                           setActiveFilter(null);
                         }}>
                         <Text>{item.name}</Text>
@@ -121,35 +125,44 @@ const FiltersSheetModal = () => {
               </View>
             )}
 
-            {activeFilter.filter.type === 'select' && (
+            {currentFilter.type === 'select' && (
               <View className="gap-4">
-                {(activeFilter.filter.options ?? []).map((opt: string) => (
-                  <Pressable
-                    key={opt}
-                    className={`rounded-xl p-4 ${
-                      activeFilter.filter.value === opt ? 'bg-primary' : 'bg-muted'
-                    }`}
-                    onPress={() =>
-                      updateFilterValue(activeFilter.group, activeFilter.filter.id, opt)
-                    }>
-                    <Text
-                      className={
-                        activeFilter.filter.value === opt ? 'text-white' : 'text-foreground'
-                      }>
-                      {opt}
-                    </Text>
-                  </Pressable>
-                ))}
+                <FlatList
+                  data={currentFilter.options}
+                  keyExtractor={(item) => item}
+                  contentContainerClassName="gap-2 py-8"
+                  className="rounded-md"
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }) => {
+                    return (
+                      <Pressable
+                        key={item}
+                        className={`rounded-xl p-4 ${
+                          currentFilter.value === item ? 'bg-primary' : 'bg-background'
+                        }`}
+                        onPress={() =>
+                          updateFilterValue(activeFilter.group, currentFilter.id, item)
+                        }>
+                        <Text
+                          className={
+                            currentFilter.value === item ? 'text-white' : 'text-foreground'
+                          }>
+                          {item}
+                        </Text>
+                      </Pressable>
+                    );
+                  }}
+                />
               </View>
             )}
 
-            {/* {activeFilter.filter.type === 'boolean' && (
+            {/* {currentFilter.type === 'boolean' && (
               <View className="flex-row items-center justify-between p-4">
                 <Text>Valore</Text>
                 <Toggle
-                  value={!!activeFilter.filter.value}
+                  value={!!currentFilter.value}
                   onValueChange={(v) =>
-                    updateFilterValue(activeFilter.group, activeFilter.filter.id, v)
+                    updateFilterValue(activeFilter.group, currentFilter.id, v)
                   }
                 />
               </View>
