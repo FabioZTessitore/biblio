@@ -33,13 +33,13 @@ const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => 
               <Icon
                 size={'label'}
                 name="circle"
-                color={item.availbale ? colors.success : colors.destructive}></Icon>
+                color={item.available ? colors.success : colors.destructive}></Icon>
               <Text
                 weight={'light'}
                 variant={'label'}
                 style={{ includeFontPadding: false }}
                 className="flex-shrink uppercase">
-                {item.availbale ? 'Disponibile' : 'Non Disponibile'}
+                {item.available ? 'Disponibile' : 'Non Disponibile'}
               </Text>
             </View>
           </View>
@@ -68,7 +68,7 @@ const Library = () => {
   const loanRequest = () => {
     // Si dovrebbe fare una fetch dei libri al momento della richiesta del prestito
     // e aggiornarla con i libri in libreria
-    if (library.some(({ availbale }) => !availbale)) {
+    if (library.some(({ available }) => !available)) {
       console.log('Uno o più libri non sono dispobili');
     } else {
       console.log('push to Form di nome, cognome, scuola, e classe');

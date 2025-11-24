@@ -60,7 +60,7 @@ const filtersState = <TFiltersState>{
       group: 'altro',
       items: [
         {
-          id: 'availbale',
+          id: 'available',
           name: 'Disponibilità',
           value: 'Tutti',
           type: 'select',
@@ -120,12 +120,12 @@ const filtersAction = <TFiltersAction>{
             );
             break;
 
-          case 'availbale':
+          case 'available':
             if (filter.value === 'Tutti') return;
             if (filter.value === 'Si')
-              filtered = filtered.filter((book) => book.availbale === true);
+              filtered = filtered.filter((book) => book.available === true);
             if (filter.value === 'No')
-              filtered = filtered.filter((book) => book.availbale === false);
+              filtered = filtered.filter((book) => book.available === false);
             break;
 
           default:
