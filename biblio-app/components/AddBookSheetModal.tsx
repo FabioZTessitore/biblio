@@ -1,24 +1,19 @@
-import { Text } from '~/components/ui';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BottomSheetModal, BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { useBookStore } from '~/store';
-import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA } from '~/lib/utils';
+import { useState } from 'react';
 import { View } from 'react-native';
+import { Text } from '~/components/ui';
+import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { useUserStore, useBookStore } from '~/store';
+import { Book } from '~/store/book';
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
 import { Toggle } from '~/components/nativewindui/Toggle';
+import { SheetModal } from './partials';
 import Toast from 'react-native-toast-message';
-import { Book } from '~/store/book';
-import { useUserStore } from '~/store/user';
 
 const AddBookSheetModal = () => {
   const { uid, profile, addBookToLibrary } = useUserStore();
-  const { colors } = useColorScheme();
   const { bookModal, setBookModal } = useBookStore();
-
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const [currentTitle, setCurrentTitle] = useState('');
   const [currentAuthor, setCurrentAuthor] = useState('');
@@ -50,33 +45,13 @@ const AddBookSheetModal = () => {
 
   const toggleIsAvailable = () => setCurrentIsAvailable((previousState) => !previousState);
 
-  const handleSheetChanges = useCallback((index: number) => {
-    // On close
-    if (index === -1) {
-      setBookModal(false);
-    }
-  }, []);
-
-  const snapPoints = useMemo(() => ['50%', '75%', '100%'], []);
-
-  useEffect(() => {
-    if (bookModal) bottomSheetModalRef.current?.present();
-  }, [bookModal]);
+  const onClose = () => {
+    setBookModal(false);
+  };
 
   return (
     // TODO: BottomSheetModal to components/ui/SheetModal.tsx
-    <BottomSheetModal
-      ref={bottomSheetModalRef}
-      index={1}
-      keyboardBehavior="extend"
-      keyboardBlurBehavior="restore"
-      snapPoints={snapPoints}
-      handleIndicatorStyle={{ backgroundColor: colors.foreground, height: 2, width: 40 }}
-      containerStyle={{
-        backgroundColor: convertToRGBA(colors.background, 0.6),
-      }}
-      onChange={handleSheetChanges}
-      backgroundStyle={{ backgroundColor: colors.card }}>
+    <SheetModal visible={bookModal} onClose={onClose}>
       <BottomSheetView className="flex-1 gap-8 p-4">
         <Text variant={'heading'} className="text-center">
           Aggiungi un nuovo libro
@@ -137,7 +112,7 @@ const AddBookSheetModal = () => {
           <Text>Salva</Text>
         </Button> */}
       </BottomSheetView>
-    </BottomSheetModal>
+    </SheetModal>
   );
 };
 

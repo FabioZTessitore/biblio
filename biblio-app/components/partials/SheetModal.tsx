@@ -7,16 +7,17 @@ interface SheetModalProps {
   visible: boolean;
   onClose?: () => void;
   onOpen?: () => void;
+  snapPoints?: string[];
   children?: React.ReactNode;
 }
 
-const SheetModal = ({ visible, onClose, onOpen, children }: SheetModalProps) => {
+const SheetModal = ({ visible, onClose, onOpen, snapPoints, children }: SheetModalProps) => {
   const { colors } = useColorScheme();
 
   const ref = useRef<BottomSheetModal>(null);
 
   // Snap points interni
-  const snapPoints = useMemo(() => ['25%', '50%', '75%', '100%'], []);
+  const snapPointInternal = useMemo(() => snapPoints ?? ['25%', '50%', '75%', '100%'], []);
 
   // Callback interna per gestire apertura/chiusura
   const handleSheetChanges = useCallback(
@@ -42,7 +43,7 @@ const SheetModal = ({ visible, onClose, onOpen, children }: SheetModalProps) => 
     <BottomSheetModal
       ref={ref}
       index={1}
-      snapPoints={snapPoints}
+      snapPoints={snapPointInternal}
       enableBlurKeyboardOnGesture
       keyboardBehavior="extend"
       keyboardBlurBehavior="restore"
