@@ -1,4 +1,4 @@
-import { View, Image } from 'react-native';
+import { View, Image, ImageBackground } from 'react-native';
 import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/book';
 import { Button } from '~/components/nativewindui/Button';
@@ -21,14 +21,19 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
       <View className="justify-center gap-6 rounded-lg">
         {/* Immagine e Valutazione */}
         <View className="gap-4">
-          <Image
-            className="h-32 rounded-2xl"
-            resizeMethod="resize"
+          <ImageBackground
+            source={{}}
             resizeMode="contain"
-            source={{
-              uri: item.imageUrl ?? 'https://islandpress.org/files/default_book_cover_2015.jpg',
-            }}></Image>
-
+            className="rounded-2xl"
+            style={{ backgroundColor: '#7d797a' }}>
+            <Image
+              className="h-32 rounded-2xl"
+              resizeMethod="resize"
+              resizeMode="contain"
+              source={{
+                uri: item.imageUrl ?? 'https://islandpress.org/files/default_book_cover_2015.jpg',
+              }}></Image>
+          </ImageBackground>
           <View className="flex-row items-center gap-1">
             <Icon name="star" size={'body'} color="#ca8a04" />
             <Text variant="label">4,6</Text>

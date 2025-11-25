@@ -12,10 +12,47 @@ type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
 };
 
+const HeaderBin = () => {
+  const { library, setLibrary } = useUserStore();
+
+  const isEmpty = library.length <= 0;
+
+  return (
+    <Button
+      variant="plain"
+      className="mr-6"
+      size={'icon'}
+      disabled={isEmpty}
+      onPress={() => {
+        Alert.alert('Attenzione!', 'Vuoi eliminare tutta la libreria?', [
+          {
+            text: 'Annulla',
+            style: 'cancel',
+            isPreferred: true,
+          },
+          {
+            text: 'Sì',
+            style: 'destructive',
+            onPress: () => {
+              setLibrary([]);
+            },
+          },
+        ]);
+      }}>
+      <Icon
+        type="MaterialCommunityIcons"
+        name={isEmpty ? 'delete-empty-outline' : 'delete-outline'}
+      />
+    </Button>
+  );
+};
+
 export default function TabLayout() {
   const navigation = useNavigation();
+
   const { openFiltersModal } = useFiltersStore();
-  const { library, setLibrary, isAuthenticated } = useUserStore();
+  const { isAuthenticated } = useUserStore();
+
   const { colors } = useColorScheme();
 
   const openDrawer = () => {
@@ -63,38 +100,7 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
-    headerRight: () => {
-      const isEmpty = library.length <= 0;
-
-      return (
-        <Button
-          variant="plain"
-          className="mr-6"
-          size={'icon'}
-          disabled={isEmpty}
-          onPress={() => {
-            Alert.alert('Attenzione!', 'Vuoi eliminare tutta la libreria?', [
-              {
-                text: 'Annulla',
-                style: 'cancel',
-                isPreferred: true,
-              },
-              {
-                text: 'Sì',
-                style: 'destructive',
-                onPress: () => {
-                  setLibrary([]);
-                },
-              },
-            ]);
-          }}>
-          <Icon
-            type="MaterialCommunityIcons"
-            name={isEmpty ? 'delete-empty-outline' : 'delete-outline'}
-          />
-        </Button>
-      );
-    },
+    headerRight: HeaderBin,
   } as TabsProps;
 
   const ADD_BOOK = {
