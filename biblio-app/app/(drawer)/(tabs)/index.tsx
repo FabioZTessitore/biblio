@@ -8,7 +8,7 @@ import { Button } from '~/components/nativewindui/Button';
 import { Icon } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 export default function Index() {
   const { colors } = useColorScheme();
@@ -22,15 +22,14 @@ export default function Index() {
     console.log(books);
   }, []);
 
-  const handlePress = (item: Book) => {
-    console.log('Pressed:', item.title);
-    if (isAuthenticated) {
-      // Modifica
-    } else {
-      if (library.includes(item)) return; // Error: Libro già aggiunto alla libreria
-      addBookToLibrary(item);
-    }
-  };
+  const handlePressMemo = useCallback(
+    (item: Book) => () => {
+      if (!isAuthenticated && !library.some((b) => b.id === item.id)) {
+        addBookToLibrary(item);
+      }
+    },
+    [isAuthenticated, library]
+  );
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
 
@@ -54,12 +53,11 @@ export default function Index() {
           contentContainerClassName="gap-14 py-8"
           className="rounded-md"
           showsVerticalScrollIndicator={false}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          // removeClippedSubviews
           renderItem={({ item }) => (
-            <BookCard
-              item={item}
-              selected={isSelected(item.id)}
-              onPress={() => handlePress(item)}
-            />
+            <BookCard item={item} selected={isSelected(item.id)} onPress={handlePressMemo(item)} />
           )}
         />
 

@@ -4,6 +4,7 @@ import { Book } from '~/store/book';
 import { Button } from '~/components/nativewindui/Button';
 // import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
+import { memo, useMemo } from 'react';
 
 interface BookCardProps {
   item: Book;
@@ -11,13 +12,18 @@ interface BookCardProps {
   onPress: () => void;
 }
 
-const BookCard = ({ item, selected, onPress }: BookCardProps) => {
+const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
   // const { colors } = useColorScheme();
 
   const { isAuthenticated } = useUserStore();
 
+  const imageSource = useMemo(
+    () => ({ uri: item.imageUrl ?? 'https://islandpress.org/files/default_book_cover_2015.jpg' }),
+    [item.imageUrl]
+  );
+
   return (
-    <View className={'flex-1 rounded-2xl bg-card p-4'}>
+    <View className={'rounded-2xl bg-card p-4'}>
       <View className="justify-center gap-6 rounded-lg">
         {/* Immagine e Valutazione */}
         <View className="gap-4">
@@ -30,9 +36,8 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
               className="h-32 rounded-2xl"
               resizeMethod="resize"
               resizeMode="contain"
-              source={{
-                uri: item.imageUrl ?? 'https://islandpress.org/files/default_book_cover_2015.jpg',
-              }}></Image>
+              source={imageSource}
+            />
           </ImageBackground>
           <View className="flex-row items-center gap-1">
             <Icon name="star" size={'body'} color="#ca8a04" />
@@ -91,6 +96,6 @@ const BookCard = ({ item, selected, onPress }: BookCardProps) => {
       </View>
     </View>
   );
-};
+});
 
 export { BookCard };
