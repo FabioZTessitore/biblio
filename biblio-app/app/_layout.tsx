@@ -66,8 +66,8 @@ export default function RootLayout() {
               </Stack>
             </NavThemeProvider>
           </KeyboardProvider>
-          <Toast config={toastConfig} />
         </BottomSheetModalProvider>
+        <Toast config={toastConfig} />
       </GestureHandlerRootView>
 
       {/* </ExampleProvider> */}
