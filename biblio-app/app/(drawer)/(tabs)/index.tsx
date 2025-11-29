@@ -1,6 +1,11 @@
 import { View, FlatList } from 'react-native';
-import { useBookStore, useFiltersStore, useUserStore } from '~/store';
-import { Book } from '~/store/book';
+import {
+  useFiltersStore,
+  useLibraryStore,
+  useAuthStore,
+  useBiblioStore,
+  useUserStore,
+} from '~/store';
 import { FiltersSheetModal, AddBookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
@@ -9,26 +14,28 @@ import { Icon } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect } from 'react';
+import { Book } from '~/store/biblio';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, bookModal, setBookModal, loadBooks } = useBookStore();
-  const { library, addBookToLibrary, isAuthenticated } = useUserStore();
+  const { books, setBookModal, fetchBooks } = useBiblioStore();
+  const { library, addToLibrary } = useLibraryStore();
+  const { membership } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
 
   useEffect(() => {
     // Load books when component mounts
-    loadBooks();
+    fetchBooks('school_id');
     console.log(books);
   }, []);
 
   const handlePressMemo = useCallback(
     (item: Book) => () => {
-      if (!isAuthenticated && !library.some((b) => b.id === item.id)) {
-        addBookToLibrary(item);
+      if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
+        addToLibrary(item);
       }
     },
-    [isAuthenticated, library]
+    [membership, library]
   );
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
@@ -61,7 +68,7 @@ export default function Index() {
           )}
         />
 
-        {isAuthenticated && (
+        {membership.role === 'staff' && (
           <View className="absolute bottom-0 right-2 z-10 h-20">
             <Button className="rounded-2xl p-4" size={'none'} onPress={() => setBookModal(true)}>
               <Icon name="add" />
@@ -83,7 +90,7 @@ export default function Index() {
         />
 
         <FiltersSheetModal />
-        {isAuthenticated && <AddBookSheetModal />}
+        {membership.role === 'staff' && <AddBookSheetModal />}
       </View>
     </View>
   );

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { Text } from '~/components/ui';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useUserStore, useBookStore } from '~/store';
-import { Book } from '~/store/book';
+import { useUserStore, useBiblioStore, useAuthStore, useLibraryStore } from '~/store';
+import { Book } from '~/store/biblio';
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
@@ -12,15 +12,13 @@ import { SheetModal } from './partials';
 import Toast from 'react-native-toast-message';
 
 const AddBookSheetModal = () => {
-  const { uid, profile, addBookToLibrary } = useUserStore();
-  const { bookModal, setBookModal } = useBookStore();
+  const { membership } = useUserStore();
+  const { bookModal, setBookModal, addBook } = useBiblioStore();
 
-  const [currentTitle, setCurrentTitle] = useState('');
-  const [currentAuthor, setCurrentAuthor] = useState('');
-  const [currentIsAvailable, setCurrentIsAvailable] = useState(true);
+  const [currentBook, setCurrentBook] = useState<Partial<Book>>({});
 
   const addBookHandler = () => {
-    if (currentTitle.trim().length === 0 || currentAuthor.trim().length === 0) {
+    if (currentBook.title?.trim().length === 0 || currentBook.author?.trim().length === 0) {
       Toast.show({
         type: 'error',
         text1: 'Non hai compilato correttamente i campi!',
@@ -28,25 +26,16 @@ const AddBookSheetModal = () => {
       });
       return;
     }
-    console.log('in book', profile);
 
-    const newBook: Book = {
-      id: '',
-      title: currentTitle,
-      author: currentAuthor,
-      available: currentIsAvailable,
-      schoolId: profile?.schoolsId[0] || '',
-      bibliotecarioId: uid!,
-    };
+    // const newBook: Book = {
+    //   id: '',
+    //   ...currentBook
+    // };
 
-    addBookToLibrary(newBook);
-    setCurrentAuthor('');
-    setCurrentTitle('');
-    setCurrentIsAvailable(true);
+    // addBook(newBook);
+    setCurrentBook({});
     setBookModal(false);
   };
-
-  const toggleIsAvailable = () => setCurrentIsAvailable((previousState) => !previousState);
 
   const onClose = () => {
     setBookModal(false);
@@ -73,16 +62,16 @@ const AddBookSheetModal = () => {
               <TextField
                 type="bottom-sheet"
                 placeholder="Titolo"
-                onChangeText={(currentTitle) => setCurrentTitle(currentTitle)}
-                value={currentTitle}
+                onChangeText={(currentTitle) => setCurrentBook({ title: currentTitle })}
+                value={currentBook.title}
               />
             </FormItem>
             <FormItem>
               <TextField
                 type="bottom-sheet"
                 placeholder="Autore"
-                onChangeText={(currentAuthor) => setCurrentAuthor(currentAuthor)}
-                value={currentAuthor}
+                onChangeText={(currentAuthor) => setCurrentBook({ author: currentAuthor })}
+                value={currentBook.author}
               />
             </FormItem>
           </FormSection>
@@ -90,7 +79,16 @@ const AddBookSheetModal = () => {
           <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'dots-horizontal' }}>
             <FormItem className="flex-row items-center gap-4">
               <Text>Disponibile</Text>
-              <Toggle onValueChange={toggleIsAvailable} value={currentIsAvailable} />
+              <TextField
+                type="bottom-sheet"
+                placeholder="Autore"
+                inputMode="numeric"
+                onChangeText={(currentAvailable) =>
+                  setCurrentBook({ available: Number(currentAvailable) })
+                }
+                value={String(currentBook.available)}
+              />
+              {/* <Toggle onValueChange={toggleIsAvailable} value={currentIsAvailable} /> */}
             </FormItem>
             <FormItem></FormItem>
           </FormSection>

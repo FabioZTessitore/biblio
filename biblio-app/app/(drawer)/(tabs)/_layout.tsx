@@ -5,7 +5,7 @@ import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { Text, Icon } from '~/components/ui';
 import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
-import { useFiltersStore, useUserStore } from '~/store';
+import { useAuthStore, useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
 
 type TabsProps = BottomTabNavigationOptions & {
@@ -13,7 +13,7 @@ type TabsProps = BottomTabNavigationOptions & {
 };
 
 const HeaderBin = () => {
-  const { library, setLibrary } = useUserStore();
+  const { library, clearLibrary } = useLibraryStore();
 
   const isEmpty = library.length <= 0;
 
@@ -23,22 +23,7 @@ const HeaderBin = () => {
       className="mr-6"
       size={'icon'}
       disabled={isEmpty}
-      onPress={() => {
-        Alert.alert('Attenzione!', 'Vuoi eliminare tutta la libreria?', [
-          {
-            text: 'Annulla',
-            style: 'cancel',
-            isPreferred: true,
-          },
-          {
-            text: 'Sì',
-            style: 'destructive',
-            onPress: () => {
-              setLibrary([]);
-            },
-          },
-        ]);
-      }}>
+      onPress={clearLibrary}>
       <Icon
         type="MaterialCommunityIcons"
         name={isEmpty ? 'delete-empty-outline' : 'delete-outline'}
@@ -51,7 +36,7 @@ export default function TabLayout() {
   const navigation = useNavigation();
 
   const { openFiltersModal } = useFiltersStore();
-  const { isAuthenticated } = useUserStore();
+  const { membership } = useUserStore();
 
   const { colors } = useColorScheme();
 
@@ -114,10 +99,10 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen name="index" options={INDEX_OPTIONS} />
-      <Tabs.Protected guard={!isAuthenticated}>
+      <Tabs.Protected guard={membership.role === 'user'}>
         <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
       </Tabs.Protected>
-      <Tabs.Protected guard={isAuthenticated}>
+      <Tabs.Protected guard={membership.role === 'staff'}>
         <Tabs.Screen name="reservation" options={ADD_BOOK} />
       </Tabs.Protected>
     </Tabs>

@@ -1,7 +1,7 @@
-import { FlatList, View, Image, Pressable } from 'react-native';
+import { FlatList, View, Image, Pressable, ImageSourcePropType } from 'react-native';
 import { Text, Icon } from '~/components/ui';
-import { Book } from '~/store/book';
-import { useUserStore } from '~/store';
+import { Book } from '~/store/biblio';
+import { useAuthStore, useLibraryStore, useUserStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA, truncateText } from '~/lib/utils';
@@ -70,10 +70,10 @@ const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => 
 
 const Library = () => {
   const { colors } = useColorScheme();
-  const { library, removeBookFromLibrary, isAuthenticated } = useUserStore();
+  const { library, removeFromLibrary } = useLibraryStore();
 
   const handlePress = (item: Book) => {
-    removeBookFromLibrary(item);
+    removeFromLibrary(item.id);
   };
 
   const loanRequest = () => {
@@ -136,7 +136,7 @@ const Library = () => {
         />
       </View>
 
-      {!isAuthenticated && library.length > 0 && (
+      {library.length > 0 && (
         <View className="p-6">
           <Button className="py-4" onPress={loanRequest}>
             <Text>Richiedi Prestito</Text>

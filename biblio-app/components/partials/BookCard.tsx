@@ -1,6 +1,6 @@
-import { View, Image, ImageBackground } from 'react-native';
+import { View, Image, ImageBackground, ImageSourcePropType } from 'react-native';
 import { Text, Icon } from '~/components/ui';
-import { Book } from '~/store/book';
+import { Book } from '~/store/biblio';
 import { Button } from '~/components/nativewindui/Button';
 // import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
@@ -40,7 +40,7 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
   // const { colors } = useColorScheme();
 
-  const { isAuthenticated } = useUserStore();
+  const { membership } = useUserStore();
 
   const imageSource = useMemo(
     () =>

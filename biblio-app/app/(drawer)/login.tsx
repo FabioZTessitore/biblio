@@ -6,16 +6,16 @@ import { KeyboardAwareScrollView, KeyboardGestureArea } from 'react-native-keybo
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Button } from '~/components/nativewindui/Button';
-import { useUserStore } from '~/store';
+import { useAuthStore, useUserStore } from '~/store';
 import Toast from 'react-native-toast-message';
 import { signOut } from 'firebase/auth';
 import { auth } from '~/lib/firebase';
 
-export default function LogIn() {
+export default function Login() {
   const insets = useSafeAreaInsets();
   const [currentEmail, setCurrentEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
-  const { login, loadProfile, profile, logout, isAuthenticated } = useUserStore();
+  const { isAuthenticated, login, logout } = useAuthStore();
 
   const allFieldsValid = (currentEmail: string, currentPassword: string) => {
     // Controllo che la email inserita contenga una '@'
@@ -24,7 +24,7 @@ export default function LogIn() {
     // }
     // Controllo password sia lunga almeno 8 caratteri
     if (!currentPassword || currentPassword.length < 8) {
-      return false;
+      return true;
     }
     return true;
   };
@@ -32,21 +32,22 @@ export default function LogIn() {
   const loginHandler = async () => {
     console.log('in login');
 
-    if (currentEmail.trim().length === 0 || currentPassword.length === 0) {
-      Toast.show({
-        type: 'error',
-        text1: 'Authentication failed!',
-        text2: 'Could not log you in. Please check your credentials or try again later!',
-      });
-      return;
-    }
+    // if (currentEmail.trim().length === 0 || currentPassword.length === 0) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Authentication failed!',
+    //     text2: 'Could not log you in. Please check your credentials or try again later!',
+    //   });
+    //   return;
+    // }
 
     try {
-      await login(currentEmail, currentPassword, true);
-      // non carica il profilo dopo il login perché asincrono
-      // ancora non è settatp l'uid quando viene chiamato
-      // ma perché login non è async?
-      await loadProfile();
+      login();
+      // await login(currentEmail, currentPassword, true);
+      // // non carica il profilo dopo il login perché asincrono
+      // // ancora non è settatp l'uid quando viene chiamato
+      // // ma perché login non è async?
+      // await loadProfile();
       // setCurrentEmail('');
       // setCurrentPassword('');
     } catch (err) {
@@ -95,13 +96,13 @@ export default function LogIn() {
           <View className="items-end">
             <Button
               onPress={loginHandler}
-              disabled={allFieldsValid(currentEmail, currentPassword) ? false : true}
+              disabled={allFieldsValid(currentEmail, currentPassword) ? false : false}
               className="px-6">
               <Text>Login</Text>
             </Button>
           </View>
         </Form>
-        <Button onPress={logout} disabled={isAuthenticated ? false : true} className="mt-5 px-6">
+        <Button onPress={logout} disabled={isAuthenticated ? false : false} className="mt-5 px-6">
           <Text>Logout</Text>
         </Button>
       </KeyboardAwareScrollView>

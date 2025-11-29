@@ -16,7 +16,6 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
 import { useEffect } from 'react';
-import { useBookStore } from '~/store';
 import { useUserStore } from '~/store';
 import * as SecureStore from 'expo-secure-store';
 
@@ -31,7 +30,6 @@ export default function RootLayout() {
 
   const { colorScheme, isDarkColorScheme } = useColorScheme();
   // const { uid } = useUserStore();
-  const { login } = useUserStore();
 
   useEffect(() => {
     async function init() {
