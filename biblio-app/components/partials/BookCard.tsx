@@ -12,14 +12,43 @@ interface BookCardProps {
   onPress: () => void;
 }
 
+const StaffCTA = ({ onPress }: Partial<BookCardProps>) => (
+  <Button
+    android_ripple={{ foreground: true, color: '#ffffff30' }}
+    onPress={onPress}
+    className={'bg-secondary'}>
+    <Icon size={'body'} type="MaterialCommunityIcons" name="pencil" />
+    <Text>{'Modifica'}</Text>
+  </Button>
+);
+
+const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
+  selected ? (
+    <Button className="bg-transparent">
+      <Text className="text-success">{'Aggiunto'}</Text>
+    </Button>
+  ) : (
+    <Button
+      android_ripple={{ foreground: true, color: '#ffffff30' }}
+      onPress={onPress}
+      className={'bg-secondary'}>
+      <Icon size={'body'} name="add" />
+      <Text>{'Libreria'}</Text>
+    </Button>
+  );
+
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
   // const { colors } = useColorScheme();
 
   const { isAuthenticated } = useUserStore();
 
   const imageSource = useMemo(
-    () => ({ uri: item.imageUrl ?? 'https://islandpress.org/files/default_book_cover_2015.jpg' }),
-    [item.imageUrl]
+    () =>
+      ({
+        uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`,
+        // fallback: 'https://islandpress.org/files/default_book_cover_2015.jpg'
+      }) satisfies ImageSourcePropType,
+    []
   );
 
   return (
@@ -28,16 +57,18 @@ const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
         {/* Immagine e Valutazione */}
         <View className="gap-4">
           <ImageBackground
-            source={{}}
-            resizeMode="contain"
-            className="rounded-2xl"
-            style={{ backgroundColor: '#7d797a' }}>
-            <Image
-              className="h-32 rounded-2xl"
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={imageSource}
-            />
+            source={imageSource}
+            resizeMode="stretch"
+            imageClassName="rounded-2xl"
+            className="rounded-2xl ">
+            <View className="rounded-2xl bg-[#000000AF]">
+              <Image
+                className="h-32 rounded-2xl"
+                resizeMethod="resize"
+                resizeMode="contain"
+                source={imageSource}
+              />
+            </View>
           </ImageBackground>
           <View className="flex-row items-center gap-1">
             <Icon name="star" size={'body'} color="#ca8a04" />
@@ -71,26 +102,12 @@ const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
               {item.available ? 'Disponibile' : 'Non Disponibile'}
             </Text>
           </View>
-          {isAuthenticated ? (
-            <Button
-              android_ripple={{ foreground: true, color: '#ffffff30' }}
-              onPress={onPress}
-              className={'bg-secondary'}>
-              <Icon size={'body'} type="MaterialCommunityIcons" name="pencil" />
-              <Text>{'Modifica'}</Text>
-            </Button>
-          ) : selected ? (
-            <Button className="bg-transparent">
-              <Text className="text-success">{'Aggiunto'}</Text>
-            </Button>
+
+          {/* Call To Actions */}
+          {membership.role === 'staff' ? (
+            <StaffCTA onPress={onPress} />
           ) : (
-            <Button
-              android_ripple={{ foreground: true, color: '#ffffff30' }}
-              onPress={onPress}
-              className={'bg-secondary'}>
-              <Icon size={'body'} name="add" />
-              <Text>{'Libreria'}</Text>
-            </Button>
+            <UserCTA onPress={onPress} selected={selected} />
           )}
         </View>
       </View>

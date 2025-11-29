@@ -4,29 +4,37 @@ import { Book } from '~/store/book';
 import { useUserStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA } from '~/lib/utils';
+import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useMemo } from 'react';
 
 const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => {
   const { colors } = useColorScheme();
 
+  const imageSource = useMemo(
+    () =>
+      ({
+        uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`,
+        // fallback: 'https://islandpress.org/files/default_book_cover_2015.jpg'
+      }) satisfies ImageSourcePropType,
+    []
+  );
+
   return (
     <View className="flex-row justify-between gap-8 rounded-lg bg-card p-4 shadow-md">
-      <View className="">
+      <View className="rounded-2xl">
         <Image
           resizeMode="cover"
           resizeMethod="resize"
-          className="h-32 w-24"
-          source={{
-            uri: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ym9vayUyMGNvdmVyfGVufDB8fDB8fHww',
-          }}></Image>
+          className="h-32 w-24 rounded-2xl"
+          source={imageSource}></Image>
       </View>
 
       <View className="items-end justify-between">
         <View className="items-end gap-2">
-          <Text>{item.title}</Text>
+          <Text>{truncateText(item.title, 20)}</Text>
           <Text variant={'label'} color={'muted'}>
-            {item.author}
+            {truncateText(item.author, 20)}
           </Text>
           <View>
             <View className="flex-row items-center gap-2">
@@ -45,12 +53,15 @@ const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => 
           </View>
         </View>
 
-        <Pressable className="items-end" onPress={onPress}>
-          <Icon
+        <Pressable className="flex-row items-center gap-2" onPress={onPress}>
+          <Text variant={'label'} weight={'light'} className="text-destructive underline">
+            Rimuovi
+          </Text>
+          {/* <Icon
             color={colors.destructive}
             type="MaterialCommunityIcons"
             name="minus-circle-outline"
-          />
+          /> */}
         </Pressable>
       </View>
     </View>
