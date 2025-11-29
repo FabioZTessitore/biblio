@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { Book } from './book';
+import { Book } from './biblio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface FilterItem {
@@ -129,10 +129,8 @@ const filtersAction = {
 
           case 'available':
             if (filter.value === 'Tutti') return;
-            if (filter.value === 'Si')
-              filtered = filtered.filter((book) => book.available === true);
-            if (filter.value === 'No')
-              filtered = filtered.filter((book) => book.available === false);
+            if (filter.value === 'Si') filtered = filtered.filter((book) => book.available > 0);
+            if (filter.value === 'No') filtered = filtered.filter((book) => book.available <= 0);
             break;
 
           default:
