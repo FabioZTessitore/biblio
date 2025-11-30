@@ -24,19 +24,19 @@ export type TAuthStore = TAuthState & TAuthMutations & TAuthAction;
 
 // Contiene solo quello che Firebase dà subito.
 // questi dati devono essere utilizzati solo nell'ambito del login
-const loanState = {
+const authState = {
   uid: '',
   email: '',
   isAuthenticated: false,
 } satisfies TAuthState;
 
-const loanMutations = {
+const authMutations = {
   setUid: (uid) => useAuthStore.setState({ uid }),
   setEmail: (email: string) => useAuthStore.setState({ email }),
   setIsAuthenticated: (value) => useAuthStore.setState({ isAuthenticated: value }),
 } satisfies TAuthMutations;
 
-const loanAction = {
+const authAction = {
   login: async () => {
     // Test, vabbuò ma nun s ver?
     const { setIsAuthenticated } = useAuthStore.getState();
@@ -62,7 +62,7 @@ const loanAction = {
 } satisfies TAuthAction;
 
 export const useAuthStore = create<TAuthStore>(() => ({
-  ...loanState,
-  ...loanMutations,
-  ...loanAction,
+  ...authState,
+  ...authMutations,
+  ...authAction,
 }));
