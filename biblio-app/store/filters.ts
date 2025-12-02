@@ -16,7 +16,7 @@ export interface Filter {
   items: FilterItem[];
 }
 
-type Filters = Filter[];
+export type Filters = Filter[];
 
 export interface TFiltersState {
   filters: Filters;

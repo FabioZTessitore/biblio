@@ -1,18 +1,30 @@
 import { Text, Icon } from '~/components/ui';
 import { useState, useEffect, useRef } from 'react';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useFiltersStore } from '~/store';
+import { useBookStore, useFiltersStore } from '~/store';
 import { truncateText } from '~/lib/utils';
 import { FlatList, Pressable, View } from 'react-native';
 import { SearchInput } from './nativewindui/SearchInput';
-import { FilterItem } from '~/store/filters';
 import { SheetModal } from '~/components/partials';
+import { Book } from '~/store/book';
+import { Filter, Filters } from '~/store/filters';
 
 const FiltersSheetModal = () => {
-  const { filters, filtersModal, setFiltersModal, resetFilters, updateFilterValue, getFilterItem } =
-    useFiltersStore();
+  const { books } = useBookStore();
+
+  const {
+    filters,
+    filtersModal,
+    setFiltersModal,
+    resetFilters,
+    updateFilterValue,
+    getFilterItem,
+    applyFilters,
+  } = useFiltersStore();
 
   const [searchText, setSearchText] = useState('');
+
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
 
   const [activeFilter, setActiveFilter] = useState<null | {
     group: string;
@@ -23,6 +35,7 @@ const FiltersSheetModal = () => {
     setSearchText('');
     setActiveFilter(null);
     setFiltersModal(false);
+    setFilteredBooks(books);
   };
 
   const currentFilter = getFilterItem(activeFilter?.group ?? '', activeFilter?.filterId ?? '');
@@ -58,6 +71,25 @@ const FiltersSheetModal = () => {
       updateFilterValue(activeFilter.group, currentFilter.id, '');
     }
   }, [searchText, activeFilter, currentFilter, updateFilterValue]);
+
+  const searchHandler = (text: string) => {
+    setSearchText(text);
+
+    // Crea manualmente un filtro
+    const newFilters: Filters = filters.map((section) => ({
+      group: section.group,
+      items: section.items.map((item) => ({ ...item })),
+    }));
+    const section = newFilters.find((f: Filter) => f.group === activeFilter?.group);
+    const filter = section?.items.find((i) => i.id === currentFilter?.id);
+    filter!.value = text;
+
+    // applco il filtro e poi aggiorno lo store
+    const filteredBooks = applyFilters(books, newFilters);
+    updateFilterValue(activeFilter?.group ?? '', currentFilter?.id ?? '', text);
+
+    setFilteredBooks(filteredBooks);
+  };
 
   return (
     <SheetModal visible={filtersModal} onClose={onClose}>
@@ -127,7 +159,7 @@ const FiltersSheetModal = () => {
                   variant="bottom-sheet"
                   containerClassName="bg-background"
                   value={searchText !== '' ? searchText : (currentFilter?.value ?? '')}
-                  onChangeText={(txt) => setSearchText(txt)}
+                  onChangeText={(txt) => searchHandler(txt)}
                 />
                 <FlatList
                   data={[
@@ -153,6 +185,13 @@ const FiltersSheetModal = () => {
                       <></>
                     );
                   }}
+                  ListFooterComponent={
+                    filteredBooks.length === 0 ? (
+                      <Text className="mt-4 text-center">
+                        La ricerca non produrrà alcun risultato...
+                      </Text>
+                    ) : null
+                  }
                 />
               </View>
             )}

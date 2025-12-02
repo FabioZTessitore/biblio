@@ -1,26 +1,26 @@
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Pressable } from 'react-native';
 import { useBookStore, useFiltersStore, useUserStore } from '~/store';
 import { Book } from '~/store/book';
 import { FiltersSheetModal, AddBookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
-import { Icon } from '~/components/ui';
+import { Icon, Text } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect } from 'react';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, bookModal, setBookModal, loadBooks } = useBookStore();
+  const { books, setBookModal, loadBooks } = useBookStore();
   const { library, addBookToLibrary, isAuthenticated } = useUserStore();
-  const { filters, applyFilters } = useFiltersStore();
+  const { filters, applyFilters, resetFilters } = useFiltersStore();
 
   useEffect(() => {
     // Load books when component mounts
     loadBooks();
     console.log(books);
-  }, []);
+  }, [books, loadBooks]);
 
   const handlePressMemo = useCallback(
     (item: Book) => () => {
@@ -28,7 +28,7 @@ export default function Index() {
         addBookToLibrary(item);
       }
     },
-    [isAuthenticated, library]
+    [addBookToLibrary, isAuthenticated, library]
   );
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
@@ -48,6 +48,26 @@ export default function Index() {
 
       <View className="flex-1">
         <FlatList
+          ListEmptyComponent={() => {
+            if (books.length === 0) {
+              return <Text className="text-center">Non ci sono libri nella tua libreria.</Text>;
+            }
+            if (filteredBooks.length === 0) {
+              return (
+                <>
+                  <Text className="text-center">
+                    Nessun libro corrisponde ai filtri selezionati.
+                  </Text>
+                  <Pressable onPress={resetFilters}>
+                    <Text className="text-center" color="primary">
+                      Elimina
+                    </Text>
+                  </Pressable>
+                </>
+              );
+            }
+            return null;
+          }}
           data={filteredBooks}
           keyExtractor={(item) => item.id}
           contentContainerClassName="gap-14 py-8"
