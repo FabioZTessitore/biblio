@@ -32,15 +32,7 @@ export interface TBookAction {
 export type TBookStore = TBookState & TBookMutations & TBookAction;
 
 const bookState = {
-  // books: [],
-  books: [
-    { id: '1', title: '1984', author: 'George Orwell', availbale: true },
-    { id: '2', title: 'To Kill a Mockingbird', author: 'Harper Lee', availbale: true },
-    { id: '3', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', availbale: true },
-    { id: '4', title: 'Moby Dick', author: 'Herman Melville', availbale: true },
-    { id: '5', title: 'Fahrenheit 451', author: 'Ray Bradbury', availbale: true },
-    { id: '6', title: 'Brave New World', author: 'Aldous Huxley', availbale: true },
-  ],
+  books: [],
   bookModal: false,
 } as TBookState;
 
@@ -61,7 +53,7 @@ const bookAction = {
     const schoolsId = docSnap.data()?.schoolsId || [];
 
     if (schoolsId.length === 0) {
-      // setBooks([]);
+      setBooks([]);
       return;
     }
 
