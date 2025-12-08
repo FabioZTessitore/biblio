@@ -76,11 +76,11 @@ const authAction = {
       setUser(user);
     } catch (error: any) {
       if (error.code === 'auth/invalid-email') {
-        setError('Email non corretta');
+        setError("Inserisci un'email valida");
       } else if (error.code === 'auth/invalid-credential') {
-        setError('Password non corretta');
+        setError('Email o password non corretti');
       } else {
-        setError(error.code || 'Errore durante il login.');
+        setError(error.code || 'Si è verificato un errore durante il login.');
       }
     } finally {
       setIsLoading(false);
@@ -94,7 +94,7 @@ const authAction = {
     try {
       await signOut(auth);
     } catch (error: any) {
-      setError(error.message || 'Errore durante il logout.');
+      setError(error.message || 'Si è verificato un errore durante il logout.');
     }
 
     setMembership({
@@ -137,7 +137,7 @@ const authAction = {
       setUser(userData);
       setMembership(membershipData);
     } catch (error: any) {
-      setError(error.message || 'Errore durante il login.');
+      setError(error.message || 'Si è verificato un errore durante il login.');
     } finally {
       setIsLoading(false);
     }
