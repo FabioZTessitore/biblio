@@ -48,7 +48,7 @@ export interface TUserMutations {
 }
 
 export interface TUserAction {
-  fetchUser: (uid: string) => Promise<void>;
+  fetchUser: (uid: string) => Promise<User | null>;
   selectSchool: (schoolId: string) => Promise<void>;
   fetchMembership: (uid: string, schoolId: string) => Promise<Membership | null>;
   createMembership: (uid: string, schoolId: string, role: Membership['role']) => Promise<void>;
@@ -120,8 +120,6 @@ const userAction = {
   },
 
   createUser: async (uid, user) => {
-    if (!user.name) return;
-
     const userRef = doc(db, 'users', uid);
     const snap = await getDoc(userRef);
 
@@ -135,7 +133,14 @@ const userAction = {
     }
   },
 
-  fetchUser: async (uid) => {},
+  fetchUser: async (uid) => {
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+
+    const user = snap.exists() ? (snap.data() as User) : null;
+
+    return user;
+  },
 
   // fetchAllMemberships: async (uid: string) => {
   //   Recupera tutte le memberships di tutte le scuole

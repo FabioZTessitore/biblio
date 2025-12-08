@@ -45,15 +45,23 @@ const authMutations = {
 
 const authAction = {
   login: async (email, password) => {
-    const { setMembership, fetchMembership } = useUserStore.getState();
-    const { setIsLoading, setError, setIsAuthenticated } = useAuthStore.getState();
+    const { setMembership, fetchMembership, fetchUser, setUser, user } = useUserStore.getState();
+    const { setIsLoading, setError } = useAuthStore.getState();
 
     setIsLoading(true);
     setError('');
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
+      const {
+        user: { uid },
+      } = await signInWithEmailAndPassword(auth, email, password);
+
+      const user = await fetchUser(uid);
+
+      if (!user) {
+        console.log('Errore: membership non trovata', user);
+        throw Error;
+      }
 
       const membership = await fetchMembership(uid, schoolId);
 
@@ -65,7 +73,7 @@ const authAction = {
       console.log('Membership Trovata:', membership);
 
       setMembership(membership);
-
+      setUser(user);
     } catch (error: any) {
       if (error.code === 'auth/invalid-email') {
         setError('Email non corretta');
