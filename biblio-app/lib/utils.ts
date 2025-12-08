@@ -15,3 +15,5 @@ export function convertToRGBA(rgb: string, opacity: number): string {
 export const truncateText = (text: string, max: number = 40) => {
   return text.length > max ? text.substring(0, max - 3) + '...' : text;
 };
+
+export const SCHOOL_ID = 'tSkHlDpJXQBXLMQjlZMm';
