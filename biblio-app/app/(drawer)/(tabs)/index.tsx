@@ -1,11 +1,5 @@
 import { View, FlatList } from 'react-native';
-import {
-  useFiltersStore,
-  useLibraryStore,
-  useAuthStore,
-  useBiblioStore,
-  useUserStore,
-} from '~/store';
+import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
 import { FiltersSheetModal, AddBookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
@@ -25,9 +19,9 @@ export default function Index() {
 
   useEffect(() => {
     // Load books when component mounts
-    fetchBooks('school_id');
-    console.log(books);
-  }, []);
+    fetchBooks();
+    console.log('libri caricati');
+  }, [membership.schoolId]);
 
   const handlePressMemo = useCallback(
     (item: Book) => () => {

@@ -65,7 +65,7 @@ export interface TBiblioMutations {
 
 export interface TBiblioAction {
   // General
-  fetchBooks: (schoolId: string) => Promise<void>;
+  fetchBooks: () => Promise<void>;
   fetchLoans: (schoolId: string) => Promise<void>;
   fetchRequests: (schoolId: string) => Promise<void>;
 
@@ -102,51 +102,21 @@ const biblioMutations = {
 
 const biblioAction = {
   // General
-  fetchBooks: async (schoolId) => {
+  fetchBooks: async () => {
     const { setBooks } = useBiblioStore.getState();
+    const { membership } = useUserStore.getState();
 
-    setBooks([
-      {
-        id: 'book_0001',
-        title: 'Il barone rampante',
-        author: 'Italo Calvino',
-        isbn: '9788807900235',
-        schoolId: 'school_01',
-        available: 4,
-      },
-      {
-        id: 'book_0002',
-        title: 'Promessi sposi',
-        author: 'Alessandro Manzoni',
-        isbn: '9788478886548',
-        schoolId: 'school_01',
-        available: 2,
-      },
-      {
-        id: 'book_0003',
-        title: 'I Malavoglia',
-        author: 'Giovanni Verga',
-        isbn: '9788478886548',
-        schoolId: 'school_01',
-        available: 5,
-      },
-      {
-        id: 'book_0004',
-        title: 'Divina Commedia - Inferno',
-        author: 'Dante Alighieri',
-        isbn: '9788478886548',
-        schoolId: 'school_01',
-        available: 3,
-      },
-      {
-        id: 'book_0005',
-        title: 'Il nome della rosa',
-        author: 'Umberto Eco',
-        isbn: '9788478886548',
-        schoolId: 'school_01',
-        available: 1,
-      },
-    ]);
+    // if (!membership?.schoolId) return setBooks([]);
+
+    const q = query(collection(db, 'books'), where('schoolId', '==', membership.schoolId));
+
+    const snap = await getDocs(q);
+    const books: Book[] = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as Omit<Book, 'id'>),
+    }));
+
+    setBooks(books);
   },
   fetchLoans: async (schoolId) => {},
   fetchRequests: async (schoolId) => {},
@@ -158,8 +128,9 @@ const biblioAction = {
   // Staff
   approveRequest: async (requestId) => {},
   rejectRequest: async (requestId) => {},
-  addBook: async (data) => {},
+
   updateBook: async (bookId, data) => {},
+
   markReturned: async (loanId) => {
     // Lo staff segna un prestito come restituito
     const { membership } = useUserStore.getState();
