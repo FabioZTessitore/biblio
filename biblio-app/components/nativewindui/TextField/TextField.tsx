@@ -132,7 +132,7 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
               accessibilityRole="search" // prima era 'textbox'
               editable={editable}
               className={cn(
-                'flex-1 rounded py-3 pl-2.5 text-[17px] text-foreground dark:placeholder:text-white/30',
+                'flex-1 rounded py-3 pl-6 text-base text-foreground dark:placeholder:text-white/30',
                 materialVariant === 'filled' && !!label && 'pb-2 pt-5',
                 className
               )}
@@ -183,7 +183,7 @@ function getInputState(args: GetInputArgs): InputState {
 const rootVariants = cva('relative rounded-[5px]', {
   variants: {
     variant: {
-      outlined: 'border',
+      outlined: 'border rounded-full',
       filled: 'border-b rounded-b-none',
     },
     state: {
@@ -203,7 +203,7 @@ const rootVariants = cva('relative rounded-[5px]', {
 const innerRootVariants = cva('flex-row rounded', {
   variants: {
     variant: {
-      outlined: 'border border-border',
+      outlined: 'border border-border rounded-full',
       filled: 'border-b bg-border/70 rounded-b-none ',
     },
     state: {
@@ -281,7 +281,7 @@ function MaterialLabel(props: MaterialLabelProps) {
   });
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
-      backgroundColor: colors.background,
+      backgroundColor: colors.card,
       color: colors.primary,
       fontSize: withTiming(isLiftedDerived.value ? 14 : 16, { duration: 100 }),
     };
@@ -316,10 +316,10 @@ function MaterialClearIcon(props: MaterialClearIconProps) {
       <Pressable
         testID="text-field-clear-button"
         disabled={props.editable === false}
-        className="flex-1 justify-center px-2 active:opacity-65"
+        className="flex-1 justify-center pr-4 active:opacity-65"
         onPress={props.clearText}>
         <Icon
-          className="bg-muted"
+          color={colors.grey2}
           type="MaterialCommunityIcons"
           name="close-circle-outline"
           size={24}
@@ -337,7 +337,7 @@ function MaterialErrorIcon() {
       pointerEvents="none"
       entering={FadeIn.duration(200)}
       exiting={FadeOut.duration(200)}
-      className="justify-center pr-2">
+      className="justify-center pr-4">
       <Icon
         color={colors.destructive}
         type="MaterialCommunityIcons"

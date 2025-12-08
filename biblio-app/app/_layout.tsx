@@ -18,6 +18,7 @@ import { NAV_THEME } from '~/theme';
 import { useEffect } from 'react';
 import { useUserStore } from '~/store';
 import * as SecureStore from 'expo-secure-store';
+import { SCHOOL_ID } from '~/lib/utils';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -29,22 +30,27 @@ export default function RootLayout() {
   SplashScreen.preventAutoHideAsync();
 
   const { colorScheme, isDarkColorScheme } = useColorScheme();
-  // const { uid } = useUserStore();
+  const { membership, fetchMembership, user, setMembership } = useUserStore();
 
   useEffect(() => {
     async function init() {
-      // loadBooks()
-      // loadPrifile()
-      // const storedToken = await SecureStore.getItemAsync('token');
-      // const storedUid = await SecureStore.getItemAsync('uid');
-      // if (storedToken && storedUid) {
-      //   login(storedToken, storedUid, true);
-      //   SplashScreen.hideAsync();
-      // }
+      console.log('uid: ', user.uid, 'schoolId:', SCHOOL_ID);
+
+      const autoMembership = await fetchMembership(user.uid, SCHOOL_ID);
+
+      console.log('Membership Salvata:', autoMembership);
+
+      if (autoMembership) return setMembership(autoMembership);
+
+      setMembership({
+        schoolId: '',
+        role: 'user',
+        createdAt: null,
+      });
     }
 
     init();
-  }, []);
+  }, [user]);
 
   return (
     <>
@@ -60,7 +66,13 @@ export default function RootLayout() {
           <KeyboardProvider>
             <NavThemeProvider value={NAV_THEME[colorScheme]}>
               <Stack screenOptions={SCREEN_OPTIONS}>
-                <Stack.Screen name="(drawer)" />
+                <Stack.Protected guard={!!membership.schoolId}>
+                  <Stack.Screen name="(drawer)" />
+                </Stack.Protected>
+
+                <Stack.Protected guard={!membership.schoolId}>
+                  <Stack.Screen name="welcome" />
+                </Stack.Protected>
               </Stack>
             </NavThemeProvider>
           </KeyboardProvider>
