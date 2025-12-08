@@ -8,7 +8,6 @@ import { SCHOOL_ID as schoolId } from '~/lib/utils';
 export interface TAuthState {
   uid: string;
   email: string;
-  isAuthenticated: boolean;
   isLoading: boolean;
   error: string;
 }
@@ -16,7 +15,6 @@ export interface TAuthState {
 export interface TAuthMutations {
   setUid: (uid: string) => void;
   setEmail: (email: string) => void;
-  setIsAuthenticated: (value: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string) => void;
 }
@@ -34,7 +32,6 @@ export type TAuthStore = TAuthState & TAuthMutations & TAuthAction;
 const authState = {
   uid: '',
   email: '',
-  isAuthenticated: false,
   isLoading: false,
   error: '',
 } satisfies TAuthState;
@@ -42,7 +39,6 @@ const authState = {
 const authMutations = {
   setUid: (uid) => useAuthStore.setState({ uid }),
   setEmail: (email: string) => useAuthStore.setState({ email }),
-  setIsAuthenticated: (value) => useAuthStore.setState({ isAuthenticated: value }),
   setIsLoading: (isLoading) => useAuthStore.setState({ isLoading }),
   setError: (error) => useAuthStore.setState({ error }),
 } satisfies TAuthMutations;
@@ -69,7 +65,7 @@ const authAction = {
       console.log('Membership Trovata:', membership);
 
       setMembership(membership);
-      setIsAuthenticated(true);
+
     } catch (error: any) {
       if (error.code === 'auth/invalid-email') {
         setError('Email non corretta');
@@ -84,7 +80,7 @@ const authAction = {
   },
 
   logout: async () => {
-    const { setIsAuthenticated, setError } = useAuthStore.getState();
+    const { setError } = useAuthStore.getState();
     const { setMembership } = useUserStore.getState();
 
     try {
@@ -93,7 +89,6 @@ const authAction = {
       setError(error.message || 'Errore durante il logout.');
     }
 
-    setIsAuthenticated(false);
     setMembership({
       role: 'user',
       schoolId: '',
@@ -103,7 +98,7 @@ const authAction = {
 
   loginAnonymously: async (name, surname) => {
     const { setUser, setMembership, createMembership, createUser } = useUserStore.getState();
-    const { setIsLoading, setError, setIsAuthenticated } = useAuthStore.getState();
+    const { setIsLoading, setError } = useAuthStore.getState();
 
     try {
       setIsLoading(true);
@@ -133,7 +128,6 @@ const authAction = {
       // Store
       setUser(userData);
       setMembership(membershipData);
-      setIsAuthenticated(true);
     } catch (error: any) {
       setError(error.message || 'Errore durante il login.');
     } finally {

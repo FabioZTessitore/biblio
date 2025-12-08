@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
-import { useAuthStore, useUserStore } from '~/store';
+import { useAuthStore } from '~/store';
 
 export default function Logout() {
-  const { setIsAuthenticated, setUid } = useAuthStore();
-  const { clearUser, setMembership } = useUserStore();
+  const { logout } = useAuthStore();
 
   useEffect(() => {
     // PRIMA esci dal drawer!!
@@ -12,14 +11,7 @@ export default function Logout() {
 
     // POI resetti lo store
     setTimeout(() => {
-      clearUser();
-      setMembership({
-        schoolId: '',
-        role: 'user',
-        createdAt: null,
-      });
-      setIsAuthenticated(false);
-      setUid('');
+      logout();
     }, 0);
   }, []);
 
