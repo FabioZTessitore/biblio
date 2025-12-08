@@ -65,6 +65,7 @@ export default function RootLayout() {
             </NavThemeProvider>
           </KeyboardProvider>
         </BottomSheetModalProvider>
+        {/*@ts-expect-error*/}
         <Toast config={toastConfig} />
       </GestureHandlerRootView>
 
