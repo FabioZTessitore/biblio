@@ -17,7 +17,7 @@ const SheetModal = ({ visible, onClose, onOpen, snapPoints, children }: SheetMod
   const ref = useRef<BottomSheetModal>(null);
 
   // Snap points interni
-  const snapPointInternal = useMemo(() => snapPoints ?? ['25%', '50%', '75%', '100%'], []);
+  const snapPointInternal = useMemo(() => snapPoints ?? ['25%', '50%', '75%', '95%'], []);
 
   // Callback interna per gestire apertura/chiusura
   const handleSheetChanges = useCallback(

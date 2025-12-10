@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import {
+  addDoc,
   collection,
   doc,
   getDoc,
@@ -76,7 +77,7 @@ export interface TBiblioAction {
   // Staff
   approveRequest: (requestId: string) => Promise<void>;
   rejectRequest: (requestId: string) => Promise<void>;
-  addBook: (data: Book) => Promise<void>;
+  addBook: (data: Partial<Book>) => Promise<void>;
   updateBook: (bookId: string, data: Book) => Promise<void>;
   markReturned: (loanId: string) => Promise<void>;
   createLoanFromRequest: (requestId: string) => Promise<void>;
@@ -129,7 +130,19 @@ const biblioAction = {
   approveRequest: async (requestId) => {},
   rejectRequest: async (requestId) => {},
 
-  updateBook: async (bookId, data) => {},
+  addBook: async (data) => {
+    const { membership } = useUserStore.getState();
+    const { fetchBooks } = useBiblioStore.getState();
+
+    if (membership.role !== 'staff') throw new Error('Not allowed');
+
+    await addDoc(collection(db, 'books'), <Book>{
+      ...data,
+      schoolId: membership.schoolId,
+    });
+
+    await fetchBooks();
+  },
 
   markReturned: async (loanId) => {
     // Lo staff segna un prestito come restituito

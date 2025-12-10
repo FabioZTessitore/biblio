@@ -282,7 +282,7 @@ function MaterialLabel(props: MaterialLabelProps) {
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: colors.card,
-      color: colors.primary,
+      color: props.isFocused ? colors.primary : colors.grey2,
       fontSize: withTiming(isLiftedDerived.value ? 14 : 16, { duration: 100 }),
     };
   });

@@ -1,38 +1,67 @@
-import { useState } from 'react';
-import { View } from 'react-native';
+import { useId, useRef, useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { Text } from '~/components/ui';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useUserStore, useBiblioStore, useAuthStore, useLibraryStore } from '~/store';
+import { useBiblioStore } from '~/store';
 import { Book } from '~/store/biblio';
 import { Form, FormItem, FormSection } from '~/components/nativewindui/Form';
 import { TextField } from '~/components/nativewindui/TextField';
-import { Button } from '~/components/nativewindui/Button';
-import { Toggle } from '~/components/nativewindui/Toggle';
 import { SheetModal } from './partials';
 import Toast from 'react-native-toast-message';
+import { TextFieldRef } from './nativewindui/TextField/types';
+import { Stepper } from './nativewindui/Stepper';
+import Animated, {
+  FadeInUp,
+  FadeOutDown,
+  LayoutAnimationConfig,
+  ZoomInEasyUp,
+  ZoomOutEasyDown,
+} from 'react-native-reanimated';
+
+const FlipCounter = ({ count }: { count: number }) => {
+  const id = useId();
+  return (
+    <View className="overflow-hidden py-1">
+      <LayoutAnimationConfig skipEntering>
+        <Animated.View
+          entering={FadeInUp.duration(120)}
+          exiting={FadeOutDown.duration(120)}
+          key={`${id}-wrapper-${count}`}>
+          <Animated.View
+            key={`${id}-inner-${count}`}
+            entering={ZoomInEasyUp.duration(120)}
+            exiting={ZoomOutEasyDown.duration(120)}>
+            <Text className="text-primary">{count}</Text>
+          </Animated.View>
+        </Animated.View>
+      </LayoutAnimationConfig>
+    </View>
+  );
+};
 
 const AddBookSheetModal = () => {
-  const { membership } = useUserStore();
   const { bookModal, setBookModal, addBook } = useBiblioStore();
 
-  const [currentBook, setCurrentBook] = useState<Partial<Book>>({});
+  const [currentBook, setCurrentBook] = useState<Partial<Book>>({
+    title: '',
+    author: '',
+    available: 0,
+  });
 
-  const addBookHandler = () => {
-    if (currentBook.title?.trim().length === 0 || currentBook.author?.trim().length === 0) {
+  const authorFieldRef = useRef<TextFieldRef>(null);
+  const isbnFieldRef = useRef<TextFieldRef>(null);
+
+  const onSave = () => {
+    if (!currentBook.title || !currentBook.author || !currentBook.isbn) {
       Toast.show({
         type: 'error',
         text1: 'Non hai compilato correttamente i campi!',
-        // text2: 'Could not log you in. Please check your credentials or try again later!',
       });
       return;
     }
 
-    // const newBook: Book = {
-    //   id: '',
-    //   ...currentBook
-    // };
+    addBook(currentBook);
 
-    // addBook(newBook);
     setCurrentBook({});
     setBookModal(false);
   };
@@ -41,77 +70,93 @@ const AddBookSheetModal = () => {
     setBookModal(false);
   };
 
+  const subtract = () => {
+    setCurrentBook({
+      ...currentBook,
+      available: (currentBook.available as number) - 1,
+    });
+  };
+  const add = () => {
+    setCurrentBook({
+      ...currentBook,
+      available: (currentBook.available as number) + 1,
+    });
+  };
+
   return (
-    // TODO: BottomSheetModal to components/ui/SheetModal.tsx
-    <SheetModal visible={bookModal} onClose={onClose}>
+    <SheetModal visible={bookModal} onClose={onClose} snapPoints={['75%', '95%']}>
       <BottomSheetView className="flex-1 gap-8 p-4">
-        <Text variant={'heading'} className="text-center">
-          Aggiungi un nuovo libro
-        </Text>
+        <View className="flex-row items-center justify-between py-2">
+          <Pressable className="px-2" onPress={onClose}>
+            <Text className="text-destructive">Annulla</Text>
+          </Pressable>
 
-        {/* <SearchInput variant="bottom-sheet" containerClassName="bg-background" /> */}
+          <Text variant="heading">{false ? 'Modifica libro' : 'Nuovo libro'}</Text>
 
-        {/* <KeyboardGestureArea interpolator="ios">
-          <KeyboardAwareScrollView
-            bottomOffset={8}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="interactive"> */}
+          <Pressable className="px-2" onPress={onSave}>
+            <Text color="primary">Salva</Text>
+          </Pressable>
+        </View>
+
         <Form className="gap-8 px-4 pt-8">
-          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'book' }}>
+          <FormSection
+            iconProps={{ type: 'MaterialCommunityIcons', name: 'book' }}
+            className="gap-6">
             <FormItem>
               <TextField
+                label="Titolo"
                 type="bottom-sheet"
-                placeholder="Titolo"
-                onChangeText={(currentTitle) => setCurrentBook({ title: currentTitle })}
+                onSubmitEditing={() => {
+                  authorFieldRef?.current?.focus();
+                }}
+                onChangeText={(title) => setCurrentBook({ ...currentBook, title })}
                 value={currentBook.title}
+                returnKeyType="next"
+                submitBehavior={'submit'}
               />
             </FormItem>
             <FormItem>
               <TextField
+                ref={authorFieldRef}
                 type="bottom-sheet"
-                placeholder="Autore"
-                onChangeText={(currentAuthor) => setCurrentBook({ author: currentAuthor })}
+                label="Autore"
+                onSubmitEditing={() => {
+                  isbnFieldRef?.current?.focus();
+                }}
+                onChangeText={(author) => setCurrentBook({ ...currentBook, author })}
                 value={currentBook.author}
+                returnKeyType="next"
+                submitBehavior={'submit'}
+              />
+            </FormItem>
+            <FormItem>
+              <TextField
+                ref={isbnFieldRef}
+                maxLength={13}
+                type="bottom-sheet"
+                label="Codice ISBN"
+                inputMode="numeric"
+                onChangeText={(isbn) => setCurrentBook({ ...currentBook, isbn })}
+                value={currentBook.isbn}
               />
             </FormItem>
           </FormSection>
 
-          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'dots-horizontal' }}>
-            <FormItem className="flex-row items-center gap-4">
-              <Text>Disponibile</Text>
-              <TextField
-                type="bottom-sheet"
-                placeholder="Autore"
-                inputMode="numeric"
-                onChangeText={(currentAvailable) =>
-                  setCurrentBook({ available: Number(currentAvailable) })
-                }
-                value={String(currentBook.available)}
+          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
+            <FormItem className="flex-row items-center justify-between">
+              <View className="flex-row items-center justify-between gap-2">
+                <Text>Quantità:</Text>
+                <FlipCounter count={currentBook.available ?? 0} />
+              </View>
+              <Stepper
+                className="p-2"
+                subtractButton={{ disabled: currentBook.available === 0, onPress: subtract }}
+                addButton={{ onPress: add }}
               />
-              {/* <Toggle onValueChange={toggleIsAvailable} value={currentIsAvailable} /> */}
             </FormItem>
             <FormItem></FormItem>
           </FormSection>
-
-          <View className="">
-            <Button onPress={addBookHandler} className="px-6">
-              <Text>Salva</Text>
-            </Button>
-          </View>
-
-          <View className="">
-            <Button onPress={() => setBookModal(false)} className="px-6">
-              <Text>Annulla</Text>
-            </Button>
-          </View>
         </Form>
-        {/* </KeyboardAwareScrollView>
-        </KeyboardGestureArea> */}
-
-        {/*
-        <Button variant="primary">
-          <Text>Salva</Text>
-        </Button> */}
       </BottomSheetView>
     </SheetModal>
   );
