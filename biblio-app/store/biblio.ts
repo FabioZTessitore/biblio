@@ -54,6 +54,7 @@ export interface TBiblioState {
   requests: Request[];
 
   bookModal: boolean;
+  bookEditModal: boolean;
 }
 
 export interface TBiblioMutations {
@@ -62,6 +63,7 @@ export interface TBiblioMutations {
   setRequests: (books: Request[]) => void;
 
   setBookModal: (isOpen: boolean) => void;
+  setBookEditModal: (isOpen: boolean) => void;
 }
 
 export interface TBiblioAction {
@@ -78,7 +80,7 @@ export interface TBiblioAction {
   approveRequest: (requestId: string) => Promise<void>;
   rejectRequest: (requestId: string) => Promise<void>;
   addBook: (data: Partial<Book>) => Promise<void>;
-  updateBook: (bookId: string, data: Book) => Promise<void>;
+  updateBook: (bookId: string, data: Partial<Book>) => Promise<void>;
   markReturned: (loanId: string) => Promise<void>;
   createLoanFromRequest: (requestId: string) => Promise<void>;
 }
@@ -91,6 +93,7 @@ const biblioState = {
   requests: [],
 
   bookModal: false,
+  bookEditModal: false,
 } satisfies TBiblioState;
 
 const biblioMutations = {
@@ -99,6 +102,7 @@ const biblioMutations = {
   setRequests: (requests) => useBiblioStore.setState({ requests }),
 
   setBookModal: (isOpen: boolean) => useBiblioStore.setState({ bookModal: isOpen }),
+  setBookEditModal: (isOpen: boolean) => useBiblioStore.setState({ bookEditModal: isOpen }),
 } satisfies TBiblioMutations;
 
 const biblioAction = {
@@ -139,6 +143,19 @@ const biblioAction = {
     await addDoc(collection(db, 'books'), <Book>{
       ...data,
       schoolId: membership.schoolId,
+    });
+
+    await fetchBooks();
+  },
+  updateBook: async (bookId, data) => {
+    const { membership } = useUserStore.getState();
+    const { fetchBooks } = useBiblioStore.getState();
+
+    if (membership.role !== 'staff') throw new Error('Not allowed');
+
+    await updateDoc(doc(db, 'books', bookId), {
+      id: bookId,
+      ...data,
     });
 
     await fetchBooks();

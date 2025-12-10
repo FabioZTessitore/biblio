@@ -1,21 +1,23 @@
 import { View, FlatList } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
-import { FiltersSheetModal, AddBookSheetModal } from '~/components';
+import { FiltersSheetModal, AddBookSheetModal, EditBookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import { Icon } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Book } from '~/store/biblio';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, setBookModal, fetchBooks } = useBiblioStore();
+  const { books, setBookModal, fetchBooks, setBookEditModal } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
+
+  const [bookIdToEdit, setBookIdToEdit] = useState('');
 
   useEffect(() => {
     // Load books when component mounts
@@ -27,6 +29,9 @@ export default function Index() {
     (item: Book) => () => {
       if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
         addToLibrary(item);
+      } else {
+        setBookIdToEdit(item.id);
+        setBookEditModal(true);
       }
     },
     [membership, library]
@@ -85,6 +90,7 @@ export default function Index() {
 
         <FiltersSheetModal />
         {membership.role === 'staff' && <AddBookSheetModal />}
+        {membership.role === 'staff' && <EditBookSheetModal bookId={bookIdToEdit} />}
       </View>
     </View>
   );
