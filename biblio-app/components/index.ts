@@ -1,5 +1,4 @@
-export * from './AddBookSheetModal';
-export * from './EditBookSheetModal';
+export * from './BookSheetModal';
 export * from './FiltersSheetModal';
 export * from './SignUp';
 export * from './Requests';

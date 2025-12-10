@@ -1,6 +1,6 @@
 import { View, FlatList } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
-import { FiltersSheetModal, AddBookSheetModal, EditBookSheetModal } from '~/components';
+import { FiltersSheetModal, BookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
@@ -12,7 +12,8 @@ import { Book } from '~/store/biblio';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, setBookModal, fetchBooks, setBookEditModal } = useBiblioStore();
+  const { books, setBookModal, fetchBooks, setBookEditModal, bookModal, bookEditModal } =
+    useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
@@ -89,8 +90,18 @@ export default function Index() {
         />
 
         <FiltersSheetModal />
-        {membership.role === 'staff' && <AddBookSheetModal />}
-        {membership.role === 'staff' && <EditBookSheetModal bookId={bookIdToEdit} />}
+        {membership.role === 'staff' && (
+          <>
+            <BookSheetModal mode="add" visible={bookModal} onClose={() => setBookModal(false)} />
+
+            <BookSheetModal
+              mode="edit"
+              visible={bookEditModal}
+              bookId={bookIdToEdit}
+              onClose={() => setBookEditModal(false)}
+            />
+          </>
+        )}
       </View>
     </View>
   );
