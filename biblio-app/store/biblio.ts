@@ -16,6 +16,7 @@ import { db } from '~/lib/firebase';
 import { useUserStore } from './user';
 
 export interface Loan {
+  id: string;
   userId: string;
   bookId: string;
   schoolId: string;
@@ -25,12 +26,12 @@ export interface Loan {
 }
 
 export interface Request {
+  id: string;
   userId: string;
   bookId: string;
   schoolId: string;
-  startDate: Timestamp;
-  dueDate: Timestamp;
-  returnedAt: Timestamp | null;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: Timestamp | null;
 }
 
 export interface Book {
@@ -70,7 +71,7 @@ export interface TBiblioAction {
   // General
   fetchBooks: () => Promise<void>;
   fetchLoans: (schoolId: string) => Promise<void>;
-  fetchRequests: (schoolId: string) => Promise<void>;
+  fetchRequests: () => Promise<void>;
 
   // User
   requestLoan: (bookId: string) => Promise<void>;
@@ -124,10 +125,53 @@ const biblioAction = {
     setBooks(books);
   },
   fetchLoans: async (schoolId) => {},
-  fetchRequests: async (schoolId) => {},
+  fetchRequests: async () => {
+    const { setRequests } = useBiblioStore.getState();
+    const { membership, user } = useUserStore.getState();
+
+    // if (!membership?.schoolId) return setBooks([]);
+
+    const q = query(
+      collection(db, 'requests'),
+      where('schoolId', '==', membership.schoolId),
+      where('userId', '==', user.uid)
+    );
+
+    const snap = await getDocs(q);
+    const requests: Request[] = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as Omit<Request, 'id'>),
+    }));
+
+    console.log('Richieste caricate', requests);
+    setRequests(requests);
+  },
 
   // User
-  requestLoan: async (bookId) => {},
+  requestLoan: async (bookId) => {
+    const { membership, user } = useUserStore.getState();
+    const { setIsLoading } = useBiblioStore.getState();
+    const { removeFromLibrary } = useLibraryStore.getState();
+
+    setIsLoading(true);
+    try {
+      if (!membership.schoolId) throw new Error('No school selected');
+
+      await addDoc(collection(db, 'requests'), {
+        userId: user.uid,
+        bookId,
+        schoolId: membership.schoolId,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      });
+
+      removeFromLibrary(bookId);
+    } catch {
+      console.log('Errore durante la richiesta di prestito');
+    } finally {
+      setIsLoading(false);
+    }
+  },
   cancelRequest: async (requestId) => {},
 
   // Staff

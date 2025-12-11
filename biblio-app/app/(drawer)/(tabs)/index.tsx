@@ -12,8 +12,15 @@ import { Book } from '~/store/biblio';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const { books, setBookModal, fetchBooks, setBookEditModal, bookModal, bookEditModal } =
-    useBiblioStore();
+  const {
+    books,
+    setBookModal,
+    fetchBooks,
+    fetchRequests,
+    setBookEditModal,
+    bookModal,
+    bookEditModal,
+  } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters } = useFiltersStore();
@@ -23,6 +30,7 @@ export default function Index() {
   useEffect(() => {
     // Load books when component mounts
     fetchBooks();
+    fetchRequests();
     console.log('libri caricati');
   }, [membership.schoolId]);
 
