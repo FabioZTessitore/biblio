@@ -1,5 +1,6 @@
 import { View, Image, Pressable } from 'react-native';
-import { Text, Icon } from '~/components/ui';
+import { Text } from './Text';
+import { Icon } from './Icon';
 import { truncateText } from '~/lib/utils';
 
 const BaseCard = ({

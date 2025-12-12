@@ -45,7 +45,7 @@ const authMutations = {
 
 const authAction = {
   login: async (email, password) => {
-    const { setMembership, fetchMembership, fetchUser, setUser, user } = useUserStore.getState();
+    const { setMembership, fetchMembership, fetchUser, setUser } = useUserStore.getState();
     const { setIsLoading, setError } = useAuthStore.getState();
 
     setIsLoading(true);
@@ -56,7 +56,7 @@ const authAction = {
         user: { uid },
       } = await signInWithEmailAndPassword(auth, email, password);
 
-      const user = await fetchUser(uid);
+      const user: Omit<User, 'uid'> | null = await fetchUser(uid);
 
       if (!user) {
         console.log('Errore: membership non trovata', user);
@@ -72,8 +72,11 @@ const authAction = {
 
       console.log('Membership Trovata:', membership);
 
+      setUser({
+        ...user,
+        uid,
+      });
       setMembership(membership);
-      setUser(user);
     } catch (error: any) {
       if (error.code === 'auth/invalid-email') {
         setError("Inserisci un'email valida");

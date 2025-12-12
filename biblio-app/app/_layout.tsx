@@ -50,7 +50,7 @@ export default function RootLayout() {
     }
 
     init();
-  }, [user]);
+  }, [user.uid]);
 
   return (
     <>
