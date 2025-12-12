@@ -109,6 +109,12 @@ const Library = () => {
     </View>
   );
 
+  const order = {
+    pending: 0,
+    rejected: 1,
+    approved: 2,
+  };
+
   const tabConfig = {
     0: {
       data: library,
@@ -120,7 +126,7 @@ const Library = () => {
       refresh: fetchBooks,
     },
     1: {
-      data: requests,
+      data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
