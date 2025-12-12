@@ -15,7 +15,7 @@ const buttonVariants = cva('flex-row items-center justify-center gap-2', {
       primary: 'ios:active:opacity-80 bg-primary',
       secondary: 'ios:border-primary ios:active:bg-primary/5 border border-foreground/40',
       tonal:
-        'ios:bg-primary/10 dark:ios:bg-primary/10 ios:active:bg-primary/15 bg-primary/15 dark:bg-primary/30',
+        'ios:bg-secondary/10 dark:ios:bg-secondary/10 ios:active:bg-secondary/15 bg-secondary/15 dark:bg-secondary/30',
       plain: 'ios:active:opacity-70',
     },
     size: {

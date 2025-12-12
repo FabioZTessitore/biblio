@@ -19,6 +19,7 @@ import { useAuthStore } from './auth';
 import { useLibraryStore } from './library';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 
 export interface Loan {
   id: string;
@@ -122,42 +123,65 @@ const biblioMutations = {
 const biblioAction = {
   // General
   fetchBooks: async () => {
-    const { setBooks } = useBiblioStore.getState();
+    const { setBooks, setIsLoading } = useBiblioStore.getState();
+    const { setLibrary, library } = useLibraryStore.getState();
     const { membership } = useUserStore.getState();
 
-    // if (!membership?.schoolId) return setBooks([]);
+    try {
+      setIsLoading(true);
 
-    const q = query(collection(db, 'books'), where('schoolId', '==', membership.schoolId));
+      // if (!membership?.schoolId) return setBooks([]);
 
-    const snap = await getDocs(q);
-    const books: Book[] = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as Omit<Book, 'id'>),
-    }));
+      const q = query(collection(db, 'books'), where('schoolId', '==', membership.schoolId));
 
-    setBooks(books);
+      const snap = await getDocs(q);
+      const books: Book[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Book, 'id'>),
+      }));
+
+      setBooks(books);
+
+      const updatedLibrary = library
+        .map((libBook) => books.find((b) => b.id === libBook.id)) // trova il libro aggiornato
+        .filter(Boolean) as Book[]; // rimuove eventuali null (libro cancellato)
+
+      setLibrary(updatedLibrary);
+    } catch {
+      Alert.alert('Errore', 'Errore durante il recupero dei libri');
+    } finally {
+      setIsLoading(false);
+    }
   },
   fetchLoans: async (schoolId) => {},
   fetchRequests: async () => {
-    const { setRequests } = useBiblioStore.getState();
+    const { setRequests, setIsLoading } = useBiblioStore.getState();
     const { membership, user } = useUserStore.getState();
 
-    // if (!membership?.schoolId) return setBooks([]);
+    try {
+      setIsLoading(true);
 
-    const q = query(
-      collection(db, 'requests'),
-      where('schoolId', '==', membership.schoolId),
-      where('userId', '==', user.uid)
-    );
+      // if (!membership?.schoolId) return setBooks([]);
 
-    const snap = await getDocs(q);
-    const requests: Request[] = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as Omit<Request, 'id'>),
-    }));
+      const q = query(
+        collection(db, 'requests'),
+        where('schoolId', '==', membership.schoolId),
+        where('userId', '==', user.uid)
+      );
 
-    console.log('Richieste caricate', requests);
-    setRequests(requests);
+      const snap = await getDocs(q);
+      const requests: Request[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Request, 'id'>),
+      }));
+
+      console.log('Richieste caricate', requests);
+      setRequests(requests);
+    } catch {
+      Alert.alert('Errore', 'Errore durante il recupero delle richieste');
+    } finally {
+      setIsLoading(false);
+    }
   },
 
   // User
