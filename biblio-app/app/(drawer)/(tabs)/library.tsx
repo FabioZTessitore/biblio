@@ -73,8 +73,7 @@ const Library = () => {
   const { requests, requestLoan, isLoading, fetchRequests, fetchBooks, setIsLoading } =
     useBiblioStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [hideGradient, setHideGradient] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(1);
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -110,121 +109,82 @@ const Library = () => {
     </View>
   );
 
+  const tabConfig = {
+    0: {
+      data: library,
+      emptyIcon: 'library-shelves',
+      emptyTitle: 'Libreria vuota',
+      renderer: ({ item }: { item: Book }) => (
+        <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
+      ),
+      refresh: fetchBooks,
+    },
+    1: {
+      data: requests,
+      emptyIcon: 'book-arrow-left',
+      emptyTitle: 'Nessuna richiesta',
+      renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
+      refresh: fetchRequests,
+    },
+  } as any;
+
+  const current = tabConfig[selectedIndex];
+
   return (
     <View className="flex-1 px-4">
-      <SegmentedControl
-        values={['Carrello', 'Richieste']}
-        selectedIndex={selectedIndex}
-        onIndexChange={setSelectedIndex}
+      <FlatList
+        ListHeaderComponent={() => (
+          <SegmentedControl
+            values={['Carrello', 'Richieste']}
+            selectedIndex={selectedIndex}
+            onIndexChange={setSelectedIndex}
+          />
+        )}
+        data={current.data}
+        keyExtractor={(item) => item.id}
+        renderItem={current.renderer}
+        ListEmptyComponent={() => (
+          <EmptyState
+            icon={current.emptyIcon}
+            title={current.emptyTitle}
+            subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
+          />
+        )}
+        refreshControl={
+          <RefreshControl
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+            progressBackgroundColor={colors.card}
+            refreshing={isLoading}
+            onRefresh={async () => {
+              setIsLoading(true);
+              await current.refresh();
+              setIsLoading(false);
+            }}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName="gap-8 py-8 pb-32"
       />
 
-      {/* --- CARRELLO --- */}
-      {selectedIndex === 0 && (
-        <>
-          <View className="flex-1">
-            <FlatList
-              data={library}
-              ListEmptyComponent={() => (
-                <EmptyState
-                  icon="library-shelves"
-                  title="Libreria vuota"
-                  subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              onScroll={(e) => setHideGradient(e.nativeEvent.contentOffset.y < 2)}
-              contentContainerClassName="flex-grow gap-8 py-8"
-              renderItem={({ item }) => (
-                <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
-              )}
-              refreshControl={
-                <RefreshControl
-                  colors={[colors.primary]}
-                  tintColor={colors.primary}
-                  progressBackgroundColor={colors.card}
-                  refreshing={isLoading}
-                  onRefresh={async () => {
-                    setIsLoading(true);
-                    await fetchBooks();
-                    setIsLoading(false);
-                  }}
-                />
-              }
-            />
+      <LinearGradient
+        colors={[colors.background, convertToRGBA(colors.background, 0)]}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 16,
+          zIndex: 1,
+        }}
+        pointerEvents="none"
+      />
 
-            {!hideGradient && (
-              <LinearGradient
-                colors={[colors.background, convertToRGBA(colors.background, 0)]}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 10,
-                  zIndex: 1,
-                }}
-                pointerEvents="none"
-              />
-            )}
-          </View>
-
-          {library.length > 0 && (
-            <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
-              <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
-                {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}
-              </Button>
-            </View>
-          )}
-        </>
-      )}
-
-      {/* --- RICHIESTE --- */}
-      {selectedIndex === 1 && (
-        <View className="flex-1">
-          <FlatList
-            data={requests}
-            ListEmptyComponent={() => (
-              <EmptyState
-                icon="book-arrow-left"
-                title="Nessuna richiesta"
-                subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            onScroll={(e) => setHideGradient(e.nativeEvent.contentOffset.y < 2)}
-            contentContainerClassName="flex-grow gap-8 py-8"
-            renderItem={({ item }) => <RequestCard item={item} />}
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                tintColor={colors.primary}
-                progressBackgroundColor={colors.card}
-                refreshing={isLoading}
-                onRefresh={async () => {
-                  setIsLoading(true);
-                  await fetchRequests();
-                  setIsLoading(false);
-                }}
-              />
-            }
-          />
-
-          {!hideGradient && (
-            <LinearGradient
-              colors={[colors.background, convertToRGBA(colors.background, 0)]}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 10,
-                zIndex: 1,
-              }}
-              pointerEvents="none"
-            />
-          )}
+      {selectedIndex === 0 && library.length > 0 && (
+        <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
+          <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
+            {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}
+          </Button>
         </View>
       )}
     </View>
