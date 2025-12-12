@@ -1,4 +1,4 @@
-import { FlatList, View, Alert } from 'react-native';
+import { FlatList, View, Alert, RefreshControl } from 'react-native';
 import { Text, Icon, BaseCard } from '~/components/ui';
 import { Book, Request, useBiblioStore } from '~/store/biblio';
 import { useLibraryStore } from '~/store';
@@ -70,13 +70,11 @@ const Library = () => {
   const { colors } = useColorScheme();
 
   const { library, removeFromLibrary } = useLibraryStore();
-  const { requests, requestLoan, isLoading } = useBiblioStore();
+  const { requests, requestLoan, isLoading, fetchRequests, fetchBooks, setIsLoading } =
+    useBiblioStore();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const handlePress = (item: Book) => {
-    removeFromLibrary(item.id);
-  };
+  const [hideGradient, setHideGradient] = useState(false);
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -135,25 +133,40 @@ const Library = () => {
               )}
               keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
+              onScroll={(e) => setHideGradient(e.nativeEvent.contentOffset.y < 2)}
               contentContainerClassName="flex-grow gap-8 py-8"
               renderItem={({ item }) => (
                 <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
               )}
-
+              refreshControl={
+                <RefreshControl
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                  progressBackgroundColor={colors.card}
+                  refreshing={isLoading}
+                  onRefresh={async () => {
+                    setIsLoading(true);
+                    await fetchBooks();
+                    setIsLoading(false);
+                  }}
+                />
+              }
             />
 
-            <LinearGradient
-              colors={[colors.background, convertToRGBA(colors.background, 0)]}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 10,
-                zIndex: 10,
-              }}
-              pointerEvents="none"
-            />
+            {!hideGradient && (
+              <LinearGradient
+                colors={[colors.background, convertToRGBA(colors.background, 0)]}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 10,
+                  zIndex: 1,
+                }}
+                pointerEvents="none"
+              />
+            )}
           </View>
 
           {library.length > 0 && (
@@ -180,9 +193,25 @@ const Library = () => {
             )}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
+            onScroll={(e) => setHideGradient(e.nativeEvent.contentOffset.y < 2)}
             contentContainerClassName="flex-grow gap-8 py-8"
             renderItem={({ item }) => <RequestCard item={item} />}
+            refreshControl={
+              <RefreshControl
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+                progressBackgroundColor={colors.card}
+                refreshing={isLoading}
+                onRefresh={async () => {
+                  setIsLoading(true);
+                  await fetchRequests();
+                  setIsLoading(false);
+                }}
+              />
+            }
           />
+
+          {!hideGradient && (
             <LinearGradient
               colors={[colors.background, convertToRGBA(colors.background, 0)]}
               style={{
@@ -195,6 +224,7 @@ const Library = () => {
               }}
               pointerEvents="none"
             />
+          )}
         </View>
       )}
     </View>
