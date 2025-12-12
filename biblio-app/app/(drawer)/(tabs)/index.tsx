@@ -1,4 +1,4 @@
-import { View, FlatList } from 'react-native';
+import { View, FlatList, RefreshControl } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
 import { FiltersSheetModal, BookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,6 +20,8 @@ export default function Index() {
     setBookEditModal,
     bookModal,
     bookEditModal,
+    setIsLoading,
+    isLoading,
   } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
@@ -70,10 +72,22 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           initialNumToRender={10}
           maxToRenderPerBatch={10}
-          // removeClippedSubviews
           renderItem={({ item }) => (
             <BookCard item={item} selected={isSelected(item.id)} onPress={handlePressMemo(item)} />
           )}
+          refreshControl={
+            <RefreshControl
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+              progressBackgroundColor={colors.card}
+              refreshing={isLoading}
+              onRefresh={async () => {
+                setIsLoading(true);
+                await fetchBooks();
+                setIsLoading(false);
+              }}
+            />
+          }
         />
 
         {membership.role === 'staff' && (
