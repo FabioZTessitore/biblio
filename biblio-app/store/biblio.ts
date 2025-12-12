@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -14,6 +15,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '~/lib/firebase';
 import { useUserStore } from './user';
+import { useAuthStore } from './auth';
+import { useLibraryStore } from './library';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Loan {
   id: string;
@@ -56,6 +61,8 @@ export interface TBiblioState {
 
   bookModal: boolean;
   bookEditModal: boolean;
+
+  isLoading: boolean;
 }
 
 export interface TBiblioMutations {
@@ -65,6 +72,8 @@ export interface TBiblioMutations {
 
   setBookModal: (isOpen: boolean) => void;
   setBookEditModal: (isOpen: boolean) => void;
+
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export interface TBiblioAction {
@@ -95,6 +104,8 @@ const biblioState = {
 
   bookModal: false,
   bookEditModal: false,
+
+  isLoading: false,
 } satisfies TBiblioState;
 
 const biblioMutations = {
@@ -104,6 +115,8 @@ const biblioMutations = {
 
   setBookModal: (isOpen: boolean) => useBiblioStore.setState({ bookModal: isOpen }),
   setBookEditModal: (isOpen: boolean) => useBiblioStore.setState({ bookEditModal: isOpen }),
+
+  setIsLoading: (isLoading) => useAuthStore.setState({ isLoading }),
 } satisfies TBiblioMutations;
 
 const biblioAction = {
@@ -150,7 +163,7 @@ const biblioAction = {
   // User
   requestLoan: async (bookId) => {
     const { membership, user } = useUserStore.getState();
-    const { setIsLoading } = useBiblioStore.getState();
+    const { setIsLoading, fetchRequests } = useBiblioStore.getState();
     const { removeFromLibrary } = useLibraryStore.getState();
 
     setIsLoading(true);
@@ -165,6 +178,8 @@ const biblioAction = {
         createdAt: serverTimestamp(),
       });
 
+      await fetchRequests();
+
       removeFromLibrary(bookId);
     } catch {
       console.log('Errore durante la richiesta di prestito');
@@ -172,7 +187,24 @@ const biblioAction = {
       setIsLoading(false);
     }
   },
-  cancelRequest: async (requestId) => {},
+  cancelRequest: async (requestId) => {
+    const { membership, user } = useUserStore.getState();
+    const { setIsLoading, fetchRequests } = useBiblioStore.getState();
+
+    setIsLoading(true);
+    try {
+      if (!membership.schoolId) throw new Error('No school selected');
+
+      await deleteDoc(doc(db, 'requests', requestId));
+
+      await fetchRequests();
+      console.log('Eliminata');
+    } catch {
+      console.log('Errore durante la richiesta di prestito');
+    } finally {
+      setIsLoading(false);
+    }
+  },
 
   // Staff
   approveRequest: async (requestId) => {},
@@ -226,37 +258,23 @@ const biblioAction = {
     });
   },
   createLoanFromRequest: async (requestId) => {},
-  // loadBooks: async () => {
-  //   // const { uid, setUid } = useUserStore.getState();
-  //   // const { setBooks } = useBookStore.getState();
-  //   // if (uid === null) setUid('Vjv3oMJC6zUfW3B9hqOlwf9JCyo2');
-  //   // const docRef = doc(db, 'users', uid!);
-  //   // const docSnap = await getDoc(docRef);
-  //   // const schoolsId = docSnap.data()?.schoolsId || [];
-  //   // if (schoolsId.length === 0) {
-  //   //   setBooks([]);
-  //   //   return;
-  //   // }
-  //   // const q = query(collection(db, 'books'), where('schoolId', 'in', schoolsId));
-  //   // const querySnapshot = await getDocs(q);
-  //   // const newBooks: Book[] = [];
-  //   // querySnapshot.forEach((doc) => {
-  //   //   newBooks.push({
-  //   //     id: doc.id,
-  //   //     ...doc.data(),
-  //   //   } as Book);
-  //   // });
-  //   // setBooks(newBooks);
-  // },
-  // saveBook: async () => {},
 } satisfies TBiblioAction;
 
-export const useBiblioStore = create<TBiblioStore>(() => ({
-  ...biblioState,
-  ...biblioMutations,
-  ...biblioAction,
-  /* Non utilizziamo il persist perché non vogliamo salvare
-   * i libri nello store del dispositivo, se poi è necessario
-   * ricaricarli (per averli aggiornati) ogni volta che l'app viene riaperta.
-   */
-}));
+export const useBiblioStore = create<TBiblioStore>()(
+  persist(
+    () =>
+      <TBiblioStore>{
+        ...biblioState,
+        ...biblioMutations,
+        ...biblioAction,
+      },
+    {
+      name: 'biblioStore',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        requests: state.requests,
+        books: state.books,
+      }),
+    }
+  )
+);

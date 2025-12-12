@@ -1,160 +1,74 @@
-import { FlatList, View, Image, Pressable, ImageSourcePropType } from 'react-native';
-import { Text, Icon } from '~/components/ui';
-import { Book, useBiblioStore, Request } from '~/store/biblio';
-import { useAuthStore, useLibraryStore, useUserStore } from '~/store';
+import { FlatList, View, Alert } from 'react-native';
+import { Text, Icon, BaseCard } from '~/components/ui';
+import { Book, Request, useBiblioStore } from '~/store/biblio';
+import { useLibraryStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 
-const BookLibrary = ({ item, onPress }: { item: Book; onPress: () => void }) => {
+/* ------------------------------------------
+   CARD LIBRERIA (usa BaseCard)
+------------------------------------------- */
+const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void }) => {
   const { colors } = useColorScheme();
 
-  const imageSource = useMemo(
-    () =>
-      ({
-        uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`,
-        // fallback: 'https://islandpress.org/files/default_book_cover_2015.jpg'
-      }) satisfies ImageSourcePropType,
-    []
-  );
-
   return (
-    <View className="flex-row justify-between gap-8 rounded-lg bg-card p-4 shadow-md">
-      <View className="rounded-2xl">
-        <Image
-          resizeMode="cover"
-          resizeMethod="resize"
-          className="h-32 w-24 rounded-2xl"
-          source={imageSource}></Image>
-      </View>
-
-      <View className="items-end justify-between">
-        <View className="items-end gap-2">
-          <Text>{truncateText(item.title, 20)}</Text>
-          <Text variant={'label'} color={'muted'}>
-            {truncateText(item.author, 20)}
-          </Text>
-          <View>
-            <View className="flex-row items-center gap-2">
-              <Icon
-                size={'label'}
-                name="circle"
-                color={item.available ? colors.success : colors.destructive}></Icon>
-              <Text
-                weight={'light'}
-                variant={'label'}
-                style={{ includeFontPadding: false }}
-                className="flex-shrink uppercase">
-                {item.available ? 'Disponibile' : 'Non Disponibile'}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <Pressable className="flex-row items-center gap-2" onPress={onPress}>
-          <Text variant={'label'} weight={'light'} className="text-destructive underline">
-            Rimuovi
-          </Text>
-          {/* <Icon
-            color={colors.destructive}
-            type="MaterialCommunityIcons"
-            name="minus-circle-outline"
-          /> */}
-        </Pressable>
-      </View>
-    </View>
+    <BaseCard
+      title={item.title}
+      subtitle={item.author}
+      imageUri={`https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`}
+      statusColor={item.available ? colors.success : colors.destructive}
+      statusLabel={item.available ? 'Disponibile' : 'Non disponibile'}
+      actionLabel="Rimuovi"
+      onPress={onRemove}
+    />
   );
 };
 
+/* ------------------------------------------
+   CARD RICHIESTE (usa BaseCard)
+------------------------------------------- */
 const RequestCard = ({ item }: { item: Request }) => {
   const { colors } = useColorScheme();
+  const { books, cancelRequest } = useBiblioStore();
 
-  const { books } = useBiblioStore();
+  const book = books.find((b) => b.id === item.bookId) ?? {
+    title: '',
+    author: '',
+    isbn: '',
+  };
 
-  const book = useMemo(
-    () =>
-      books.find((book) => book.id === item.bookId) ?? {
-        title: '',
-        author: '',
-        isbn: '',
-        available: 0,
-      },
-    [item]
-  );
+  const statusMap = {
+    approved: { color: colors.success, label: 'Approvato' },
+    rejected: { color: colors.destructive, label: 'Rifiutato' },
+    pending: { color: colors.grey2, label: 'In attesa' },
+  };
 
-  const imageSource = useMemo(
-    () =>
-      ({
-        uri: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`,
-        // fallback: 'https://islandpress.org/files/default_book_cover_2015.jpg'
-      }) satisfies ImageSourcePropType,
-    []
-  );
+  const { color, label } = statusMap[item.status] ?? statusMap.pending;
 
   return (
-    <View className="flex-row justify-between gap-8 rounded-lg bg-card p-4 shadow-md">
-      <View className="rounded-2xl">
-        <Image
-          resizeMode="cover"
-          resizeMethod="resize"
-          className="h-32 w-24 rounded-2xl"
-          source={imageSource}></Image>
-      </View>
-
-      <View className="items-end justify-between">
-        <View className="items-end gap-2">
-          <Text>{truncateText(book.title, 20)}</Text>
-          <Text variant={'label'} color={'muted'}>
-            {truncateText(book.author, 20)}
-          </Text>
-          <View>
-            <View className="flex-row items-center gap-2">
-              <Icon
-                size={'label'}
-                name="circle"
-                color={
-                  item.status === 'approved'
-                    ? colors.success
-                    : item.status === 'rejected'
-                      ? colors.destructive
-                      : colors.grey2
-                }></Icon>
-              <Text
-                weight={'light'}
-                variant={'label'}
-                style={{ includeFontPadding: false }}
-                className="flex-shrink uppercase">
-                {item.status === 'approved'
-                  ? 'Approvato'
-                  : item.status === 'rejected'
-                    ? 'Rifiutao'
-                    : 'In Attesa'}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <Pressable className="flex-row items-center gap-2" onPress={() => {}}>
-          <Text variant={'label'} weight={'light'} className="text-destructive underline">
-            Cancella richiesta
-          </Text>
-          {/* <Icon
-            color={colors.destructive}
-            type="MaterialCommunityIcons"
-            name="minus-circle-outline"
-          /> */}
-        </Pressable>
-      </View>
-    </View>
+    <BaseCard
+      title={book.title}
+      subtitle={book.author}
+      imageUri={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`}
+      statusColor={color}
+      statusLabel={label}
+      actionLabel="Cancella richiesta"
+      onPress={() => cancelRequest(item.id)}
+    />
   );
 };
 
+/* ------------------------------------------
+   LIBRERIA
+------------------------------------------- */
 const Library = () => {
   const { colors } = useColorScheme();
+
   const { library, removeFromLibrary } = useLibraryStore();
   const { requests, requestLoan, isLoading } = useBiblioStore();
 
@@ -165,61 +79,67 @@ const Library = () => {
   };
 
   const loanRequest = () => {
-    // Si dovrebbe fare una fetch dei libri al momento della richiesta del prestito
-    // e aggiornarla con i libri in libreria
-    if (library.some(({ available }) => !available)) {
-      console.log('Uno o più libri non sono dispobili');
-    } else {
-      library.forEach((book) => {
-        requestLoan(book.id);
-      });
+    if (library.some((book) => !book.available)) {
+      Alert.alert('Attenzione!', 'Uno o più libri non sono disponibili');
+      return;
     }
+
+    if (library.some((book) => requests.some((r) => r.bookId === book.id))) {
+      Alert.alert('Attenzione!', 'Non puoi richiedere un libro già richiesto');
+      return;
+    }
+
+    library.forEach((book) => requestLoan(book.id));
   };
+
+  const EmptyState = ({
+    icon,
+    title,
+    subtitle,
+  }: {
+    icon: any;
+    title: string;
+    subtitle: string;
+  }) => (
+    <View className="flex-1 items-center justify-center gap-12">
+      <Icon size={192} type="MaterialCommunityIcons" name={icon} color={colors.primary} />
+      <View className="items-center gap-6">
+        <Text variant="heading" className="text-center">
+          {title}
+        </Text>
+        <Text className="text-center">{subtitle}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View className="flex-1 px-4">
       <SegmentedControl
         values={['Carrello', 'Richieste']}
         selectedIndex={selectedIndex}
-        onIndexChange={(index) => {
-          setSelectedIndex(index);
-        }}
+        onIndexChange={setSelectedIndex}
       />
 
+      {/* --- CARRELLO --- */}
       {selectedIndex === 0 && (
         <>
           <View className="flex-1">
             <FlatList
               data={library}
               ListEmptyComponent={() => (
-                <View className="flex-1 items-center justify-center gap-12">
-                  <Icon
-                    size={192}
-                    type="MaterialCommunityIcons"
-                    name="library-shelves"
-                    color={colors.primary}
-                  />
-                  <View className="items-center gap-6">
-                    <Text variant={'heading'} className="text-center">
-                      Libreria vuota
-                    </Text>
-                    <Text className="text-center">
-                      Aggiungi i libri dalla lista dei libri e richeidi il prestito!
-                    </Text>
-                  </View>
-                </View>
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerClassName="flex-grow gap-8 py-8"
-              className="rounded-md"
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <BookLibrary
-                  item={item}
-                  // selected={isSelected(item.id)}
-                  onPress={() => handlePress(item)}
+                <EmptyState
+                  icon="library-shelves"
+                  title="Libreria vuota"
+                  subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
                 />
               )}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+              contentContainerClassName="flex-grow gap-8 py-8"
+              renderItem={({ item }) => (
+                <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
+              )}
+
             />
 
             <LinearGradient
@@ -237,7 +157,7 @@ const Library = () => {
           </View>
 
           {library.length > 0 && (
-            <View className="p-6">
+            <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
               <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
                 {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}
               </Button>
@@ -246,53 +166,35 @@ const Library = () => {
         </>
       )}
 
+      {/* --- RICHIESTE --- */}
       {selectedIndex === 1 && (
         <View className="flex-1">
           <FlatList
             data={requests}
             ListEmptyComponent={() => (
-              <View className="flex-1 items-center justify-center gap-12">
-                <Icon
-                  size={192}
-                  type="MaterialCommunityIcons"
-                  name="book-arrow-left"
-                  color={colors.primary}
-                />
-                <View className="items-center gap-6">
-                  <Text variant={'heading'} className="text-center">
-                    Nessuna richiesta
-                  </Text>
-                  <Text className="text-center">
-                    Aggiungi i libri dalla lista dei libri e richeidi il prestito!
-                  </Text>
-                </View>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            contentContainerClassName="flex-grow gap-8 py-8"
-            className="rounded-md"
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <RequestCard
-                item={item}
-                // // selected={isSelected(item.id)}
-                // onPress={() => handlePress(item)}
+              <EmptyState
+                icon="book-arrow-left"
+                title="Nessuna richiesta"
+                subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
               />
             )}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerClassName="flex-grow gap-8 py-8"
+            renderItem={({ item }) => <RequestCard item={item} />}
           />
-
-          <LinearGradient
-            colors={[colors.background, convertToRGBA(colors.background, 0)]}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 10,
-              zIndex: 10,
-            }}
-            pointerEvents="none"
-          />
+            <LinearGradient
+              colors={[colors.background, convertToRGBA(colors.background, 0)]}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 10,
+                zIndex: 1,
+              }}
+              pointerEvents="none"
+            />
         </View>
       )}
     </View>
