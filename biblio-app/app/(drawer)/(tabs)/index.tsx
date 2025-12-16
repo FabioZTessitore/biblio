@@ -20,8 +20,10 @@ export default function Index() {
     setBookEditModal,
     bookModal,
     bookEditModal,
+    fetchLoans,
     setIsLoading,
     isLoading,
+    fetchRequestUsers,
   } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
@@ -33,6 +35,9 @@ export default function Index() {
     // Load books when component mounts
     fetchBooks();
     fetchRequests();
+    membership.role === 'staff' && fetchLoans();
+    fetchRequestUsers();
+
     console.log('libri caricati');
   }, [membership.schoolId]);
 

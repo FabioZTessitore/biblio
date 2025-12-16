@@ -4,18 +4,19 @@ import {
   collection,
   deleteDoc,
   doc,
+  documentId,
   getDoc,
   getDocs,
   increment,
   query,
+  runTransaction,
   serverTimestamp,
   Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '~/lib/firebase';
-import { useUserStore } from './user';
-import { useAuthStore } from './auth';
+import { User, useUserStore } from './user';
 import { useLibraryStore } from './library';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,6 +61,8 @@ export interface TBiblioState {
   loans: Loan[];
   requests: Request[];
 
+  requestUsers: User[];
+
   bookModal: boolean;
   bookEditModal: boolean;
 
@@ -68,8 +71,10 @@ export interface TBiblioState {
 
 export interface TBiblioMutations {
   setBooks: (books: Book[]) => void;
-  setLoans: (books: Loan[]) => void;
-  setRequests: (books: Request[]) => void;
+  setLoans: (loans: Loan[]) => void;
+  setRequests: (requests: Request[]) => void;
+
+  setRequestUsers: (requestUsers: User[]) => void;
 
   setBookModal: (isOpen: boolean) => void;
   setBookEditModal: (isOpen: boolean) => void;
@@ -80,11 +85,13 @@ export interface TBiblioMutations {
 export interface TBiblioAction {
   // General
   fetchBooks: () => Promise<void>;
-  fetchLoans: (schoolId: string) => Promise<void>;
+  fetchLoans: () => Promise<void>;
   fetchRequests: () => Promise<void>;
 
+  fetchRequestUsers: () => Promise<void>;
+
   // User
-  requestLoan: (bookId: string) => Promise<void>;
+  requestLoan: (loanId: string) => Promise<void>;
   cancelRequest: (requestId: string) => Promise<void>;
 
   // Staff
@@ -103,6 +110,8 @@ const biblioState = {
   loans: [],
   requests: [],
 
+  requestUsers: [],
+
   bookModal: false,
   bookEditModal: false,
 
@@ -114,10 +123,12 @@ const biblioMutations = {
   setLoans: (loans) => useBiblioStore.setState({ loans }),
   setRequests: (requests) => useBiblioStore.setState({ requests }),
 
-  setBookModal: (isOpen: boolean) => useBiblioStore.setState({ bookModal: isOpen }),
-  setBookEditModal: (isOpen: boolean) => useBiblioStore.setState({ bookEditModal: isOpen }),
+  setRequestUsers: (requestUsers) => useBiblioStore.setState({ requestUsers }),
 
-  setIsLoading: (isLoading) => useAuthStore.setState({ isLoading }),
+  setBookModal: (isOpen) => useBiblioStore.setState({ bookModal: isOpen }),
+  setBookEditModal: (isOpen) => useBiblioStore.setState({ bookEditModal: isOpen }),
+
+  setIsLoading: (isLoading) => useBiblioStore.setState({ isLoading }),
 } satisfies TBiblioMutations;
 
 const biblioAction = {
@@ -161,13 +172,18 @@ const biblioAction = {
     try {
       setIsLoading(true);
 
-      // if (!membership?.schoolId) return setBooks([]);
+      const baseQuery = [where('schoolId', '==', membership.schoolId)];
 
-      const q = query(
-        collection(db, 'requests'),
-        where('schoolId', '==', membership.schoolId),
-        where('userId', '==', user.uid)
-      );
+      // Solo gli utenti normali filtrano per userId
+      if (membership.role === 'user') {
+        baseQuery.push(where('userId', '==', user.uid));
+      }
+      if (membership.role === 'staff') {
+        // Lo staff vede solo richieste in attesa
+        baseQuery.push(where('status', '==', 'pending'));
+      }
+
+      const q = query(collection(db, 'requests'), ...baseQuery);
 
       const snap = await getDocs(q);
       const requests: Request[] = snap.docs.map((d) => ({
@@ -175,13 +191,47 @@ const biblioAction = {
         ...(d.data() as Omit<Request, 'id'>),
       }));
 
-      console.log('Richieste caricate', requests);
       setRequests(requests);
-    } catch {
+    } catch (err) {
+      console.log('Errore', err);
       Alert.alert('Errore', 'Errore durante il recupero delle richieste');
     } finally {
       setIsLoading(false);
     }
+  },
+
+  fetchRequestUsers: async () => {
+    const { requests, requestUsers, setRequestUsers } = useBiblioStore.getState();
+
+    if (!requests.length) return;
+
+    // ID richiesti
+    const requestedIds = [...new Set(requests.map((r) => r.userId))];
+
+    // ID mancanti in cache
+    const missingIds = requestedIds.filter((id) => !requestUsers[id as any]);
+    if (!missingIds.length) return;
+
+    // helper chunk
+    const chunk = <T>(arr: T[], size: number) =>
+      Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+        arr.slice(i * size, i * size + size)
+      );
+
+    const chunks = chunk(missingIds, 10);
+
+    const snaps = await Promise.all(
+      chunks.map((c) => getDocs(query(collection(db, 'users'), where(documentId(), 'in', c))))
+    );
+
+    const fetched: User[] = snaps.flatMap((snap) =>
+      snap.docs.map((d) => ({
+        uid: d.id,
+        ...(d.data() as Omit<User, 'uid'>),
+      }))
+    );
+
+    setRequestUsers(fetched);
   },
 
   // User
@@ -231,8 +281,84 @@ const biblioAction = {
   },
 
   // Staff
-  approveRequest: async (requestId) => {},
-  rejectRequest: async (requestId) => {},
+  approveRequest: async (requestId: string) => {
+    const { membership } = useUserStore.getState();
+    const { requests, setRequests } = useBiblioStore.getState();
+
+    if (membership.role !== 'staff') {
+      Alert.alert('Attenzione!', 'Permessi insufficienti');
+    }
+
+    const requestRef = doc(db, 'requests', requestId);
+
+    await runTransaction(db, async (tx) => {
+      const requestSnap = await tx.get(requestRef);
+      if (!requestSnap.exists()) {
+        Alert.alert('Attenzione!', 'Request non trovata');
+        return;
+      }
+      const request = requestSnap.data() as Request;
+
+      if (request.status !== 'pending') {
+        Alert.alert('Attenzione!', 'Request già processata');
+        return;
+      }
+
+      const bookRef = doc(db, 'books', request.bookId);
+      const bookSnap = await tx.get(bookRef);
+      if (!bookSnap.exists()) {
+        Alert.alert('Attenzione!', 'Libro non trovato');
+        return;
+      }
+      const book = bookSnap.data() as Book;
+
+      if (book.available <= 0) {
+        Alert.alert('Attenzione!', 'Nessuna copia disponibile');
+        return;
+      }
+
+      // 1) Approva la request
+      tx.update(requestRef, {
+        status: 'approved',
+      });
+
+      // 2) Decrementa copie libro
+      tx.update(bookRef, {
+        available: book.available - 1,
+      });
+
+      // 3) Crea il loan
+      const loanRef = doc(collection(db, 'loans'));
+      tx.set(loanRef, {
+        userId: request.userId,
+        bookId: request.bookId,
+        schoolId: request.schoolId,
+        startDate: serverTimestamp(),
+        dueDate: null, // lo decidi dopo
+        returnedAt: null,
+      });
+
+      // 4) Rimuovo dallo store
+      setRequests(requests.filter((r) => r.id !== requestId));
+    });
+  },
+
+  rejectRequest: async (requestId: string) => {
+    const { membership } = useUserStore.getState();
+    const { requests, setRequests } = useBiblioStore.getState();
+
+    if (membership.role !== 'staff') {
+      throw new Error('Permessi insufficienti');
+    }
+
+    const requestRef = doc(db, 'requests', requestId);
+
+    await updateDoc(requestRef, {
+      status: 'rejected',
+    });
+
+    setRequests(requests.filter((r) => r.id !== requestId));
+  },
 
   addBook: async (data) => {
     const { membership } = useUserStore.getState();

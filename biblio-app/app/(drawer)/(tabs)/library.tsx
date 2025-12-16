@@ -1,5 +1,6 @@
 import { FlatList, View, Alert, RefreshControl } from 'react-native';
-import { Text, Icon, BaseCard } from '~/components/ui';
+import { Text, BaseCard } from '~/components/ui';
+import { EmptyState } from '~/components/partials';
 import { Book, Request, useBiblioStore } from '~/store/biblio';
 import { useLibraryStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
@@ -88,26 +89,6 @@ const Library = () => {
 
     library.forEach((book) => requestLoan(book.id));
   };
-
-  const EmptyState = ({
-    icon,
-    title,
-    subtitle,
-  }: {
-    icon: any;
-    title: string;
-    subtitle: string;
-  }) => (
-    <View className="flex-1 items-center justify-center gap-12">
-      <Icon size={192} type="MaterialCommunityIcons" name={icon} color={colors.primary} />
-      <View className="items-center gap-6">
-        <Text variant="heading" className="text-center">
-          {title}
-        </Text>
-        <Text className="text-center">{subtitle}</Text>
-      </View>
-    </View>
-  );
 
   const order = {
     pending: 0,
