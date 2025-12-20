@@ -3,33 +3,102 @@ import { Text } from '~/components/ui';
 import { useState } from 'react';
 import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
 import { LinearGradient } from 'expo-linear-gradient';
-import { convertToRGBA, truncateText } from '~/lib/utils';
+import { convertToRGBA, formatDate, truncateText } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useBiblioStore } from '~/store';
 import { Loan, Request } from '~/store/biblio';
 import { EmptyState } from '~/components/partials';
+import { Button } from '~/components/nativewindui/Button';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Timestamp } from 'firebase/firestore';
 
-const BookLoanCard = ({ item, onRemove }: { item: Loan; onRemove: () => void }) => {
-  const { colors } = useColorScheme();
-  const { books, cancelRequest } = useBiblioStore();
+const SetDueDate = ({ loanId }: { loanId: string }) => {
+  const updateLoan = useBiblioStore((s) => s.updateLoan);
+  const loan = useBiblioStore((s) => s.loans.find((l) => l.id === loanId));
 
-  const book = books.find((b) => b.id === item.bookId) ?? {
-    title: '',
-    author: '',
-    isbn: '',
+  const [isVisible, setIsVisible] = useState(false);
+
+  if (!loan) return null;
+
+  const currentDate = loan.dueDate?.toDate?.() ?? new Date();
+
+  const onConfirm = (_: any, date?: Date) => {
+    setIsVisible(false);
+    if (!date) return;
+
+    updateLoan(loanId, {
+      dueDate: Timestamp.fromDate(date),
+    });
   };
 
   return (
-    // <BaseStaffCard
-    //   // title={item.dueDate.toString()}
-    //   // subtitle={item.startDate.toString()}
-    //   // imageUri={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`}
-    //   // statusColor={item.returnedAt ? colors.success : colors.destructive}
-    //   // user={}
-    //   // actionLabel="Rimuovi"
-    //   // onPress={onRemove}
-    // />
-    <></>
+    <View>
+      <Pressable onPress={() => setIsVisible(true)}>
+        <Text className="underline" color="primary" variant="label">
+          {loan.dueDate ? `Scadenza: ${currentDate.toLocaleDateString()}` : 'Imposta scadenza'}
+        </Text>
+      </Pressable>
+
+      {isVisible && (
+        <DateTimePicker value={currentDate} mode="date" display="default" onChange={onConfirm} />
+      )}
+    </View>
+  );
+};
+
+const BookLoanCard = ({ item }: { item: Loan }) => {
+  const { books, loanUsers, markReturned } = useBiblioStore();
+
+  const user = loanUsers.find((u) => u.uid === item.userId);
+
+  if (!user) return null;
+
+  const book = books.find((b) => b.id === item.bookId);
+  if (!book) return null;
+
+  return (
+    <View className="gap-6 rounded-lg bg-card p-4 shadow-md">
+      <View className="flex-row justify-between gap-8">
+        <Image
+          resizeMode="cover"
+          resizeMethod="resize"
+          className="h-36 w-28 rounded-2xl"
+          source={{ uri: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg` }}
+        />
+
+        <View className="items-end justify-between gap-8">
+          <View className="items-end gap-2">
+            <Text>{truncateText(book.title, 20)}</Text>
+            <Text variant={'label'}>{`${user.name} ${user.surname} 2Gi`}</Text>
+            <Text color={'muted'} variant={'label'}>
+              {`Prestato il ${formatDate(item.startDate)}`}
+            </Text>
+
+            {!item.returnedAt && <SetDueDate loanId={item.id} />}
+
+            {item.returnedAt && (
+              <Text color={'muted'} variant={'label'}>
+                {`Restituito il ${formatDate(item.returnedAt)}`}
+              </Text>
+            )}
+          </View>
+        </View>
+      </View>
+
+      <View className="flex-1">
+        {item.returnedAt ? (
+          <View className="items-end">
+            <Text variant="label" weight={'bold'} className="text-success">
+              {'Restituito'}
+            </Text>
+          </View>
+        ) : (
+          <Button className="bg-secondary" size={'md'} onPress={() => markReturned(item.id)}>
+            <Text variant="label">{'Segna come restituito'}</Text>
+          </Button>
+        )}
+      </View>
+    </View>
   );
 };
 
@@ -53,10 +122,10 @@ const RequestCard = ({ item }: { item: Request }) => {
         source={{ uri: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg` }}
       />
 
-      <View className="items-end justify-between">
+      <View className="items-end justify-between gap-4">
         <View className="items-end gap-2">
-          <Text>{`${user.name} ${user.surname} 2Gi`}</Text>
-          <Text variant={'label'}>{truncateText(book.title, 20)}</Text>
+          <Text>{truncateText(book.title, 20)}</Text>
+          <Text variant={'label'}>{`${user.name} ${user.surname} 2Gi`}</Text>
           <Text color={'muted'} variant={'label'}>{`Copie rimanenti: ${book.available}`}</Text>
         </View>
 
@@ -109,26 +178,31 @@ const Reservation = () => {
     fetchBooks,
     setIsLoading,
     fetchRequestUsers,
+    fetchLoanUsers,
     fetchLoans,
   } = useBiblioStore();
 
   const tabConfig = {
     0: {
       data: loans,
-      emptyIcon: 'library-shelves',
+      emptyIcon: 'book-clock',
       emptyTitle: 'Nessun prestito in corso',
-      renderer: ({ item }: { item: Loan }) => <BookLoanCard item={item} onRemove={() => {}} />,
-      refresh: fetchLoans,
+      renderer: ({ item }: { item: Loan }) => <BookLoanCard item={item} />,
+      refresh: async () => {
+        fetchBooks();
+        await fetchLoans();
+        await fetchLoanUsers();
+      },
     },
     1: {
       data: requests,
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
-      refresh: () => {
+      refresh: async () => {
         fetchBooks();
-        fetchRequests();
-        fetchRequestUsers();
+        await fetchRequests();
+        await fetchRequestUsers();
       },
     },
   } as any;

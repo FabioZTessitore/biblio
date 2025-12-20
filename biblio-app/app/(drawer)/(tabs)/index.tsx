@@ -24,6 +24,7 @@ export default function Index() {
     setIsLoading,
     isLoading,
     fetchRequestUsers,
+    fetchLoanUsers,
   } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
@@ -33,12 +34,19 @@ export default function Index() {
 
   useEffect(() => {
     // Load books when component mounts
-    fetchBooks();
-    fetchRequests();
-    membership.role === 'staff' && fetchLoans();
-    fetchRequestUsers();
+    const init = async () => {
+      fetchBooks();
+      await fetchRequests();
 
-    console.log('libri caricati');
+      if (membership.role === 'staff') {
+        await fetchLoans();
+        await fetchLoanUsers();
+        await fetchRequestUsers();
+      }
+    };
+
+    console.log('Caricamento completato');
+    init();
   }, [membership.schoolId]);
 
   const handlePressMemo = useCallback(
