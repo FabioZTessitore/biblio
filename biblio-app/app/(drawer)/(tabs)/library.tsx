@@ -74,7 +74,7 @@ const Library = () => {
   const { requests, requestLoan, isLoading, fetchRequests, fetchBooks, setIsLoading } =
     useBiblioStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {

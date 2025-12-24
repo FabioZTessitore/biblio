@@ -11,36 +11,86 @@ import { EmptyState } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Timestamp } from 'firebase/firestore';
+import { cn } from '~/lib/cn';
 
 const SetDueDate = ({ loanId }: { loanId: string }) => {
   const updateLoan = useBiblioStore((s) => s.updateLoan);
   const loan = useBiblioStore((s) => s.loans.find((l) => l.id === loanId));
+  const { colors } = useColorScheme();
 
   const [isVisible, setIsVisible] = useState(false);
+  const [pickerDate, setPickerDate] = useState<Date | null>(null);
 
   if (!loan) return null;
 
-  const currentDate = loan.dueDate?.toDate?.() ?? new Date();
+  const isReturned = !!loan.returnedAt;
+  const hasDueDate = !!loan.dueDate;
 
-  const onConfirm = (_: any, date?: Date) => {
+  if (isReturned && !hasDueDate) {
+    return null;
+  }
+
+  const today = Timestamp.now().toDate();
+
+  const currentDate = loan.dueDate?.toDate();
+
+  const openPicker = () => {
+    // inizializzi SOLO quando apri
+    setPickerDate(currentDate ?? today);
+    setIsVisible(true);
+  };
+
+  const onChange = (event: any, date?: Date) => {
     setIsVisible(false);
-    if (!date) return;
+
+    // ANDROID: annulla
+    if (event?.type === 'dismissed' || !date) {
+      setPickerDate(null);
+      return;
+    }
+
+    if (event?.type === 'neutralButtonPressed') {
+      updateLoan(loanId, {
+        dueDate: null,
+      });
+      setPickerDate(null);
+      return;
+    }
 
     updateLoan(loanId, {
       dueDate: Timestamp.fromDate(date),
     });
+
+    setPickerDate(null);
   };
+
+  const label =
+    hasDueDate && currentDate ? `Scadenza: ${formatDate(currentDate)}` : 'Imposta scadenza';
+
+  const isEditable = !isReturned;
 
   return (
     <View>
-      <Pressable onPress={() => setIsVisible(true)}>
-        <Text className="underline" color="primary" variant="label">
-          {loan.dueDate ? `Scadenza: ${currentDate.toLocaleDateString()}` : 'Imposta scadenza'}
+      <Pressable onPress={openPicker} disabled={!isEditable}>
+        <Text
+          className={cn(isEditable && 'underline')}
+          color={isEditable ? 'primary' : 'muted'}
+          variant="label">
+          {label}
         </Text>
       </Pressable>
 
-      {isVisible && (
-        <DateTimePicker value={currentDate} mode="date" display="default" onChange={onConfirm} />
+      {isEditable && isVisible && pickerDate && (
+        <DateTimePicker
+          value={pickerDate}
+          minimumDate={today}
+          mode="date"
+          display="default"
+          neutralButton={
+            loan.dueDate ? { label: 'Cancella', textColor: colors.destructive } : undefined
+          }
+          onChange={onChange}
+        />
       )}
     </View>
   );
@@ -50,7 +100,6 @@ const BookLoanCard = ({ item }: { item: Loan }) => {
   const { books, loanUsers, markReturned } = useBiblioStore();
 
   const user = loanUsers.find((u) => u.uid === item.userId);
-
   if (!user) return null;
 
   const book = books.find((b) => b.id === item.bookId);
@@ -71,33 +120,31 @@ const BookLoanCard = ({ item }: { item: Loan }) => {
             <Text>{truncateText(book.title, 20)}</Text>
             <Text variant={'label'}>{`${user.name} ${user.surname} 2Gi`}</Text>
             <Text color={'muted'} variant={'label'}>
-              {`Prestato il ${formatDate(item.startDate)}`}
+              {`Prestato il ${formatDate(item.startDate.toDate())}`}
             </Text>
 
-            {!item.returnedAt && <SetDueDate loanId={item.id} />}
+            <SetDueDate loanId={item.id} />
 
             {item.returnedAt && (
               <Text color={'muted'} variant={'label'}>
-                {`Restituito il ${formatDate(item.returnedAt)}`}
+                {`Restituito il ${formatDate(item.returnedAt.toDate())}`}
               </Text>
             )}
           </View>
         </View>
       </View>
 
-      <View className="flex-1">
-        {item.returnedAt ? (
-          <View className="items-end">
-            <Text variant="label" weight={'bold'} className="text-success">
-              {'Restituito'}
-            </Text>
-          </View>
-        ) : (
-          <Button className="bg-secondary" size={'md'} onPress={() => markReturned(item.id)}>
-            <Text variant="label">{'Segna come restituito'}</Text>
-          </Button>
-        )}
-      </View>
+      {item.returnedAt ? (
+        <View className="items-end">
+          <Text variant="label" weight={'bold'} className="text-success">
+            {'Restituito'}
+          </Text>
+        </View>
+      ) : (
+        <Button className="bg-secondary" size={'md'} onPress={() => markReturned(item.id)}>
+          <Text variant="label">{'Segna come restituito'}</Text>
+        </Button>
+      )}
     </View>
   );
 };

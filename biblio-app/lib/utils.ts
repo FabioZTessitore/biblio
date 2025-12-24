@@ -19,11 +19,10 @@ export const truncateText = (text: string, max: number = 40) => {
   return text.length > max ? text.substring(0, max - 3) + '...' : text;
 };
 
-export const formatDate = (date: Timestamp) => {
-  const d = date.toDate(); // Converte il Timestamp Firestore in un oggetto Date
-  const day = d.getDate().toString().padStart(2, '0'); // Ottieni il giorno
-  const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Ottieni il mese (i mesi partono da 0)
-  const year = d.getFullYear(); // Ottieni l'anno
+export const formatDate = (date: Date) => {
+  const day = date.getDate().toString().padStart(2, '0'); // Ottieni il giorno
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ottieni il mese (i mesi partono da 0)
+  const year = date.getFullYear(); // Ottieni l'anno
   return `${day}/${month}/${year}`; // Restituisce la data nel formato gg/mm/aaaa
 };
 
