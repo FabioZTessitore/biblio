@@ -20,10 +20,12 @@ const MemberWelcome = () => {
     schoolId: SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
     name: '',
     surname: '',
+    grade: '',
     error: '',
   });
 
   const surnameFieldRef = useRef<TextFieldRef>(null);
+  const gradeFieldRef = useRef<TextFieldRef>(null);
 
   const handleEnter = () => {
     if (!userAttempt.name || !userAttempt.surname) {
@@ -31,7 +33,7 @@ const MemberWelcome = () => {
       return;
     }
 
-    loginAnonymously(userAttempt.name, userAttempt.surname);
+    loginAnonymously(userAttempt.name, userAttempt.surname, userAttempt.grade);
   };
 
   useEffect(() => {
@@ -83,6 +85,22 @@ const MemberWelcome = () => {
             onChangeText={(surname) => setUserAttempt({ ...userAttempt, surname })}
             errorMessage={userAttempt.error}
             value={userAttempt.surname}
+            onSubmitEditing={() => {
+              gradeFieldRef?.current?.focus();
+            }}
+            returnKeyType="next"
+            submitBehavior={'submit'}
+          />
+        </FormItem>
+        <FormItem className="gap-2">
+          <Text>Classe*</Text>
+          <TextField
+            ref={gradeFieldRef}
+            placeholder="Inserisci la tua classe"
+            maxLength={5}
+            onChangeText={(grade) => setUserAttempt({ ...userAttempt, grade })}
+            errorMessage={userAttempt.error}
+            value={userAttempt.grade}
           />
         </FormItem>
 

@@ -118,7 +118,7 @@ const BookLoanCard = ({ item }: { item: Loan }) => {
         <View className="items-end justify-between gap-8">
           <View className="items-end gap-2">
             <Text>{truncateText(book.title, 20)}</Text>
-            <Text variant={'label'}>{`${user.name} ${user.surname} 2Gi`}</Text>
+            <Text variant={'label'}>{`${user.name} ${user.surname} ${user.grade}`}</Text>
             <Text color={'muted'} variant={'label'}>
               {`Prestato il ${formatDate(item.startDate.toDate())}`}
             </Text>
@@ -172,7 +172,7 @@ const RequestCard = ({ item }: { item: Request }) => {
       <View className="items-end justify-between gap-4">
         <View className="items-end gap-2">
           <Text>{truncateText(book.title, 20)}</Text>
-          <Text variant={'label'}>{`${user.name} ${user.surname} 2Gi`}</Text>
+          <Text variant={'label'}>{`${user.name} ${user.surname} ${user.grade}`}</Text>
           <Text color={'muted'} variant={'label'}>{`Copie rimanenti: ${book.available}`}</Text>
         </View>
 

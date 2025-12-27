@@ -22,7 +22,7 @@ export interface TAuthMutations {
 export interface TAuthAction {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  loginAnonymously: (name: string, surname: string) => Promise<void>;
+  loginAnonymously: (name: string, surname: string, grade: string) => Promise<void>;
 }
 
 export type TAuthStore = TAuthState & TAuthMutations & TAuthAction;
@@ -107,7 +107,7 @@ const authAction = {
     });
   },
 
-  loginAnonymously: async (name, surname) => {
+  loginAnonymously: async (name, surname, grade) => {
     const { setUser, setMembership, createMembership, createUser } = useUserStore.getState();
     const { setIsLoading, setError } = useAuthStore.getState();
 
@@ -121,6 +121,7 @@ const authAction = {
         uid,
         name,
         surname,
+        grade,
         email: '',
         role: 'user',
         createdAt: Timestamp.now(),

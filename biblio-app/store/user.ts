@@ -26,6 +26,7 @@ export interface User {
   uid: string;
   name: string;
   surname: string;
+  grade?: string;
   email: string;
   role: 'user' | 'staff' | 'admin';
   createdAt: Timestamp | null;
@@ -54,7 +55,7 @@ export interface TUserAction {
   createMembership: (uid: string, schoolId: string, role: Membership['role']) => Promise<void>;
   createUser: (
     uid: string,
-    partial_user: { name: string; surname: string; role: string }
+    partial_user: { name: string; surname: string; role: string; grade?: string }
   ) => Promise<void>;
 
   clearUser: () => void;
@@ -127,6 +128,7 @@ const userAction = {
       await setDoc(userRef, <User>{
         name: user.name,
         surname: user.surname,
+        grade: user.grade,
         role: 'user',
         createdAt: serverTimestamp(),
       });
