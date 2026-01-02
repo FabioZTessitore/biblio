@@ -1,0 +1,110 @@
+import { Alert } from 'react-native';
+import { Tabs, Href, useNavigation } from 'expo-router';
+import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { Text, Icon } from '~/components/ui';
+import { TabBarIcon } from '~/components/partials';
+import { Button } from '~/components/nativewindui/Button';
+import { useAuthStore, useFiltersStore, useLibraryStore, useUserStore } from '~/store';
+import { DrawerActions } from '@react-navigation/native';
+
+type TabsProps = BottomTabNavigationOptions & {
+  href?: Href | null;
+};
+
+const HeaderBin = () => {
+  const { library, clearLibrary } = useLibraryStore();
+
+  const isEmpty = library.length <= 0;
+
+  return (
+    <Button
+      variant="plain"
+      className="mr-6"
+      size={'icon'}
+      disabled={isEmpty}
+      onPress={clearLibrary}>
+      <Icon
+        type="MaterialCommunityIcons"
+        name={isEmpty ? 'delete-empty-outline' : 'delete-outline'}
+      />
+    </Button>
+  );
+};
+
+export default function TabLayout() {
+  const navigation = useNavigation();
+
+  const { openFiltersModal } = useFiltersStore();
+  const { membership } = useUserStore();
+
+  const { colors } = useColorScheme();
+
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
+
+  const SCREEN_OPTIONS = {
+    headerStyle: {
+      backgroundColor: colors.background,
+    },
+    headerShown: true,
+    headerShadowVisible: false,
+    headerTitleContainerStyle: { marginLeft: 24 },
+  } as TabsProps;
+
+  const INDEX_OPTIONS = {
+    ...SCREEN_OPTIONS,
+    title: 'Lista dei libri',
+    headerTitleStyle: { fontSize: 24 },
+    tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
+    headerLeft: () => {
+      return (
+        <Button onPress={openDrawer} variant="plain" size={'icon'}>
+          <Icon color={colors.grey2} type="MaterialCommunityIcons" name="menu" />
+        </Button>
+      );
+    },
+    headerRight: () => {
+      return (
+        <Button
+          onPress={openFiltersModal}
+          variant="plain"
+          size={'none'}
+          className="mr-6 bg-transparent">
+          <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
+          <Text color={'primary'}>Filters</Text>
+        </Button>
+      );
+    },
+  } as TabsProps;
+
+  const LIBRARY_OPTIONS = {
+    ...SCREEN_OPTIONS,
+    title: 'Libreria',
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
+    ),
+    headerRight: HeaderBin,
+  } as TabsProps;
+
+  const ADD_BOOK = {
+    ...SCREEN_OPTIONS,
+    title: 'Prenotazioni',
+    tabBarIcon: ({ focused, size }) => (
+      <TabBarIcon type="MaterialCommunityIcons" name="hand-extended" active={focused} />
+    ),
+  } as TabsProps;
+
+  return (
+    <Tabs>
+      <Tabs.Screen name="index" options={INDEX_OPTIONS} />
+      <Tabs.Protected guard={membership.role === 'user'}>
+        <Tabs.Screen name="library" options={LIBRARY_OPTIONS} />
+      </Tabs.Protected>
+      <Tabs.Protected guard={membership.role === 'staff'}>
+        <Tabs.Screen name="reservation" options={ADD_BOOK} />
+      </Tabs.Protected>
+    </Tabs>
+  );
+}
