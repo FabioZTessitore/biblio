@@ -1,18 +1,30 @@
 import { Text, Icon } from '~/components/ui';
 import { useState, useEffect, useRef } from 'react';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { useFiltersStore } from '~/store';
+import { useBiblioStore, useFiltersStore } from '~/store';
 import { truncateText } from '~/lib/utils';
 import { FlatList, Pressable, View } from 'react-native';
 import { SearchInput } from './nativewindui/SearchInput';
-import { FilterItem } from '~/store/filters';
 import { SheetModal } from '~/components/partials';
+import { Book } from '~/store/biblio';
+import { Filter, Filters } from '~/store/filters';
 
 const FiltersSheetModal = () => {
-  const { filters, filtersModal, setFiltersModal, resetFilters, updateFilterValue, getFilterItem } =
-    useFiltersStore();
+  const { books } = useBiblioStore();
+
+  const {
+    filters,
+    filtersModal,
+    setFiltersModal,
+    resetFilters,
+    updateFilterValue,
+    getFilterItem,
+    applyFilters,
+  } = useFiltersStore();
 
   const [searchText, setSearchText] = useState('');
+
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>(books);
 
   const [activeFilter, setActiveFilter] = useState<null | {
     group: string;
@@ -23,6 +35,7 @@ const FiltersSheetModal = () => {
     setSearchText('');
     setActiveFilter(null);
     setFiltersModal(false);
+    setFilteredBooks(books);
   };
 
   const currentFilter = getFilterItem(activeFilter?.group ?? '', activeFilter?.filterId ?? '');
@@ -58,6 +71,19 @@ const FiltersSheetModal = () => {
       updateFilterValue(activeFilter.group, currentFilter.id, '');
     }
   }, [searchText, activeFilter, currentFilter, updateFilterValue]);
+
+  const searchHandler = (text: string) => {
+    setSearchText(text);
+
+    if (!activeFilter || !currentFilter) return;
+
+    updateFilterValue(activeFilter.group, currentFilter.id, text);
+
+    const updatedFilters = useFiltersStore.getState().filters;
+    const result = applyFilters(books, updatedFilters);
+
+    setFilteredBooks(result);
+  };
 
   return (
     <SheetModal visible={filtersModal} onClose={onClose}>
@@ -118,6 +144,10 @@ const FiltersSheetModal = () => {
               <Text variant="heading" className="text-center">
                 {currentFilter?.name ?? ''}
               </Text>
+
+              <Pressable className="absolute right-0 px-2" onPress={resetFilters}>
+                <Text color="primary">Elimina</Text>
+              </Pressable>
             </View>
 
             {/* Contenuto dinamico */}
@@ -127,32 +157,39 @@ const FiltersSheetModal = () => {
                   variant="bottom-sheet"
                   containerClassName="bg-background"
                   value={searchText !== '' ? searchText : (currentFilter?.value ?? '')}
-                  onChangeText={(txt) => setSearchText(txt)}
+                  onChangeText={(txt) => searchHandler(txt)}
                 />
                 <FlatList
-                  data={[
-                    { id: '0', name: searchText },
-                    { id: '1', name: 'To' },
-                    { id: '2', name: '19' },
-                  ]}
+                  data={filteredBooks}
                   keyExtractor={(item) => item.id}
                   contentContainerClassName="gap-2 py-8"
                   className="rounded-md"
                   showsVerticalScrollIndicator={false}
                   renderItem={({ item }) => {
-                    return item.name ? (
+                    return item ? (
                       <Pressable
                         className="rounded-xl bg-background p-4"
                         onPress={() => {
-                          updateFilterValue(activeFilter.group, currentFilter?.id ?? '', item.name);
+                          updateFilterValue(
+                            activeFilter.group,
+                            currentFilter?.id ?? '',
+                            item[activeFilter.filterId]
+                          );
                           setActiveFilter(null);
                         }}>
-                        <Text>{item.name}</Text>
+                        <Text>{item[activeFilter.filterId]}</Text>
                       </Pressable>
                     ) : (
                       <></>
                     );
                   }}
+                  ListFooterComponent={
+                    !filteredBooks ? (
+                      <Text className="mt-4 text-center">
+                        La ricerca non produrrà alcun risultato...
+                      </Text>
+                    ) : null
+                  }
                 />
               </View>
             )}

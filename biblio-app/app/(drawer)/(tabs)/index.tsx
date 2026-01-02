@@ -1,10 +1,10 @@
-import { View, FlatList, RefreshControl } from 'react-native';
+import { View, FlatList, RefreshControl, Pressable } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
 import { FiltersSheetModal, BookSheetModal } from '~/components';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
-import { Icon } from '~/components/ui';
+import { Icon, Text } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,7 +28,7 @@ export default function Index() {
   } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
-  const { filters, applyFilters } = useFiltersStore();
+  const { filters, applyFilters, resetFilters } = useFiltersStore();
 
   const [bookIdToEdit, setBookIdToEdit] = useState('');
 
@@ -78,6 +78,26 @@ export default function Index() {
 
       <View className="flex-1">
         <FlatList
+          ListEmptyComponent={() => {
+            if (books.length === 0) {
+              return <Text className="text-center">Non ci sono libri nella tua libreria.</Text>;
+            }
+            if (filteredBooks.length === 0) {
+              return (
+                <>
+                  <Text className="text-center">
+                    Nessun libro corrisponde ai filtri selezionati.
+                  </Text>
+                  <Pressable onPress={resetFilters}>
+                    <Text className="text-center" color="primary">
+                      Elimina
+                    </Text>
+                  </Pressable>
+                </>
+              );
+            }
+            return null;
+          }}
           data={filteredBooks}
           keyExtractor={(item) => item.id}
           contentContainerClassName="gap-14 py-8"
