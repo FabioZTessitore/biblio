@@ -3,9 +3,10 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform, Pressable, PressableProps, View, ViewStyle } from 'react-native';
 
-import { TextClassContext } from '~/components/Text';
+import { TextClassContext } from '~/components/ui';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { convertToRGBA } from '~/lib/utils';
 import { COLORS } from '~/theme/colors';
 
 const buttonVariants = cva('flex-row items-center justify-center gap-2', {
@@ -14,7 +15,7 @@ const buttonVariants = cva('flex-row items-center justify-center gap-2', {
       primary: 'ios:active:opacity-80 bg-primary',
       secondary: 'ios:border-primary ios:active:bg-primary/5 border border-foreground/40',
       tonal:
-        'ios:bg-primary/10 dark:ios:bg-primary/10 ios:active:bg-primary/15 bg-primary/15 dark:bg-primary/30',
+        'ios:bg-secondary/10 dark:ios:bg-secondary/10 ios:active:bg-secondary/15 bg-secondary/15 dark:bg-secondary/30',
       plain: 'ios:active:opacity-70',
     },
     size: {
@@ -67,20 +68,6 @@ const buttonTextVariants = cva('font-medium', {
     size: 'md',
   },
 });
-
-function convertToRGBA(rgb: string, opacity: number): string {
-  const rgbValues = rgb.match(/\d+/g);
-  if (!rgbValues || rgbValues.length !== 3) {
-    throw new Error('Invalid RGB color format');
-  }
-  const red = parseInt(rgbValues[0], 10);
-  const green = parseInt(rgbValues[1], 10);
-  const blue = parseInt(rgbValues[2], 10);
-  if (opacity < 0 || opacity > 1) {
-    throw new Error('Opacity must be a number between 0 and 1');
-  }
-  return `rgba(${red},${green},${blue},${opacity})`;
-}
 
 const ANDROID_RIPPLE = {
   dark: {

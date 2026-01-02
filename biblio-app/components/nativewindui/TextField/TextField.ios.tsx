@@ -4,7 +4,7 @@ import { Pressable, TextInput, View } from 'react-native';
 
 import type { TextFieldProps, TextFieldRef } from './types';
 
-import { Text } from '~/components/Text';
+import { Text } from '~/components/ui';
 import { cn } from '~/lib/cn';
 
 const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(

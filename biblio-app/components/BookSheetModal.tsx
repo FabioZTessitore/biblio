@@ -1,0 +1,136 @@
+import { useEffect, useId, useRef, useState } from 'react';
+import { Book, useBiblioStore } from '~/store/biblio';
+import { TextFieldRef } from './nativewindui/TextField/types';
+import Toast from 'react-native-toast-message';
+import { SheetModal } from './partials';
+import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { Pressable, View } from 'react-native';
+import { Form, FormItem, FormSection } from './nativewindui/Form';
+import { TextField } from './nativewindui/TextField';
+import { Stepper } from './nativewindui/Stepper';
+import { Text } from '~/components/ui';
+import { FlipCounter } from '~/components/partials';
+
+const EMPTY_BOOK: Partial<Book> = {
+  title: '',
+  author: '',
+  isbn: '',
+  available: 0,
+};
+
+interface Props {
+  mode: 'add' | 'edit';
+  visible: boolean;
+  bookId?: string;
+  onClose: () => void;
+}
+
+export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
+  const { addBook, updateBook, books } = useBiblioStore();
+
+  const [currentBook, setCurrentBook] = useState<Partial<Book>>(EMPTY_BOOK);
+
+  const authorRef = useRef<TextFieldRef>(null);
+  const isbnRef = useRef<TextFieldRef>(null);
+
+  const isEdit = mode === 'edit';
+
+  // Carica dati solo quando il modal si apre
+  useEffect(() => {
+    if (!visible) return;
+
+    if (isEdit && bookId) {
+      const b = books.find((x) => x.id === bookId) ?? EMPTY_BOOK;
+      setCurrentBook(b);
+    } else {
+      setCurrentBook(EMPTY_BOOK);
+    }
+  }, [visible]);
+
+  const onSave = () => {
+    if (!currentBook.title || !currentBook.author || !currentBook.isbn) {
+      Toast.show({ type: 'error', text1: 'Compila tutti i campi.' });
+      return;
+    }
+
+    if (isEdit && bookId) updateBook(bookId, currentBook);
+    else addBook(currentBook);
+
+    onClose();
+  };
+
+  const subtract = () =>
+    setCurrentBook((p) => ({ ...p, available: Math.max(0, (p.available ?? 0) - 1) }));
+
+  const add = () => setCurrentBook((p) => ({ ...p, available: (p.available ?? 0) + 1 }));
+
+  return (
+    <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
+      <BottomSheetView className="flex-1 gap-8 p-4">
+        <View className="flex-row items-center justify-between py-2">
+          <Pressable className="px-2" onPress={onClose}>
+            <Text className="text-destructive">Annulla</Text>
+          </Pressable>
+
+          <Text variant="heading">{isEdit ? 'Modifica libro' : 'Nuovo libro'}</Text>
+
+          <Pressable className="px-2" onPress={onSave}>
+            <Text color="primary">Salva</Text>
+          </Pressable>
+        </View>
+
+        <Form className="gap-8 px-4 pt-8">
+          <FormSection
+            iconProps={{ type: 'MaterialCommunityIcons', name: 'book' }}
+            className="gap-6">
+            <FormItem>
+              <TextField
+                label="Titolo"
+                type="bottom-sheet"
+                value={currentBook.title}
+                onChangeText={(title) => setCurrentBook((p) => ({ ...p, title }))}
+                onSubmitEditing={() => authorRef.current?.focus()}
+              />
+            </FormItem>
+            <FormItem>
+              <TextField
+                ref={authorRef}
+                label="Autore"
+                type="bottom-sheet"
+                value={currentBook.author}
+                onChangeText={(author) => setCurrentBook((p) => ({ ...p, author }))}
+                onSubmitEditing={() => isbnRef.current?.focus()}
+              />
+            </FormItem>
+            <FormItem>
+              <TextField
+                ref={isbnRef}
+                label="Codice ISBN"
+                type="bottom-sheet"
+                maxLength={13}
+                inputMode="numeric"
+                value={currentBook.isbn}
+                onChangeText={(isbn) => setCurrentBook((p) => ({ ...p, isbn }))}
+              />
+            </FormItem>
+          </FormSection>
+
+          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
+            <FormItem className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-2">
+                <Text>Quantità:</Text>
+                <FlipCounter count={currentBook.available ?? 0} />
+              </View>
+
+              <Stepper
+                className="p-2"
+                subtractButton={{ disabled: (currentBook.available ?? 0) === 0, onPress: subtract }}
+                addButton={{ onPress: add }}
+              />
+            </FormItem>
+          </FormSection>
+        </Form>
+      </BottomSheetView>
+    </SheetModal>
+  );
+}

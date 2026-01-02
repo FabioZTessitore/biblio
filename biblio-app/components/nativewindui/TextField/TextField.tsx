@@ -1,5 +1,5 @@
 import { useAugmentedRef, useControllableState } from '@rn-primitives/hooks';
-import { Icon } from '~/components/Icon';
+import { Icon } from '~/components/ui';
 import { cva } from 'class-variance-authority';
 import * as React from 'react';
 import {
@@ -23,6 +23,7 @@ import type { TextFieldProps, TextFieldRef } from './types';
 
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
 const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
   (
@@ -46,6 +47,7 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
       materialVariant = 'outlined',
       materialRingColor,
       materialHideActionIcons,
+      type,
       ...props
     },
     ref
@@ -82,6 +84,8 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
     }
 
     const InputWrapper = materialVariant === 'filled' ? FilledWrapper : FilledWrapper;
+
+    const InputComponent = type === 'bottom-sheet' ? BottomSheetTextInput : TextInput;
 
     return (
       <Pressable
@@ -121,20 +125,20 @@ const TextField = React.forwardRef<TextFieldRef, TextFieldProps>(
                 hasError={!!errorMessage}
               />
             )}
-            <TextInput
-              ref={inputRef}
+            <InputComponent
+              ref={inputRef as any}
               testID="text-field-input"
               accessible={true}
               accessibilityRole="search" // prima era 'textbox'
               editable={editable}
               className={cn(
-                'flex-1 rounded py-3 pl-2.5 text-[17px] text-foreground dark:placeholder:text-white/30',
+                'flex-1 rounded py-3 pl-6 text-base text-foreground dark:placeholder:text-white/30',
                 materialVariant === 'filled' && !!label && 'pb-2 pt-5',
                 className
               )}
               placeholder={isFocused || !label ? placeholder : ''}
-              onFocus={onFocus}
-              onBlur={onBlur}
+              onFocus={onFocus as any}
+              onBlur={onBlur as any}
               onChangeText={onChangeText}
               value={value}
               accessibilityHint={accessibilityHint ?? errorMessage}
@@ -179,7 +183,7 @@ function getInputState(args: GetInputArgs): InputState {
 const rootVariants = cva('relative rounded-[5px]', {
   variants: {
     variant: {
-      outlined: 'border',
+      outlined: 'border rounded-full',
       filled: 'border-b rounded-b-none',
     },
     state: {
@@ -199,7 +203,7 @@ const rootVariants = cva('relative rounded-[5px]', {
 const innerRootVariants = cva('flex-row rounded', {
   variants: {
     variant: {
-      outlined: 'border border-border',
+      outlined: 'border border-border rounded-full',
       filled: 'border-b bg-border/70 rounded-b-none ',
     },
     state: {
@@ -277,8 +281,8 @@ function MaterialLabel(props: MaterialLabelProps) {
   });
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
-      backgroundColor: colors.background,
-      color: colors.primary,
+      backgroundColor: colors.card,
+      color: props.isFocused ? colors.primary : colors.grey2,
       fontSize: withTiming(isLiftedDerived.value ? 14 : 16, { duration: 100 }),
     };
   });
@@ -312,9 +316,14 @@ function MaterialClearIcon(props: MaterialClearIconProps) {
       <Pressable
         testID="text-field-clear-button"
         disabled={props.editable === false}
-        className="flex-1 justify-center px-2 active:opacity-65"
+        className="flex-1 justify-center pr-4 active:opacity-65"
         onPress={props.clearText}>
-        <Icon color={colors.muted} type="AntDesign" name="closecircleo" size={24} />
+        <Icon
+          color={colors.grey2}
+          type="MaterialCommunityIcons"
+          name="close-circle-outline"
+          size={24}
+        />
       </Pressable>
     </Animated.View>
   );
@@ -328,8 +337,13 @@ function MaterialErrorIcon() {
       pointerEvents="none"
       entering={FadeIn.duration(200)}
       exiting={FadeOut.duration(200)}
-      className="justify-center pr-2">
-      <Icon color={colors.destructive} type="AntDesign" name="closecircleo" size={24} />
+      className="justify-center pr-4">
+      <Icon
+        color={colors.destructive}
+        type="MaterialCommunityIcons"
+        name="close-circle-outline"
+        size={24}
+      />
     </Animated.View>
   );
 }

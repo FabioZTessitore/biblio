@@ -20,6 +20,7 @@ export interface IconProps<T extends IconType = 'MaterialIcons'> {
   size?: 'display' | 'heading' | 'body' | 'label' | number;
   color?: string;
   link?: string;
+  className?: string;
 }
 
 const ICON_TYPES = {
@@ -54,13 +55,21 @@ export const Icon = <T extends IconType = 'MaterialIcons'>({
   size = 'heading',
   color,
   link,
+  className,
 }: IconProps<T>) => {
   const { colors } = useColorScheme();
   const IconComponent = ICON_TYPES[type];
 
   if (!IconComponent) {
     console.warn(`Tipo di icona "${type}" non trovato. Usando "MaterialIcons" di default.`);
-    return <MaterialIcons name={name} size={parseSize(size)} color={color ?? colors.foreground} />;
+    return (
+      <MaterialIcons
+        name={name}
+        className={className}
+        size={parseSize(size)}
+        color={color ?? colors.foreground}
+      />
+    );
   }
 
   const handlePress = () => {
@@ -70,7 +79,12 @@ export const Icon = <T extends IconType = 'MaterialIcons'>({
   };
 
   const icon = (
-    <IconComponent name={name} size={parseSize(size)} color={color ?? colors.foreground} />
+    <IconComponent
+      name={name}
+      className={className}
+      size={parseSize(size)}
+      color={color ?? colors.foreground}
+    />
   );
 
   return link ? <TouchableOpacity onPress={handlePress}>{icon}</TouchableOpacity> : icon;

@@ -1,8 +1,6 @@
-import { Icon, type IconProps, type IconType } from '~/components/Icon';
+import { Text, Icon, type IconProps, type IconType } from '~/components/ui';
 import * as React from 'react';
 import { Platform, View, ViewProps, ViewStyle } from 'react-native';
-
-import { Text } from '~/components/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 
