@@ -9,16 +9,7 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
-        }
-      ],
-      "expo-web-browser"
-    ],
+    "plugins": ["expo-router", "expo-web-browser", "expo-font"],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
@@ -39,8 +30,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }, 
+      },
       "package": "com.fzt.biblioapp"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1ddc28af-85cf-495a-95be-796dd7ea4e26"
+      }
     }
   }
 }

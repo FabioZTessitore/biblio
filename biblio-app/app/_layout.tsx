@@ -1,20 +1,13 @@
 import '../global.css';
 import 'expo-dev-client';
 import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { Icon } from '@roninoss/icons';
 
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, View } from 'react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
-import { ThemeToggle } from '~/components/ThemeToggle';
-import { cn } from '~/lib/cn';
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
 import { NAV_THEME } from '~/theme';
 
@@ -37,16 +30,14 @@ export default function RootLayout() {
       {/* <ExampleProvider> */}
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          <ActionSheetProvider>
-            <NavThemeProvider value={NAV_THEME[colorScheme]}>
-              <Stack screenOptions={SCREEN_OPTIONS}>
-                <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
-                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-              </Stack>
-            </NavThemeProvider>
-          </ActionSheetProvider>
-        </BottomSheetModalProvider>
+        <KeyboardProvider>
+          <NavThemeProvider value={NAV_THEME[colorScheme]}>
+            <Stack screenOptions={SCREEN_OPTIONS}>
+              <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
+              <Stack.Screen name="sign-up" options={SIGN_UP_OPTIONS} />
+            </Stack>
+          </NavThemeProvider>
+        </KeyboardProvider>
       </GestureHandlerRootView>
 
       {/* </ExampleProvider> */}
@@ -62,9 +53,8 @@ const TABS_OPTIONS = {
   headerShown: false,
 } as const;
 
-const MODAL_OPTIONS = {
-  presentation: 'modal',
-  animation: 'fade_from_bottom', // for android
-  title: 'Settings',
-  headerRight: () => <ThemeToggle />,
+const SIGN_UP_OPTIONS = {
+  headerShown: true,
+  title: 'Create Account',
+  headerBackTitleVisible: false,
 } as const;

@@ -49,7 +49,7 @@ export { useColorScheme, useInitialAndroidBarSync };
 function setNavigationBar(colorScheme: 'light' | 'dark') {
   return Promise.all([
     NavigationBar.setButtonStyleAsync(colorScheme === 'dark' ? 'light' : 'dark'),
-    NavigationBar.setPositionAsync('absolute'),
-    NavigationBar.setBackgroundColorAsync(colorScheme === 'dark' ? '#00000030' : '#ffffff80'),
+    // NavigationBar.setPositionAsync('absolute'),
+    // NavigationBar.setBackgroundColorAsync(colorScheme === 'dark' ? '#00000030' : '#ffffff80'),
   ]);
 }

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform, Pressable, PressableProps, View, ViewStyle } from 'react-native';
 
-import { TextClassContext } from '~/components/nativewindui/Text';
+import { TextClassContext } from '~/components/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { COLORS } from '~/theme/colors';
@@ -19,10 +19,10 @@ const buttonVariants = cva('flex-row items-center justify-center gap-2', {
     },
     size: {
       none: '',
-      sm: 'py-1 px-2.5 rounded-full',
-      md: 'ios:rounded-lg py-2 ios:py-1.5 ios:px-3.5 px-5 rounded-full',
-      lg: 'py-2.5 px-5 ios:py-2 rounded-xl gap-2',
-      icon: 'ios:rounded-lg h-10 w-10 rounded-full',
+      sm: 'py-1 px-2 rounded-full',
+      md: 'ios:rounded-lg py-2 ios:py-1 ios:px-3 px-5 rounded-full',
+      lg: 'py-2 px-5 ios:py-2 rounded-xl gap-2',
+      icon: 'ios:rounded-lg h-12 w-12 rounded-full',
     },
   },
   defaultVariants: {
@@ -57,9 +57,9 @@ const buttonTextVariants = cva('font-medium', {
     size: {
       none: '',
       icon: '',
-      sm: 'text-[15px] leading-5',
-      md: 'text-[17px] leading-7',
-      lg: 'text-[17px] leading-7',
+      sm: 'text-base',
+      md: 'text-base',
+      lg: 'text-base',
     },
   },
   defaultVariants: {
@@ -84,16 +84,16 @@ function convertToRGBA(rgb: string, opacity: number): string {
 
 const ANDROID_RIPPLE = {
   dark: {
-    primary: { color: convertToRGBA(COLORS.dark.grey3, 0.4), borderless: false },
-    secondary: { color: convertToRGBA(COLORS.dark.grey5, 0.8), borderless: false },
-    plain: { color: convertToRGBA(COLORS.dark.grey5, 0.8), borderless: false },
-    tonal: { color: convertToRGBA(COLORS.dark.grey5, 0.8), borderless: false },
+    primary: { color: convertToRGBA(COLORS.dark.grey, 0.4), borderless: false },
+    secondary: { color: convertToRGBA(COLORS.dark.grey2, 0.8), borderless: false },
+    plain: { color: convertToRGBA(COLORS.dark.grey2, 0.8), borderless: false },
+    tonal: { color: convertToRGBA(COLORS.dark.grey2, 0.8), borderless: false },
   },
   light: {
-    primary: { color: convertToRGBA(COLORS.light.grey4, 0.4), borderless: false },
-    secondary: { color: convertToRGBA(COLORS.light.grey5, 0.4), borderless: false },
-    plain: { color: convertToRGBA(COLORS.light.grey5, 0.4), borderless: false },
-    tonal: { color: convertToRGBA(COLORS.light.grey6, 0.4), borderless: false },
+    primary: { color: convertToRGBA(COLORS.light.grey2, 0.4), borderless: false },
+    secondary: { color: convertToRGBA(COLORS.light.grey2, 0.4), borderless: false },
+    plain: { color: convertToRGBA(COLORS.light.grey2, 0.4), borderless: false },
+    tonal: { color: convertToRGBA(COLORS.light.grey3, 0.4), borderless: false },
   },
 };
 
