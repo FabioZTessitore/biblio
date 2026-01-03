@@ -71,8 +71,7 @@ const Library = () => {
   const { colors } = useColorScheme();
 
   const { library, removeFromLibrary } = useLibraryStore();
-  const { requests, requestLoan, isLoading, fetchRequests, fetchBooks, setIsLoading } =
-    useBiblioStore();
+  const { requests, requestLoan, isLoading } = useBiblioStore();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -104,14 +103,12 @@ const Library = () => {
       renderer: ({ item }: { item: Book }) => (
         <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
       ),
-      refresh: fetchBooks,
     },
     1: {
       data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
-      refresh: fetchRequests,
     },
   } as any;
 
@@ -143,11 +140,7 @@ const Library = () => {
             tintColor={colors.primary}
             progressBackgroundColor={colors.card}
             refreshing={isLoading}
-            onRefresh={async () => {
-              setIsLoading(true);
-              await current.refresh();
-              setIsLoading(false);
-            }}
+            enabled={false}
           />
         }
         showsVerticalScrollIndicator={false}

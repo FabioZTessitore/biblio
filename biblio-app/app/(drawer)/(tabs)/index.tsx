@@ -15,16 +15,13 @@ export default function Index() {
   const {
     books,
     setBookModal,
-    fetchBooks,
-    fetchRequests,
+    subscribeBooks,
+    subscribeRequests,
     setBookEditModal,
     bookModal,
     bookEditModal,
-    fetchLoans,
-    setIsLoading,
+    subscribeLoans,
     isLoading,
-    fetchRequestUsers,
-    fetchLoanUsers,
   } = useBiblioStore();
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
@@ -33,21 +30,19 @@ export default function Index() {
   const [bookIdToEdit, setBookIdToEdit] = useState('');
 
   useEffect(() => {
-    // Load books when component mounts
-    const init = async () => {
-      fetchBooks();
-      await fetchRequests();
+    const unsubs: (() => void)[] = [];
 
-      if (membership.role === 'staff') {
-        await fetchLoans();
-        await fetchLoanUsers();
-        await fetchRequestUsers();
-      }
+    unsubs.push(subscribeBooks());
+    unsubs.push(subscribeRequests());
+
+    if (membership.role === 'staff') {
+      unsubs.push(subscribeLoans());
+    }
+
+    return () => {
+      unsubs.forEach((u) => u && u());
     };
-
-    console.log('Caricamento completato');
-    init();
-  }, [membership.schoolId]);
+  }, [membership.schoolId, membership.role]);
 
   const handlePressMemo = useCallback(
     (item: Book) => () => {
@@ -114,11 +109,7 @@ export default function Index() {
               tintColor={colors.primary}
               progressBackgroundColor={colors.card}
               refreshing={isLoading}
-              onRefresh={async () => {
-                setIsLoading(true);
-                await fetchBooks();
-                setIsLoading(false);
-              }}
+              enabled={false}
             />
           }
         />

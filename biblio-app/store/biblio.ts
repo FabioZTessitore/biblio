@@ -4,14 +4,14 @@ import {
   collection,
   deleteDoc,
   doc,
-  documentId,
   getDoc,
-  getDocs,
   increment,
+  onSnapshot,
   query,
   runTransaction,
   serverTimestamp,
   Timestamp,
+  Unsubscribe,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -21,7 +21,7 @@ import { useLibraryStore } from './library';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import { fetchByIds } from '~/lib/utils';
+import { fetchUsersByIds } from '~/lib/utils';
 
 export interface Loan {
   id: string;
@@ -62,8 +62,8 @@ export interface TBiblioState {
   loans: Loan[];
   requests: Request[];
 
-  requestUsers: User[];
-  loanUsers: User[];
+  requestUsers: Record<string, User>;
+  loanUsers: Record<string, User>;
 
   bookModal: boolean;
   bookEditModal: boolean;
@@ -76,8 +76,8 @@ export interface TBiblioMutations {
   setLoans: (loans: Loan[]) => void;
   setRequests: (requests: Request[]) => void;
 
-  setRequestUsers: (requestUsers: User[]) => void;
-  setLoanUsers: (loanUsers: User[]) => void;
+  setRequestUsers: (requestUsers: Record<string, User>) => void;
+  setLoanUsers: (loanUsers: Record<string, User>) => void;
 
   setBookModal: (isOpen: boolean) => void;
   setBookEditModal: (isOpen: boolean) => void;
@@ -87,9 +87,9 @@ export interface TBiblioMutations {
 
 export interface TBiblioAction {
   // General
-  fetchBooks: () => Promise<void>;
-  fetchLoans: () => Promise<void>;
-  fetchRequests: () => Promise<void>;
+  subscribeBooks: () => Unsubscribe;
+  subscribeLoans: () => Unsubscribe;
+  subscribeRequests: () => Unsubscribe;
 
   fetchRequestUsers: () => Promise<void>;
   fetchLoanUsers: () => Promise<void>;
@@ -114,8 +114,8 @@ const biblioState = {
   loans: [],
   requests: [],
 
-  requestUsers: [],
-  loanUsers: [],
+  requestUsers: {},
+  loanUsers: {},
 
   bookModal: false,
   bookEditModal: false,
@@ -139,128 +139,146 @@ const biblioMutations = {
 
 const biblioAction = {
   // General
-  fetchBooks: async () => {
+  subscribeBooks: () => {
     const { setBooks, setIsLoading } = useBiblioStore.getState();
-    const { setLibrary, library } = useLibraryStore.getState();
+    const { setLibrary } = useLibraryStore.getState();
     const { membership } = useUserStore.getState();
 
-    try {
-      setIsLoading(true);
+    if (!membership?.schoolId) return () => {};
 
-      // if (!membership?.schoolId) return setBooks([]);
+    setIsLoading(true);
 
-      const q = query(collection(db, 'books'), where('schoolId', '==', membership.schoolId));
+    const q = query(collection(db, 'books'), where('schoolId', '==', membership.schoolId));
 
-      const snap = await getDocs(q);
-      const books: Book[] = snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Book, 'id'>),
-      }));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const books: Book[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Book, 'id'>),
+        }));
 
-      setBooks(books);
+        setBooks(books);
 
-      const updatedLibrary = library
-        .map((libBook) => books.find((b) => b.id === libBook.id)) // trova il libro aggiornato
-        .filter(Boolean) as Book[]; // rimuove eventuali null (libro cancellato)
+        const { library } = useLibraryStore.getState();
+        const updatedLibrary = library
+          .map((lb) => books.find((b) => b.id === lb.id))
+          .filter(Boolean) as Book[];
 
-      setLibrary(updatedLibrary);
-    } catch {
-      Alert.alert('Errore', 'Errore durante il recupero dei libri');
-    } finally {
-      setIsLoading(false);
-    }
+        setLibrary(updatedLibrary);
+        setIsLoading(false);
+      },
+      () => {
+        setIsLoading(false);
+        Alert.alert('Errore', 'Errore realtime libri');
+      }
+    );
+
+    return unsub;
   },
-  fetchLoans: async () => {
+  subscribeLoans: () => {
     const { setLoans, setIsLoading } = useBiblioStore.getState();
-    const { membership, user } = useUserStore.getState();
+    const { membership } = useUserStore.getState();
 
-    try {
-      setIsLoading(true);
+    if (!membership?.schoolId) return () => {};
 
-      const q = query(collection(db, 'loans'), where('schoolId', '==', membership.schoolId));
+    setIsLoading(true);
 
-      const snap = await getDocs(q);
-      const loans: Loan[] = snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Loan, 'id'>),
-      }));
+    const q = query(collection(db, 'loans'), where('schoolId', '==', membership.schoolId));
 
-      setLoans(loans);
-    } catch {
-      Alert.alert('Errore', 'Errore durante il recupero dei prestiti');
-    } finally {
-      setIsLoading(false);
-    }
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const loans: Loan[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Loan, 'id'>),
+        }));
+
+        setLoans(loans);
+        setIsLoading(false);
+      },
+      () => {
+        setIsLoading(false);
+        Alert.alert('Errore', 'Errore realtime prestiti');
+      }
+    );
+
+    return unsub;
   },
-  fetchRequests: async () => {
+  subscribeRequests: () => {
     const { setRequests, setIsLoading } = useBiblioStore.getState();
     const { membership, user } = useUserStore.getState();
 
-    try {
-      setIsLoading(true);
+    if (!membership?.schoolId) return () => {};
 
-      const baseQuery = [where('schoolId', '==', membership.schoolId)];
+    setIsLoading(true);
 
-      // Solo gli utenti normali filtrano per userId
-      if (membership.role === 'user') {
-        baseQuery.push(where('userId', '==', user.uid));
-      }
-      if (membership.role === 'staff') {
-        // Lo staff vede solo richieste in attesa
-        baseQuery.push(where('status', '==', 'pending'));
-      }
+    const filters = [where('schoolId', '==', membership.schoolId)];
 
-      const q = query(collection(db, 'requests'), ...baseQuery);
-
-      const snap = await getDocs(q);
-      const requests: Request[] = snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Request, 'id'>),
-      }));
-
-      setRequests(requests);
-    } catch (err) {
-      console.log('Errore', err);
-      Alert.alert('Errore', 'Errore durante il recupero delle richieste');
-    } finally {
-      setIsLoading(false);
+    if (membership.role === 'user') {
+      filters.push(where('userId', '==', user.uid));
     }
+
+    if (membership.role === 'staff') {
+      filters.push(where('status', '==', 'pending'));
+    }
+
+    const q = query(collection(db, 'requests'), ...filters);
+
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const requests: Request[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Request, 'id'>),
+        }));
+
+        setRequests(requests);
+        setIsLoading(false);
+      },
+      () => {
+        setIsLoading(false);
+        Alert.alert('Errore', 'Errore realtime richieste');
+      }
+    );
+
+    return unsub;
   },
 
   fetchRequestUsers: async () => {
     const { requests, requestUsers, setRequestUsers } = useBiblioStore.getState();
 
-    if (!requests.length) return;
+    const ids = [...new Set(requests.map((r) => r.userId))];
+    const missing = ids.filter((id) => !requestUsers[id]);
 
-    const ids = requests.map((r) => r.userId);
-
-    const missing = ids.filter((id) => !requestUsers.some((u) => u.uid === id));
     if (!missing.length) return;
 
-    const fetched = await fetchByIds<User>('users', missing, (id, data) => ({
-      uid: id,
-      ...(data as Omit<User, 'uid'>),
-    }));
+    const users = await fetchUsersByIds(missing);
 
-    setRequestUsers([...requestUsers, ...fetched]);
+    const map = { ...requestUsers };
+    users.forEach((u) => {
+      map[u.uid] = u;
+    });
+
+    setRequestUsers(map);
   },
+
   fetchLoanUsers: async () => {
     const { loans, loanUsers, setLoanUsers } = useBiblioStore.getState();
 
-    if (!loans.length) return;
+    const ids = [...new Set(loans.map((l) => l.userId))];
+    const missing = ids.filter((id) => !loanUsers[id as any]);
 
-    const ids = loans.map((l) => l.userId);
-
-    const missing = ids.filter((id) => !loanUsers.some((u) => u.uid === id));
     if (!missing.length) return;
 
-    const fetched = await fetchByIds<User>('users', missing, (id, data) => ({
-      uid: id,
-      ...(data as Omit<User, 'uid'>),
-    }));
+    const users = await fetchUsersByIds(missing);
 
-    setLoanUsers([...loanUsers, ...fetched]);
-    console.log('settati\n\n');
+    const map = { ...loanUsers };
+    users.forEach((u) => {
+      map[u.uid as any] = u;
+    });
+
+    setLoanUsers(map);
   },
 
   // User
@@ -329,40 +347,30 @@ const biblioAction = {
   // Staff
   approveRequest: async (requestId: string) => {
     const { membership } = useUserStore.getState();
-    const { requests, loans, setRequests, setLoans } = useBiblioStore.getState();
 
     if (membership.role !== 'staff') {
       Alert.alert('Attenzione!', 'Permessi insufficienti');
       return;
     }
 
-    // backup
-    const requestsBackup = requests.map((r) => ({ ...r }));
-    const loansBackup = loans.map((l) => ({ ...l }));
-
-    let newLoan: Loan | null = null;
-    let removedRequest: Request | null = null;
-
     try {
-      setRequests(requests.filter((r) => r.id !== requestId));
-
       await runTransaction(db, async (tx) => {
         const requestRef = doc(db, 'requests', requestId);
         const requestSnap = await tx.get(requestRef);
         if (!requestSnap.exists()) throw new Error('Request non trovata');
 
         const request = requestSnap.data() as Request;
-        removedRequest = { id: requestId, ...(request as Omit<Request, 'id'>) };
 
         const bookRef = doc(db, 'books', request.bookId);
         const bookSnap = await tx.get(bookRef);
         if (!bookSnap.exists()) throw new Error('Libro non trovato');
 
         const book = bookSnap.data() as Book;
-        if (book.available <= 0) throw new Error('Nessuna copia');
+        if (book.available <= 0) throw new Error('Nessuna copia disponibile');
 
         const loanRef = doc(collection(db, 'loans'));
 
+        // Aggiornamenti Firestore
         tx.update(requestRef, { status: 'approved' });
         tx.update(bookRef, { available: book.available - 1 });
         tx.set(loanRef, {
@@ -373,25 +381,9 @@ const biblioAction = {
           dueDate: null,
           returnedAt: null,
         });
-
-        newLoan = {
-          id: loanRef.id,
-          userId: request.userId,
-          bookId: request.bookId,
-          schoolId: request.schoolId,
-          startDate: Timestamp.now(),
-          dueDate: null,
-          returnedAt: null,
-        };
       });
-
-      if (newLoan) {
-        setLoans([...loans, newLoan]);
-      }
     } catch (err) {
-      // rollback sicuro
-      setRequests(requestsBackup);
-      setLoans(loansBackup);
+      console.error(err);
       Alert.alert('Errore', 'Operazione non completata');
     }
   },

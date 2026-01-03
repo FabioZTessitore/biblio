@@ -1,6 +1,6 @@
 import { View, FlatList, Image, Pressable, RefreshControl } from 'react-native';
 import { Text } from '~/components/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
 import { LinearGradient } from 'expo-linear-gradient';
 import { convertToRGBA, formatDate, truncateText } from '~/lib/utils';
@@ -96,10 +96,10 @@ const SetDueDate = ({ loanId }: { loanId: string }) => {
   );
 };
 
-const BookLoanCard = ({ item }: { item: Loan }) => {
+const LoanCard = ({ item }: { item: Loan }) => {
   const { books, loanUsers, markReturned } = useBiblioStore();
 
-  const user = loanUsers.find((u) => u.uid === item.userId);
+  const user = loanUsers[item.userId];
   if (!user) return null;
 
   const book = books.find((b) => b.id === item.bookId);
@@ -153,7 +153,7 @@ const RequestCard = ({ item }: { item: Request }) => {
   const { books, rejectRequest, requestUsers, approveRequest } = useBiblioStore();
   const { colors } = useColorScheme();
 
-  const user = requestUsers.find((u) => u.uid === item.userId);
+  const user = requestUsers[item.userId];
 
   if (!user) return null;
 
@@ -214,47 +214,37 @@ const RequestCard = ({ item }: { item: Request }) => {
 const Reservation = () => {
   const { colors } = useColorScheme();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const { requests, loans, isLoading, fetchRequestUsers, fetchLoanUsers } = useBiblioStore();
 
-  const {
-    requests,
-    loans,
-    requestLoan,
-    isLoading,
-    fetchRequests,
-    fetchBooks,
-    setIsLoading,
-    fetchRequestUsers,
-    fetchLoanUsers,
-    fetchLoans,
-  } = useBiblioStore();
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const tabConfig = {
     0: {
       data: loans,
       emptyIcon: 'book-clock',
       emptyTitle: 'Nessun prestito in corso',
-      renderer: ({ item }: { item: Loan }) => <BookLoanCard item={item} />,
-      refresh: async () => {
-        fetchBooks();
-        await fetchLoans();
-        await fetchLoanUsers();
-      },
+      renderer: ({ item }: { item: Loan }) => <LoanCard item={item} />,
     },
     1: {
       data: requests,
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
-      refresh: async () => {
-        fetchBooks();
-        await fetchRequests();
-        await fetchRequestUsers();
-      },
     },
   } as any;
 
   const current = tabConfig[selectedIndex];
+
+  useEffect(() => {
+    if (!loans.length) return;
+    fetchLoanUsers();
+  }, [loans]);
+
+  useEffect(() => {
+    if (!requests.length) return;
+    fetchRequestUsers();
+  }, [requests]);
+
   return (
     <View className="flex-1 px-4">
       <FlatList
@@ -281,9 +271,7 @@ const Reservation = () => {
             tintColor={colors.primary}
             progressBackgroundColor={colors.card}
             refreshing={isLoading}
-            onRefresh={async () => {
-              await current.refresh();
-            }}
+            enabled={false}
           />
         }
         showsVerticalScrollIndicator={false}
