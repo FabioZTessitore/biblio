@@ -16,6 +16,7 @@ const EMPTY_BOOK: Partial<Book> = {
   author: '',
   isbn: '',
   available: 0,
+  quantity: 0,
 };
 
 interface Props {
@@ -53,16 +54,44 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
       return;
     }
 
-    if (isEdit && bookId) updateBook(bookId, currentBook);
-    else addBook(currentBook);
+    if (isEdit && bookId) {
+      // Modifica libro
+      const oldBook = books.find((b) => b.id === bookId);
+      if (!oldBook) return;
+
+      const loansActive = (oldBook.quantity ?? 0) - (oldBook.available ?? 0);
+      const newQuantity = currentBook.quantity ?? 0;
+
+      if (newQuantity < loansActive) {
+        Toast.show({
+          type: 'error',
+          text1: 'Non puoi impostare la quantità totale inferiore ai libri già prestati',
+        });
+        return;
+      }
+
+      updateBook(bookId, {
+        ...currentBook,
+        quantity: newQuantity,
+        available: newQuantity - loansActive,
+      });
+    } else {
+      // Nuovo libro
+      const qty = currentBook.quantity ?? 0;
+      addBook({
+        ...currentBook,
+        quantity: qty,
+        available: qty,
+      });
+    }
 
     onClose();
   };
 
   const subtract = () =>
-    setCurrentBook((p) => ({ ...p, available: Math.max(0, (p.available ?? 0) - 1) }));
+    setCurrentBook((p) => ({ ...p, quantity: Math.max(0, (p.quantity ?? 0) - 1) }));
 
-  const add = () => setCurrentBook((p) => ({ ...p, available: (p.available ?? 0) + 1 }));
+  const add = () => setCurrentBook((p) => ({ ...p, quantity: (p.quantity ?? 0) + 1 }));
 
   return (
     <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
@@ -119,15 +148,20 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
             <FormItem className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <Text>Quantità:</Text>
-                <FlipCounter count={currentBook.available ?? 0} />
+                <FlipCounter count={currentBook.quantity ?? 0} />
               </View>
 
               <Stepper
                 className="p-2"
-                subtractButton={{ disabled: (currentBook.available ?? 0) === 0, onPress: subtract }}
+                subtractButton={{ disabled: (currentBook.quantity ?? 0) === 0, onPress: subtract }}
                 addButton={{ onPress: add }}
               />
             </FormItem>
+            {mode === 'edit' && (
+              <Text color={'muted'} variant={'label'}>
+                Attualmente disponibili: {currentBook.available}
+              </Text>
+            )}
           </FormSection>
         </Form>
       </BottomSheetView>

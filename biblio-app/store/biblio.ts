@@ -49,6 +49,7 @@ export interface Book {
   isbn: string;
   schoolId: string;
   available: number;
+  quantity: number;
 
   // Solo se:
   //  - ISBN non esiste su OpenLibrary
@@ -262,7 +263,6 @@ const biblioAction = {
 
     setRequestUsers(map);
   },
-
   fetchLoanUsers: async () => {
     const { loans, loanUsers, setLoanUsers } = useBiblioStore.getState();
 
@@ -383,7 +383,6 @@ const biblioAction = {
         });
       });
     } catch (err) {
-      console.error(err);
       Alert.alert('Errore', 'Operazione non completata');
     }
   },
@@ -419,6 +418,7 @@ const biblioAction = {
 
     const ref = await addDoc(collection(db, 'books'), {
       ...data,
+      available: data.quantity,
       schoolId: membership.schoolId,
     });
 
