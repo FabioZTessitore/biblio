@@ -253,7 +253,10 @@ const Welcome = () => {
                 size: 24,
               },
             ]}
-            values={['Membro', 'Operatore']}
+            values={[
+              process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Membro',
+              process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Operatore',
+            ]}
             selectedIndex={selectedIndex}
             onIndexChange={(index) => {
               setSelectedIndex(index);
