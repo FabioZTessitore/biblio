@@ -1,7 +1,7 @@
 import { View, FlatList, Image, Pressable, RefreshControl } from 'react-native';
 import { Text } from '~/components/ui';
 import { useEffect, useState } from 'react';
-import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
+import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
 import { LinearGradient } from 'expo-linear-gradient';
 import { convertToRGBA, formatDate, truncateText } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
@@ -216,16 +216,16 @@ const Reservation = () => {
 
   const { requests, loans, isLoading, fetchRequestUsers, fetchLoanUsers } = useBiblioStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tab, setTab] = useState<'prestiti' | 'richieste'>('prestiti');
 
   const tabConfig = {
-    0: {
+    prestiti: {
       data: loans,
       emptyIcon: 'book-clock',
       emptyTitle: 'Nessun prestito in corso',
       renderer: ({ item }: { item: Loan }) => <LoanCard item={item} />,
     },
-    1: {
+    richieste: {
       data: requests,
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
@@ -233,7 +233,7 @@ const Reservation = () => {
     },
   } as any;
 
-  const current = tabConfig[selectedIndex];
+  const current = tabConfig[tab];
 
   useEffect(() => {
     if (!loans.length) return;
@@ -249,10 +249,13 @@ const Reservation = () => {
     <View className="flex-1 px-4">
       <FlatList
         ListHeaderComponent={() => (
-          <SegmentedControl
-            values={['Prestiti', 'Richieste']}
-            selectedIndex={selectedIndex}
-            onIndexChange={setSelectedIndex}
+          <ToggleGroup
+            value={tab}
+            onChange={(value) => setTab(value as 'prestiti' | 'richieste')}
+            items={[
+              { label: 'Prestiti', value: 'prestiti' },
+              { label: 'Richieste', value: 'richieste' },
+            ]}
           />
         )}
         data={current.data}

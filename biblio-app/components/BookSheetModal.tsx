@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import { SheetModal } from './partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Pressable, View } from 'react-native';
-import { Form, FormItem, FormSection } from './nativewindui/Form';
+import { FormBlock, FormRow, FormGroup } from './nativewindui/FormGroup';
 import { TextField } from './nativewindui/TextField';
 import { Stepper } from './nativewindui/Stepper';
 import { Text } from '~/components/ui';
@@ -108,11 +108,9 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
           </Pressable>
         </View>
 
-        <Form className="gap-8 px-4 pt-8">
-          <FormSection
-            iconProps={{ type: 'MaterialCommunityIcons', name: 'book' }}
-            className="gap-6">
-            <FormItem>
+        <FormBlock className="gap-8 px-4 pt-8">
+          <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book' }} className="gap-6">
+            <FormRow>
               <TextField
                 label="Titolo"
                 type="bottom-sheet"
@@ -120,8 +118,8 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
                 onChangeText={(title) => setCurrentBook((p) => ({ ...p, title }))}
                 onSubmitEditing={() => authorRef.current?.focus()}
               />
-            </FormItem>
-            <FormItem>
+            </FormRow>
+            <FormRow>
               <TextField
                 ref={authorRef}
                 label="Autore"
@@ -130,8 +128,8 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
                 onChangeText={(author) => setCurrentBook((p) => ({ ...p, author }))}
                 onSubmitEditing={() => isbnRef.current?.focus()}
               />
-            </FormItem>
-            <FormItem>
+            </FormRow>
+            <FormRow>
               <TextField
                 ref={isbnRef}
                 label="Codice ISBN"
@@ -141,11 +139,11 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
                 value={currentBook.isbn}
                 onChangeText={(isbn) => setCurrentBook((p) => ({ ...p, isbn }))}
               />
-            </FormItem>
-          </FormSection>
+            </FormRow>
+          </FormGroup>
 
-          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
-            <FormItem className="flex-row items-center justify-between">
+          <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
+            <FormRow className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <Text>Quantità:</Text>
                 <FlipCounter count={currentBook.quantity ?? 0} />
@@ -153,17 +151,17 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
               <Stepper
                 className="p-2"
-                subtractButton={{ disabled: (currentBook.quantity ?? 0) === 0, onPress: subtract }}
-                addButton={{ onPress: add }}
+                minusButton={{ disabled: (currentBook.quantity ?? 0) === 0, onPress: subtract }}
+                plusButton={{ onPress: add }}
               />
-            </FormItem>
+            </FormRow>
             {mode === 'edit' && (
               <Text color={'muted'} variant={'label'}>
                 Attualmente disponibili: {currentBook.available}
               </Text>
             )}
-          </FormSection>
-        </Form>
+          </FormGroup>
+        </FormBlock>
       </BottomSheetView>
     </SheetModal>
   );

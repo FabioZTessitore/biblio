@@ -3,8 +3,8 @@ import { Pressable, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '~/components/nativewindui/Button';
-import { Form, FormItem } from '~/components/nativewindui/Form';
-import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
+import { FormBlock, FormRow } from '~/components/nativewindui/FormGroup';
+import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
 import { TextField } from '~/components/nativewindui/TextField';
 import { Icon, Text } from '~/components/ui';
 import { useAuthStore } from '~/store';
@@ -12,6 +12,7 @@ import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 import { SCHOOL_ID } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { TextFieldRef } from '~/components/nativewindui/TextField/types';
+import { Membership } from '~/store/user';
 
 const MemberWelcome = () => {
   const { loginAnonymously, isLoading } = useAuthStore();
@@ -52,16 +53,16 @@ const MemberWelcome = () => {
         </Text>
       </View>
 
-      <Form className="gap-6 px-4 pt-8">
-        {/* <FormItem className="gap-2">
+      <FormBlock className="gap-6 px-4 pt-8">
+        {/* <FormRow className="gap-2">
           <Text>Codice Scuola</Text>
           <TextField
             placeholder="Inserisci il codice della tua scuola"
             onChangeText={(schoolId) => setUserAttempt({ ...userAttempt, schoolId })}
             value={userAttempt.schoolId}
           />
-        </FormItem> */}
-        <FormItem className="gap-2">
+        </FormRow> */}
+        <FormRow className="gap-2">
           <Text>Nome*</Text>
           <TextField
             placeholder="Inserisci il tuo nome"
@@ -75,8 +76,8 @@ const MemberWelcome = () => {
             returnKeyType="next"
             submitBehavior={'submit'}
           />
-        </FormItem>
-        <FormItem className="gap-2">
+        </FormRow>
+        <FormRow className="gap-2">
           <Text>Cognome*</Text>
           <TextField
             ref={surnameFieldRef}
@@ -91,8 +92,8 @@ const MemberWelcome = () => {
             returnKeyType="next"
             submitBehavior={'submit'}
           />
-        </FormItem>
-        <FormItem className="gap-2">
+        </FormRow>
+        <FormRow className="gap-2">
           <Text>Classe*</Text>
           <TextField
             ref={gradeFieldRef}
@@ -102,7 +103,7 @@ const MemberWelcome = () => {
             errorMessage={userAttempt.error}
             value={userAttempt.grade}
           />
-        </FormItem>
+        </FormRow>
 
         {userAttempt.error && <Text className="text-destructive">{userAttempt.error}</Text>}
 
@@ -111,7 +112,7 @@ const MemberWelcome = () => {
             {isLoading ? <ActivityIndicator /> : <Text>Entra</Text>}
           </Button>
         </View>
-      </Form>
+      </FormBlock>
     </View>
   );
 };
@@ -156,8 +157,8 @@ const OperatorWelcome = () => {
         </Text>
       </View>
 
-      <Form className="gap-6 px-4 pt-8">
-        <FormItem className="gap-2">
+      <FormBlock className="gap-6 px-4 pt-8">
+        <FormRow className="gap-2">
           <Text>Email*</Text>
           <TextField
             placeholder="Inserisci la tua email"
@@ -173,9 +174,9 @@ const OperatorWelcome = () => {
             returnKeyType="next"
             submitBehavior={'submit'}
           />
-        </FormItem>
+        </FormRow>
 
-        <FormItem className="gap-2">
+        <FormRow className="gap-2">
           <Text>Password*</Text>
           <TextField
             ref={passwordFieldRef}
@@ -197,7 +198,7 @@ const OperatorWelcome = () => {
               </Pressable>
             }
           />
-        </FormItem>
+        </FormRow>
 
         {/* <View className="flex-row justify-between">
           <View className="flex-row items-center  gap-3">
@@ -219,7 +220,7 @@ const OperatorWelcome = () => {
             {isLoading ? <ActivityIndicator /> : <Text>Accedi</Text>}
           </Button>
         </View>
-      </Form>
+      </FormBlock>
     </View>
   );
 };
@@ -227,7 +228,7 @@ const OperatorWelcome = () => {
 const Welcome = () => {
   const insets = useSafeAreaInsets();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [role, setRole] = useState<Membership['role']>('user');
 
   return (
     <SafeAreaView className="flex-1 p-4 px-6">
@@ -241,30 +242,32 @@ const Welcome = () => {
         <View className="h-24 w-full rounded-2xl bg-blue-200"></View>
 
         <View className="flex-1 gap-8">
-          <SegmentedControl
-            icons={[
+          <ToggleGroup
+            value={role}
+            onChange={(value) => setRole(value as Membership['role'])}
+            items={[
               {
-                name: 'account',
-                type: 'MaterialCommunityIcons',
-                size: 24,
+                label: process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Membro',
+                value: 'user',
+                icon: {
+                  name: 'account',
+                  type: 'MaterialCommunityIcons',
+                  size: 24,
+                },
               },
               {
-                name: 'supervisor-account',
-                size: 24,
+                label: process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Operatore',
+                value: 'staff',
+                icon: {
+                  name: 'supervisor-account',
+                  size: 24,
+                },
               },
             ]}
-            values={[
-              process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Membro',
-              process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Operatore',
-            ]}
-            selectedIndex={selectedIndex}
-            onIndexChange={(index) => {
-              setSelectedIndex(index);
-            }}
           />
 
-          {selectedIndex === 0 && <MemberWelcome />}
-          {selectedIndex === 1 && <OperatorWelcome />}
+          {role === 'user' && <MemberWelcome />}
+          {role === 'staff' && <OperatorWelcome />}
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

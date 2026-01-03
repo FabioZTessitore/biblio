@@ -8,7 +8,7 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
+import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 
 /* ------------------------------------------
@@ -73,7 +73,7 @@ const Library = () => {
   const { library, removeFromLibrary } = useLibraryStore();
   const { requests, requestLoan, isLoading } = useBiblioStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tab, setTab] = useState<'carrello' | 'richieste'>('carrello');
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -96,7 +96,7 @@ const Library = () => {
   };
 
   const tabConfig = {
-    0: {
+    carrello: {
       data: library,
       emptyIcon: 'library-shelves',
       emptyTitle: 'Libreria vuota',
@@ -104,7 +104,7 @@ const Library = () => {
         <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
       ),
     },
-    1: {
+    richieste: {
       data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
@@ -112,16 +112,19 @@ const Library = () => {
     },
   } as any;
 
-  const current = tabConfig[selectedIndex];
+  const current = tabConfig[tab];
 
   return (
     <View className="flex-1 px-4">
       <FlatList
         ListHeaderComponent={() => (
-          <SegmentedControl
-            values={['Carrello', 'Richieste']}
-            selectedIndex={selectedIndex}
-            onIndexChange={setSelectedIndex}
+          <ToggleGroup
+            value={tab}
+            onChange={(value) => setTab(value as 'carrello' | 'richieste')}
+            items={[
+              { label: 'Carrello', value: 'carrello' },
+              { label: 'Richieste', value: 'richieste' },
+            ]}
           />
         )}
         data={current.data}
@@ -160,7 +163,7 @@ const Library = () => {
         pointerEvents="none"
       />
 
-      {selectedIndex === 0 && library.length > 0 && (
+      {tab === 'carrello' && library.length > 0 && (
         <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
           <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
             {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}
