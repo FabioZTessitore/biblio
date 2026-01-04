@@ -1,12 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Book, useBiblioStore } from '~/store/biblio';
-import { TextFieldRef } from './nativewindui/TextField/types';
 import Toast from 'react-native-toast-message';
 import { SheetModal } from './partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Pressable, View } from 'react-native';
 import { FormBlock, FormRow, FormGroup } from './nativewindui/FormGroup';
-import { TextField } from './nativewindui/TextField';
+import { InputField } from './nativewindui/InputField';
 import { Stepper } from './nativewindui/Stepper';
 import { Text } from '~/components/ui';
 import { FlipCounter } from '~/components/partials';
@@ -31,8 +30,8 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const [currentBook, setCurrentBook] = useState<Partial<Book>>(EMPTY_BOOK);
 
-  const authorRef = useRef<TextFieldRef>(null);
-  const isbnRef = useRef<TextFieldRef>(null);
+  const authorRef = useRef<any>(null);
+  const isbnRef = useRef<any>(null);
 
   const isEdit = mode === 'edit';
 
@@ -111,29 +110,33 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
         <FormBlock className="gap-8 px-4 pt-8">
           <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book' }} className="gap-6">
             <FormRow>
-              <TextField
+              <InputField
                 label="Titolo"
-                type="bottom-sheet"
+                sheet={true}
                 value={currentBook.title}
                 onChangeText={(title) => setCurrentBook((p) => ({ ...p, title }))}
                 onSubmitEditing={() => authorRef.current?.focus()}
+                returnKeyType="next"
+                submitBehavior={'submit'}
               />
             </FormRow>
             <FormRow>
-              <TextField
+              <InputField
                 ref={authorRef}
                 label="Autore"
-                type="bottom-sheet"
+                sheet={true}
                 value={currentBook.author}
                 onChangeText={(author) => setCurrentBook((p) => ({ ...p, author }))}
                 onSubmitEditing={() => isbnRef.current?.focus()}
+                returnKeyType="next"
+                submitBehavior={'submit'}
               />
             </FormRow>
             <FormRow>
-              <TextField
+              <InputField
                 ref={isbnRef}
                 label="Codice ISBN"
-                type="bottom-sheet"
+                sheet={true}
                 maxLength={13}
                 inputMode="numeric"
                 value={currentBook.isbn}

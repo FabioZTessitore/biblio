@@ -5,13 +5,12 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Button } from '~/components/nativewindui/Button';
 import { FormBlock, FormRow } from '~/components/nativewindui/FormGroup';
 import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
-import { TextField } from '~/components/nativewindui/TextField';
+import { InputField } from '~/components/nativewindui/InputField';
 import { Icon, Text } from '~/components/ui';
 import { useAuthStore } from '~/store';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 import { SCHOOL_ID } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { TextFieldRef } from '~/components/nativewindui/TextField/types';
 import { Membership } from '~/store/user';
 
 const MemberWelcome = () => {
@@ -25,8 +24,8 @@ const MemberWelcome = () => {
     error: '',
   });
 
-  const surnameFieldRef = useRef<TextFieldRef>(null);
-  const gradeFieldRef = useRef<TextFieldRef>(null);
+  const surnameFieldRef = useRef<any>(null);
+  const gradeFieldRef = useRef<any>(null);
 
   const handleEnter = () => {
     if (!userAttempt.name || !userAttempt.surname) {
@@ -64,11 +63,11 @@ const MemberWelcome = () => {
         </FormRow> */}
         <FormRow className="gap-2">
           <Text>Nome*</Text>
-          <TextField
+          <InputField
             placeholder="Inserisci il tuo nome"
             onChangeText={(name) => setUserAttempt({ ...userAttempt, name })}
             maxLength={20}
-            errorMessage={userAttempt.error}
+            error={userAttempt.error}
             value={userAttempt.name}
             onSubmitEditing={() => {
               surnameFieldRef?.current?.focus();
@@ -79,12 +78,12 @@ const MemberWelcome = () => {
         </FormRow>
         <FormRow className="gap-2">
           <Text>Cognome*</Text>
-          <TextField
+          <InputField
             ref={surnameFieldRef}
             placeholder="Inserisci il tuo cognome"
             maxLength={20}
             onChangeText={(surname) => setUserAttempt({ ...userAttempt, surname })}
-            errorMessage={userAttempt.error}
+            error={userAttempt.error}
             value={userAttempt.surname}
             onSubmitEditing={() => {
               gradeFieldRef?.current?.focus();
@@ -95,12 +94,12 @@ const MemberWelcome = () => {
         </FormRow>
         <FormRow className="gap-2">
           <Text>Classe*</Text>
-          <TextField
+          <InputField
             ref={gradeFieldRef}
             placeholder="Inserisci la tua classe"
             maxLength={5}
             onChangeText={(grade) => setUserAttempt({ ...userAttempt, grade })}
-            errorMessage={userAttempt.error}
+            error={userAttempt.error}
             value={userAttempt.grade}
           />
         </FormRow>
@@ -130,7 +129,7 @@ const OperatorWelcome = () => {
 
   const [hidePass, setHidePass] = useState(true);
 
-  const passwordFieldRef = useRef<TextFieldRef>(null);
+  const passwordFieldRef = useRef<any>(null);
 
   const handleEnter = () => {
     if (!userAttempt.email || !userAttempt.password) {
@@ -160,13 +159,13 @@ const OperatorWelcome = () => {
       <FormBlock className="gap-6 px-4 pt-8">
         <FormRow className="gap-2">
           <Text>Email*</Text>
-          <TextField
+          <InputField
             placeholder="Inserisci la tua email"
             onChangeText={(email) => setUserAttempt({ ...userAttempt, email })}
             maxLength={50}
             inputMode="email"
             autoComplete="email"
-            errorMessage={userAttempt.error}
+            error={userAttempt.error}
             value={userAttempt.email}
             onSubmitEditing={() => {
               passwordFieldRef?.current?.focus();
@@ -178,17 +177,16 @@ const OperatorWelcome = () => {
 
         <FormRow className="gap-2">
           <Text>Password*</Text>
-          <TextField
+          <InputField
             ref={passwordFieldRef}
             placeholder="Inserisci la tua password"
             onChangeText={(password) => setUserAttempt({ ...userAttempt, password })}
             maxLength={256}
             autoComplete="password"
             secureTextEntry={hidePass}
-            errorMessage={userAttempt.error}
+            error={userAttempt.error}
             value={userAttempt.password}
-            materialHideActionIcons={true}
-            rightView={
+            right={
               <Pressable className="mr-4 justify-center" onPress={() => setHidePass(!hidePass)}>
                 <Icon
                   name={hidePass ? 'eye' : 'eye-off'}
@@ -199,17 +197,6 @@ const OperatorWelcome = () => {
             }
           />
         </FormRow>
-
-        {/* <View className="flex-row justify-between">
-          <View className="flex-row items-center  gap-3">
-            <Checkbox
-              defaultChecked={true}
-              checked={userAttempt.remeberMe}
-              onCheckedChange={(remeberMe) => setUserAttempt({ ...userAttempt, remeberMe })}
-            />
-            <Text>Ricordami</Text>
-          </View>
-        </View> */}
 
         {(error || userAttempt.error) && (
           <Text className="text-destructive">{error || userAttempt.error}</Text>

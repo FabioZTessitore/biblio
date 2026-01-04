@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { BaseToast, BaseToastProps, ErrorToast } from 'react-native-toast-message';
-import { TextField } from '~/components/nativewindui/TextField';
+import { InputField } from '~/components/nativewindui/InputField';
 
 // Configurazione per Toast
 export const toastConfig = {
@@ -80,7 +80,7 @@ export const toastConfig = {
         flexShrink: 1,
         flexGrow: 1, // Permette al contenuto di espandersi
       }}>
-      <TextField
+      <InputField
         style={{
           fontSize: 18,
           fontWeight: 'bold',
@@ -88,8 +88,8 @@ export const toastConfig = {
           flexWrap: 'wrap',
         }}>
         {text1}
-      </TextField>
-      <TextField style={{ fontSize: 14, color: '#ddd', flexWrap: 'wrap' }}>{text2}</TextField>
+      </InputField>
+      <InputField style={{ fontSize: 14, color: '#ddd', flexWrap: 'wrap' }}>{text2}</InputField>
     </View>
   ),
 };
