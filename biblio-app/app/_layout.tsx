@@ -18,7 +18,6 @@ import { NAV_THEME } from '~/theme';
 import { useEffect } from 'react';
 import { useUserStore } from '~/store';
 import * as SecureStore from 'expo-secure-store';
-import { SCHOOL_ID } from '~/lib/utils';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -34,9 +33,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function init() {
-      console.log('uid: ', user.uid, 'schoolId:', SCHOOL_ID);
+      console.log('uid: ', user.uid, 'schoolId:', process.env.SCHOOL_ID);
 
-      const autoMembership = await fetchMembership(user.uid, SCHOOL_ID);
+      const autoMembership = await fetchMembership(user.uid, process.env.SCHOOL_ID);
 
       console.log('Membership Salvata:', autoMembership);
 

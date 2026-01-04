@@ -40,5 +40,3 @@ export const fetchUsersByIds = async (ids: string[]) => {
       ...(s.data() as Omit<User, 'uid'>),
     }));
 };
-
-export const SCHOOL_ID = 'tSkHlDpJXQBXLMQjlZMm';
