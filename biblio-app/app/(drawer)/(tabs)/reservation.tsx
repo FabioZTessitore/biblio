@@ -1,7 +1,6 @@
 import { View, FlatList, Image, Pressable, RefreshControl } from 'react-native';
-import { Text } from '~/components/ui';
+import { Text, ToggleGroup } from '~/components/ui';
 import { useEffect, useState } from 'react';
-import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
 import { LinearGradient } from 'expo-linear-gradient';
 import { convertToRGBA, formatDate, truncateText } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';

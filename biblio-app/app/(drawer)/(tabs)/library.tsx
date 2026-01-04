@@ -1,5 +1,5 @@
 import { FlatList, View, Alert, RefreshControl } from 'react-native';
-import { Text, BaseCard } from '~/components/ui';
+import { Text, BaseCard, ToggleGroup } from '~/components/ui';
 import { EmptyState } from '~/components/partials';
 import { Book, Request, useBiblioStore } from '~/store/biblio';
 import { useLibraryStore } from '~/store';
@@ -8,7 +8,6 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { ToggleGroup } from '~/components/nativewindui/ToggleGroup';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 
 /* ------------------------------------------

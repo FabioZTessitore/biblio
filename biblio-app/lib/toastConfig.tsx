@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { BaseToast, BaseToastProps, ErrorToast } from 'react-native-toast-message';
-import { InputField } from '~/components/nativewindui/InputField';
+import { InputField } from '~/components/ui';
 
 // Configurazione per Toast
 export const toastConfig = {

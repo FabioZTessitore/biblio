@@ -1,10 +1,9 @@
-import { Text, Icon } from '~/components/ui';
+import { Text, Icon, SearchField } from '~/components/ui';
 import { useState, useEffect, useRef } from 'react';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useBiblioStore, useFiltersStore } from '~/store';
 import { truncateText } from '~/lib/utils';
 import { FlatList, Pressable, View } from 'react-native';
-import { SearchField } from './nativewindui/SearchField';
 import { SheetModal } from '~/components/partials';
 import { Book } from '~/store/biblio';
 

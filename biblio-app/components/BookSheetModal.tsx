@@ -4,10 +4,7 @@ import Toast from 'react-native-toast-message';
 import { SheetModal } from './partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Pressable, View } from 'react-native';
-import { FormBlock, FormRow, FormGroup } from './nativewindui/FormGroup';
-import { InputField } from './nativewindui/InputField';
-import { Stepper } from './nativewindui/Stepper';
-import { Text } from '~/components/ui';
+import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper } from 'components/ui';
 import { FlipCounter } from '~/components/partials';
 
 const EMPTY_BOOK: Partial<Book> = {
