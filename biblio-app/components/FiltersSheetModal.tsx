@@ -171,7 +171,7 @@ const FiltersSheetModal = () => {
                   onChangeText={(txt) => searchHandler(txt)}
                 />
                 <FlatList
-                  data={filteredBooks}
+                  data={filteredBooks.slice(0, 10)} // Mostra i primi 10 risultati
                   keyExtractor={(item) => item.id}
                   contentContainerClassName="gap-2 py-8"
                   className="rounded-md"
