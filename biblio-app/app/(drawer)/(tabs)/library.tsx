@@ -1,5 +1,5 @@
 import { FlatList, View, Alert, RefreshControl } from 'react-native';
-import { Text, BaseCard } from '~/components/ui';
+import { Text, BaseCard, ToggleGroup } from '~/components/ui';
 import { EmptyState } from '~/components/partials';
 import { Book, Request, useBiblioStore } from '~/store/biblio';
 import { useLibraryStore } from '~/store';
@@ -8,7 +8,6 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { SegmentedControl } from '~/components/nativewindui/SegmentedControl';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 
 /* ------------------------------------------
@@ -21,7 +20,7 @@ const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void 
     <BaseCard
       title={item.title}
       subtitle={item.author}
-      imageUri={`https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`}
+      isbn={item.isbn}
       statusColor={item.available ? colors.success : colors.destructive}
       statusLabel={item.available ? 'Disponibile' : 'Non disponibile'}
       actionLabel="Rimuovi"
@@ -55,7 +54,7 @@ const RequestCard = ({ item }: { item: Request }) => {
     <BaseCard
       title={book.title}
       subtitle={book.author}
-      imageUri={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`}
+      isbn={book.isbn}
       statusColor={color}
       statusLabel={label}
       actionLabel="Cancella richiesta"
@@ -71,10 +70,9 @@ const Library = () => {
   const { colors } = useColorScheme();
 
   const { library, removeFromLibrary } = useLibraryStore();
-  const { requests, requestLoan, isLoading, fetchRequests, fetchBooks, setIsLoading } =
-    useBiblioStore();
+  const { requests, requestLoan, isLoading } = useBiblioStore();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tab, setTab] = useState<'carrello' | 'richieste'>('carrello');
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -97,34 +95,35 @@ const Library = () => {
   };
 
   const tabConfig = {
-    0: {
+    carrello: {
       data: library,
       emptyIcon: 'library-shelves',
       emptyTitle: 'Libreria vuota',
       renderer: ({ item }: { item: Book }) => (
         <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
       ),
-      refresh: fetchBooks,
     },
-    1: {
+    richieste: {
       data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
-      refresh: fetchRequests,
     },
   } as any;
 
-  const current = tabConfig[selectedIndex];
+  const current = tabConfig[tab];
 
   return (
     <View className="flex-1 px-4">
       <FlatList
         ListHeaderComponent={() => (
-          <SegmentedControl
-            values={['Carrello', 'Richieste']}
-            selectedIndex={selectedIndex}
-            onIndexChange={setSelectedIndex}
+          <ToggleGroup
+            value={tab}
+            onChange={(value) => setTab(value as 'carrello' | 'richieste')}
+            items={[
+              { label: 'Carrello', value: 'carrello' },
+              { label: 'Richieste', value: 'richieste' },
+            ]}
           />
         )}
         data={current.data}
@@ -143,11 +142,7 @@ const Library = () => {
             tintColor={colors.primary}
             progressBackgroundColor={colors.card}
             refreshing={isLoading}
-            onRefresh={async () => {
-              setIsLoading(true);
-              await current.refresh();
-              setIsLoading(false);
-            }}
+            enabled={false}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -167,7 +162,7 @@ const Library = () => {
         pointerEvents="none"
       />
 
-      {selectedIndex === 0 && library.length > 0 && (
+      {tab === 'carrello' && library.length > 0 && (
         <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
           <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
             {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}

@@ -4,7 +4,8 @@ import { Book } from '~/store/biblio';
 import { Button } from '~/components/nativewindui/Button';
 // import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { BookImage } from './BookImage';
 
 interface BookCardProps {
   item: Book;
@@ -38,38 +39,35 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
   );
 
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
-  // const { colors } = useColorScheme();
-
   const { membership } = useUserStore();
+
+  const [imageError, setImageError] = useState(false);
 
   const imageSource = useMemo(
     () =>
       ({
-        uri: `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`,
-        // fallback: 'https://islandpress.org/files/default_book_cover_2015.jpg'
+        uri: !imageError
+          ? `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`
+          : 'https://islandpress.org/files/default_book_cover_2015.jpg',
       }) satisfies ImageSourcePropType,
-    []
+    [item.isbn]
   );
+
+  useEffect(() => {
+    setImageError(false);
+  }, [item.isbn]);
 
   return (
     <View className={'rounded-2xl bg-card p-4'}>
       <View className="justify-center gap-6 rounded-lg">
         {/* Immagine e Valutazione */}
         <View className="gap-4">
-          <ImageBackground
-            source={imageSource}
-            resizeMode="stretch"
-            imageClassName="rounded-2xl"
-            className="rounded-2xl ">
-            <View className="rounded-2xl bg-[#000000AF]">
-              <Image
-                className="h-32 rounded-2xl"
-                resizeMethod="resize"
-                resizeMode="contain"
-                source={imageSource}
-              />
-            </View>
-          </ImageBackground>
+          <BookImage
+            isbn={item.isbn}
+            withBackground
+            resizeMode="contain"
+            className="h-32 rounded-2xl"
+          />
           <View className="flex-row items-center gap-1">
             <Icon name="star" size={'body'} color="#ca8a04" />
             <Text variant="label">4,6</Text>

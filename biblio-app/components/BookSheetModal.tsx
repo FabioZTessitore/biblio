@@ -1,14 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Book, useBiblioStore } from '~/store/biblio';
-import { TextFieldRef } from './nativewindui/TextField/types';
 import Toast from 'react-native-toast-message';
 import { SheetModal } from './partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Pressable, View } from 'react-native';
-import { Form, FormItem, FormSection } from './nativewindui/Form';
-import { TextField } from './nativewindui/TextField';
-import { Stepper } from './nativewindui/Stepper';
-import { Text } from '~/components/ui';
+import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper } from 'components/ui';
 import { FlipCounter } from '~/components/partials';
 
 const EMPTY_BOOK: Partial<Book> = {
@@ -16,6 +12,7 @@ const EMPTY_BOOK: Partial<Book> = {
   author: '',
   isbn: '',
   available: 0,
+  quantity: 0,
 };
 
 interface Props {
@@ -30,8 +27,8 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const [currentBook, setCurrentBook] = useState<Partial<Book>>(EMPTY_BOOK);
 
-  const authorRef = useRef<TextFieldRef>(null);
-  const isbnRef = useRef<TextFieldRef>(null);
+  const authorRef = useRef<any>(null);
+  const isbnRef = useRef<any>(null);
 
   const isEdit = mode === 'edit';
 
@@ -53,16 +50,44 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
       return;
     }
 
-    if (isEdit && bookId) updateBook(bookId, currentBook);
-    else addBook(currentBook);
+    if (isEdit && bookId) {
+      // Modifica libro
+      const oldBook = books.find((b) => b.id === bookId);
+      if (!oldBook) return;
+
+      const loansActive = (oldBook.quantity ?? 0) - (oldBook.available ?? 0);
+      const newQuantity = currentBook.quantity ?? 0;
+
+      if (newQuantity < loansActive) {
+        Toast.show({
+          type: 'error',
+          text1: 'Non puoi impostare la quantità totale inferiore ai libri già prestati',
+        });
+        return;
+      }
+
+      updateBook(bookId, {
+        ...currentBook,
+        quantity: newQuantity,
+        available: newQuantity - loansActive,
+      });
+    } else {
+      // Nuovo libro
+      const qty = currentBook.quantity ?? 0;
+      addBook({
+        ...currentBook,
+        quantity: qty,
+        available: qty,
+      });
+    }
 
     onClose();
   };
 
   const subtract = () =>
-    setCurrentBook((p) => ({ ...p, available: Math.max(0, (p.available ?? 0) - 1) }));
+    setCurrentBook((p) => ({ ...p, quantity: Math.max(0, (p.quantity ?? 0) - 1) }));
 
-  const add = () => setCurrentBook((p) => ({ ...p, available: (p.available ?? 0) + 1 }));
+  const add = () => setCurrentBook((p) => ({ ...p, quantity: (p.quantity ?? 0) + 1 }));
 
   return (
     <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
@@ -79,57 +104,64 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
           </Pressable>
         </View>
 
-        <Form className="gap-8 px-4 pt-8">
-          <FormSection
-            iconProps={{ type: 'MaterialCommunityIcons', name: 'book' }}
-            className="gap-6">
-            <FormItem>
-              <TextField
+        <FormBlock className="gap-8 px-4 pt-8">
+          <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book' }} className="gap-6">
+            <FormRow>
+              <InputField
                 label="Titolo"
-                type="bottom-sheet"
+                sheet={true}
                 value={currentBook.title}
                 onChangeText={(title) => setCurrentBook((p) => ({ ...p, title }))}
                 onSubmitEditing={() => authorRef.current?.focus()}
+                returnKeyType="next"
+                submitBehavior={'submit'}
               />
-            </FormItem>
-            <FormItem>
-              <TextField
+            </FormRow>
+            <FormRow>
+              <InputField
                 ref={authorRef}
                 label="Autore"
-                type="bottom-sheet"
+                sheet={true}
                 value={currentBook.author}
                 onChangeText={(author) => setCurrentBook((p) => ({ ...p, author }))}
                 onSubmitEditing={() => isbnRef.current?.focus()}
+                returnKeyType="next"
+                submitBehavior={'submit'}
               />
-            </FormItem>
-            <FormItem>
-              <TextField
+            </FormRow>
+            <FormRow>
+              <InputField
                 ref={isbnRef}
                 label="Codice ISBN"
-                type="bottom-sheet"
+                sheet={true}
                 maxLength={13}
                 inputMode="numeric"
                 value={currentBook.isbn}
                 onChangeText={(isbn) => setCurrentBook((p) => ({ ...p, isbn }))}
               />
-            </FormItem>
-          </FormSection>
+            </FormRow>
+          </FormGroup>
 
-          <FormSection iconProps={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
-            <FormItem className="flex-row items-center justify-between">
+          <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book-plus-multiple' }}>
+            <FormRow className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <Text>Quantità:</Text>
-                <FlipCounter count={currentBook.available ?? 0} />
+                <FlipCounter count={currentBook.quantity ?? 0} />
               </View>
 
               <Stepper
                 className="p-2"
-                subtractButton={{ disabled: (currentBook.available ?? 0) === 0, onPress: subtract }}
-                addButton={{ onPress: add }}
+                minusButton={{ disabled: (currentBook.quantity ?? 0) === 0, onPress: subtract }}
+                plusButton={{ onPress: add }}
               />
-            </FormItem>
-          </FormSection>
-        </Form>
+            </FormRow>
+            {mode === 'edit' && (
+              <Text color={'muted'} variant={'label'}>
+                Attualmente disponibili: {currentBook.available}
+              </Text>
+            )}
+          </FormGroup>
+        </FormBlock>
       </BottomSheetView>
     </SheetModal>
   );

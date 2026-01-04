@@ -1,5 +1,6 @@
-import { collection, documentId, getDocs, query, Timestamp, where } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { User } from '~/store/user';
 
 export function convertToRGBA(rgb: string, opacity: number): string {
   const rgbValues = rgb.match(/\d+/g);
@@ -26,27 +27,18 @@ export const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`; // Restituisce la data nel formato gg/mm/aaaa
 };
 
-export const fetchByIds = async <T>(
-  collectionName: string,
-  ids: string[],
-  map: (id: string, data: any) => T
-): Promise<T[]> => {
-  if (!ids.length) return [];
-
+export const fetchUsersByIds = async (ids: string[]) => {
   const unique = [...new Set(ids)];
+  if (!unique.length) return [];
 
-  const chunk = <U>(arr: U[], size: number) =>
-    Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-      arr.slice(i * size, i * size + size)
-    );
+  const snaps = await Promise.all(unique.map((id) => getDoc(doc(db, 'users', id))));
 
-  const chunks = chunk(unique, 10);
-
-  const snaps = await Promise.all(
-    chunks.map((c) => getDocs(query(collection(db, collectionName), where(documentId(), 'in', c))))
-  );
-
-  return snaps.flatMap((s) => s.docs.map((d) => map(d.id, d.data())));
+  return snaps
+    .filter((s) => s.exists())
+    .map((s) => ({
+      uid: s.id,
+      ...(s.data() as Omit<User, 'uid'>),
+    }));
 };
 
 export const SCHOOL_ID = 'tSkHlDpJXQBXLMQjlZMm';
