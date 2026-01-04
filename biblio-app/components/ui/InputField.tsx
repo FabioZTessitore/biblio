@@ -9,7 +9,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 
-import { Text, Icon } from '~/components/ui';
+import { Icon } from '~/components/ui/Icon';
+import { Text } from '~/components/ui/Text';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 

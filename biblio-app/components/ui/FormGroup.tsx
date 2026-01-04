@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, ViewProps } from 'react-native';
 import { cn } from '~/lib/cn';
-import { Icon, type IconProps, type IconType } from '~/components/ui';
+import { Icon, type IconProps, type IconType } from '~/components/ui/Icon';
 import { useColorScheme } from '~/lib/useColorScheme';
 
 type FormGroupProps = ViewProps & {

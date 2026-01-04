@@ -1,5 +1,5 @@
 import { useAugmentedRef, useControllableState } from '@rn-primitives/hooks';
-import { Icon } from '~/components/ui';
+import { Icon } from '~/components/ui/Icon';
 import { memo, forwardRef, useCallback } from 'react';
 import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';

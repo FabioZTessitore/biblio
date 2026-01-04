@@ -1,5 +1,5 @@
 import { Pressable, View, type PressableProps, type ViewProps } from 'react-native';
-import { Icon } from '~/components/ui';
+import { Icon } from '~/components/ui/Icon';
 import { cn } from '~/lib/cn';
 import { useColorScheme } from '~/lib/useColorScheme';
 

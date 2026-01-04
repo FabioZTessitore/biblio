@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { Pressable, View } from 'react-native';
-import { Text, Icon, type IconProps, type IconType } from '~/components/ui';
+import { Icon, type IconProps, type IconType } from '~/components/ui/Icon';
+import { Text } from '~/components/ui/Text';
 import { cn } from '~/lib/cn';
 
 type ToggleItem = {
@@ -29,9 +29,7 @@ export function ToggleGroup({
   textClassName,
 }: ToggleGroupProps) {
   return (
-    <View
-      testID="toggle-group"
-      className={cn('flex-row overflow-hidden rounded-full border border-border', className)}>
+    <View className={cn('flex-row overflow-hidden rounded-full border border-border', className)}>
       {items.map((item, index) => {
         const active = item.value === value;
         const isFirst = index === 0;
