@@ -20,7 +20,7 @@ const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void 
     <BaseCard
       title={item.title}
       subtitle={item.author}
-      imageUri={`https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`}
+      isbn={item.isbn}
       statusColor={item.available ? colors.success : colors.destructive}
       statusLabel={item.available ? 'Disponibile' : 'Non disponibile'}
       actionLabel="Rimuovi"
@@ -54,7 +54,7 @@ const RequestCard = ({ item }: { item: Request }) => {
     <BaseCard
       title={book.title}
       subtitle={book.author}
-      imageUri={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`}
+      isbn={book.isbn}
       statusColor={color}
       statusLabel={label}
       actionLabel="Cancella richiesta"

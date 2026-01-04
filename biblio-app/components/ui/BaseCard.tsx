@@ -1,12 +1,13 @@
-import { View, Image, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { Text } from './Text';
 import { Icon } from './Icon';
 import { truncateText } from '~/lib/utils';
+import { BookImage } from '../partials';
 
 const BaseCard = ({
   title,
   subtitle,
-  imageUri,
+  isbn,
   statusColor,
   statusLabel,
   actionLabel,
@@ -14,7 +15,7 @@ const BaseCard = ({
 }: {
   title: string;
   subtitle: string;
-  imageUri: string;
+  isbn: string;
   statusColor: string;
   statusLabel: string;
   actionLabel: string;
@@ -22,12 +23,7 @@ const BaseCard = ({
 }) => {
   return (
     <View className="flex-row justify-between gap-8 rounded-lg bg-card p-4 shadow-md">
-      <Image
-        resizeMode="cover"
-        resizeMethod="resize"
-        className="h-32 w-24 rounded-2xl"
-        source={{ uri: imageUri }}
-      />
+      <BookImage isbn={isbn} resizeMode="contain" className="h-32 min-w-24 rounded-2xl" />
 
       <View className="items-end justify-between">
         <View className="items-end gap-2">

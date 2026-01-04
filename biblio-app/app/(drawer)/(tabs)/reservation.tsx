@@ -6,7 +6,7 @@ import { convertToRGBA, formatDate, truncateText } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useBiblioStore } from '~/store';
 import { Loan, Request } from '~/store/biblio';
-import { EmptyState } from '~/components/partials';
+import { BookImage, EmptyState } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Timestamp } from 'firebase/firestore';
@@ -107,12 +107,7 @@ const LoanCard = ({ item }: { item: Loan }) => {
   return (
     <View className="gap-6 rounded-lg bg-card p-4 shadow-md">
       <View className="flex-row justify-between gap-8">
-        <Image
-          resizeMode="cover"
-          resizeMethod="resize"
-          className="h-36 w-28 rounded-2xl"
-          source={{ uri: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg` }}
-        />
+        <BookImage isbn={book.isbn} resizeMode="contain" className="h-36 min-w-24 rounded-2xl" />
 
         <View className="items-end justify-between gap-8">
           <View className="items-end gap-2">
@@ -161,12 +156,7 @@ const RequestCard = ({ item }: { item: Request }) => {
 
   return (
     <View className="flex-row justify-between gap-8 rounded-lg bg-card p-4 shadow-md">
-      <Image
-        resizeMode="cover"
-        resizeMethod="resize"
-        className="h-36 w-28 rounded-2xl"
-        source={{ uri: `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg` }}
-      />
+      <BookImage isbn={book.isbn} resizeMode="contain" className="h-36 min-w-24 rounded-2xl" />
 
       <View className="items-end justify-between gap-4">
         <View className="items-end gap-2">
