@@ -4,10 +4,9 @@ import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useBiblioStore, useFiltersStore } from '~/store';
 import { truncateText } from '~/lib/utils';
 import { FlatList, Pressable, View } from 'react-native';
-import { SearchInput } from './nativewindui/SearchInput';
+import { SearchField } from './nativewindui/SearchField';
 import { SheetModal } from '~/components/partials';
 import { Book } from '~/store/biblio';
-import { Filter, Filters } from '~/store/filters';
 
 const FiltersSheetModal = () => {
   const { books } = useBiblioStore();
@@ -165,9 +164,9 @@ const FiltersSheetModal = () => {
             {/* Contenuto dinamico */}
             {currentFilter?.type === 'text' && (
               <View>
-                <SearchInput
-                  variant="bottom-sheet"
-                  containerClassName="bg-background"
+                <SearchField
+                  sheet={true}
+                  rootClassName="bg-background"
                   value={searchText !== '' ? searchText : (currentFilter?.value ?? '')}
                   onChangeText={(txt) => searchHandler(txt)}
                 />
