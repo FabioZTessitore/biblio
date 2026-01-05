@@ -2,7 +2,7 @@ import { View, Pressable } from 'react-native';
 import { Text } from './Text';
 import { Icon } from './Icon';
 import { truncateText } from '~/lib/utils';
-import { BookImage } from '../partials';
+import { BookImage } from '~/components/partials/BookImage';
 
 const BaseCard = ({
   title,

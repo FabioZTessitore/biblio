@@ -41,22 +41,6 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
   const { membership } = useUserStore();
 
-  const [imageError, setImageError] = useState(false);
-
-  const imageSource = useMemo(
-    () =>
-      ({
-        uri: !imageError
-          ? `https://covers.openlibrary.org/b/isbn/${item.isbn}-L.jpg`
-          : 'https://islandpress.org/files/default_book_cover_2015.jpg',
-      }) satisfies ImageSourcePropType,
-    [item.isbn]
-  );
-
-  useEffect(() => {
-    setImageError(false);
-  }, [item.isbn]);
-
   return (
     <View className={'rounded-2xl bg-card p-4'}>
       <View className="justify-center gap-6 rounded-lg">
