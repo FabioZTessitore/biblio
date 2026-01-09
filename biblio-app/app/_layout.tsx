@@ -33,9 +33,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function init() {
-      console.log('uid: ', user.uid, 'schoolId:', process.env.SCHOOL_ID);
+      console.log('uid: ', user.uid, 'schoolId:', process.env.EXPO_PUBLIC_SCHOOL_ID);
 
-      const autoMembership = await fetchMembership(user.uid, process.env.SCHOOL_ID);
+      const autoMembership = await fetchMembership(user.uid, process.env.EXPO_PUBLIC_SCHOOL_ID);
 
       console.log('Membership Salvata:', autoMembership);
 

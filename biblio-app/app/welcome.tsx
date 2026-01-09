@@ -13,7 +13,7 @@ const MemberWelcome = () => {
   const { loginAnonymously, isLoading } = useAuthStore();
 
   const [userAttempt, setUserAttempt] = useState({
-    schoolId: process.env.SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
+    schoolId: process.env.EXPO_PUBLIC_SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
     name: '',
     surname: '',
     grade: '',
