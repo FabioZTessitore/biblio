@@ -3,7 +3,8 @@ import { auth, db } from '~/lib/firebase';
 import { Membership, User, useUserStore } from './user';
 import { collection, doc, getDoc, query, Timestamp, updateDoc, where } from 'firebase/firestore';
 import { signInAnonymously, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { SCHOOL_ID as schoolId } from '~/lib/utils';
+
+const schoolId = process.env.EXPO_PUBLIC_SCHOOL_ID
 
 export interface TAuthState {
   uid: string;

@@ -6,7 +6,6 @@ import { Button } from '~/components/nativewindui/Button';
 import { Icon, Text, InputField, FormBlock, FormRow, ToggleGroup } from '~/components/ui';
 import { useAuthStore } from '~/store';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
-import { SCHOOL_ID } from '~/lib/utils';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { Membership } from '~/store/user';
 
@@ -14,7 +13,7 @@ const MemberWelcome = () => {
   const { loginAnonymously, isLoading } = useAuthStore();
 
   const [userAttempt, setUserAttempt] = useState({
-    schoolId: SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
+    schoolId: process.env.EXPO_PUBLIC_SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
     name: '',
     surname: '',
     grade: '',
@@ -45,7 +44,7 @@ const MemberWelcome = () => {
         <Text variant={'heading'}>Benvenuto!</Text>
 
         <Text weight={'light'} color={'muted'} className="text-center">
-          Chiedi in prestito dei libri della tua scuola!
+          Chiedi in prestito i libri della tua scuola!
         </Text>
       </View>
 
@@ -149,7 +148,7 @@ const OperatorWelcome = () => {
         <Text variant={'heading'}>Benvenuto!</Text>
 
         <Text weight={'light'} color={'muted'} className="text-center">
-          Pronto a monitorare i tuoi prestiti dei libri?
+          Pronto a monitorare i prestiti dei libri?
         </Text>
       </View>
 
@@ -223,7 +222,9 @@ const Welcome = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-12"
         contentContainerStyle={{ paddingBottom: insets.bottom }}>
-        <View className="h-24 w-full rounded-2xl bg-blue-200"></View>
+        <View className="flex h-24 w-full items-center justify-center rounded-2xl bg-blue-200">
+          <Icon type="MaterialCommunityIcons" name={'bookshelf'} size={48} color="#f44587" />
+        </View>
 
         <View className="flex-1 gap-8">
           <ToggleGroup
@@ -231,7 +232,7 @@ const Welcome = () => {
             onChange={(value) => setRole(value as Membership['role'])}
             items={[
               {
-                label: process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Membro',
+                label: process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Utente',
                 value: 'user',
                 icon: {
                   name: 'account',
@@ -240,10 +241,11 @@ const Welcome = () => {
                 },
               },
               {
-                label: process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Operatore',
+                label: process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Bibliotecario',
                 value: 'staff',
                 icon: {
-                  name: 'supervisor-account',
+                  name: 'account-wrench',
+                  type: 'MaterialCommunityIcons',
                   size: 24,
                 },
               },

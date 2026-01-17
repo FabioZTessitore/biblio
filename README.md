@@ -5,7 +5,8 @@ gestione della biblioteca scolastica
 ## requisiti
 
 Un responsabile della gestione della libreria
-deve potersi autenticare mediante email google.
+deve potersi autenticare, ma non registrare autonomamente,
+mediante email google.
 Ottenuti i permessi
 di accesso potrà inserire un nuovo libro e
 modificarne uno esistente (eventualmente
@@ -22,7 +23,7 @@ la lista dei libri con eventuali filtri,
 selezionarne uno o più per richiederne il prestito.
 
 ps. In previsione di utilizzi futuri aggiungere
-al db i dati della scuola del progetto. il codice
+al db i dati della scuola del progetto. Il codice
 della scuola verrà utilizzato al momento della registrazione
 del responsabile e associato a ogni entità.
 **ATTENZIONE**: la registrazione del responsabile
