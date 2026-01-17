@@ -211,7 +211,7 @@ const OperatorWelcome = () => {
 const Welcome = () => {
   const insets = useSafeAreaInsets();
 
-  const [role, setRole] = useState<Membership['role']>('user');
+  const [isLibrarian, setIsLibrarian] = useState<boolean>(false);
 
   return (
     <SafeAreaView className="flex-1 p-4 px-6">
@@ -227,33 +227,17 @@ const Welcome = () => {
         </View>
 
         <View className="flex-1 gap-8">
-          <ToggleGroup
-            value={role}
-            onChange={(value) => setRole(value as Membership['role'])}
-            items={[
-              {
-                label: process.env.EXPO_PUBLIC_STUDENT_STRING ?? 'Utente',
-                value: 'user',
-                icon: {
-                  name: 'account',
-                  type: 'MaterialCommunityIcons',
-                  size: 24,
-                },
-              },
-              {
-                label: process.env.EXPO_PUBLIC_LIBRARIAN_STRING ?? 'Bibliotecario',
-                value: 'staff',
-                icon: {
-                  name: 'account-wrench',
-                  type: 'MaterialCommunityIcons',
-                  size: 24,
-                },
-              },
-            ]}
-          />
+          {!isLibrarian && <MemberWelcome />}
+          {isLibrarian && <OperatorWelcome />}
 
-          {role === 'user' && <MemberWelcome />}
-          {role === 'staff' && <OperatorWelcome />}
+          <View className="h-px bg-muted"></View>
+
+          <Pressable
+            onPress={() => setIsLibrarian((v) => !v)}
+            className="flex-row items-center justify-center gap-1">
+            <Text> {isLibrarian ? 'Sei uno studente?' : 'Sei il bibliotecario?'} </Text>
+            <Text color={'primary'}>Accedi</Text>
+          </Pressable>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
