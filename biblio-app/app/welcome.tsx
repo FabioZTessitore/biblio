@@ -222,9 +222,6 @@ const Welcome = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-12"
         contentContainerStyle={{ paddingBottom: insets.bottom }}>
-        <View className="flex h-24 w-full items-center justify-center rounded-2xl bg-blue-200">
-          <Icon type="MaterialCommunityIcons" name={'bookshelf'} size={48} color="#f44587" />
-        </View>
 
         <View className="flex-1 gap-8">
           {!isLibrarian && <MemberWelcome />}
