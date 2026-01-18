@@ -14,10 +14,12 @@
       "expo-web-browser",
       "expo-font",
       "expo-secure-store",
-      "expo-camera",
-      {
-        "cameraPermission": "Allow biblio-app to access your camera"
-      }
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow biblio-app to access your camera"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

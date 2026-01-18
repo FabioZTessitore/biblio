@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
 import { Book, useBiblioStore } from '~/store/biblio';
 import { TextFieldRef } from './nativewindui/TextField/types';
 import Toast from 'react-native-toast-message';
@@ -29,6 +30,7 @@ interface Props {
 
 export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
   const [permission, requestPermission] = useCameraPermissions();
+  const [showCamera, setShowCamera] = useState(false);
 
   const { addBook, updateBook, books } = useBiblioStore();
 
@@ -68,7 +70,47 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const add = () => setCurrentBook((p) => ({ ...p, available: (p.available ?? 0) + 1 }));
 
-  const scanISBN = () => {};
+  const requestCameraPermission = async () => {
+    if (!permission?.granted) {
+      const res = await requestPermission();
+      if (!res.granted) {
+        Toast.show({
+          type: 'error',
+          text1: 'Permesso fotocamera negato',
+        });
+        return;
+      }
+    }
+
+    setShowCamera(true);
+  };
+
+  const scanISBN = (isbn: string) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  if (showCamera) {
+    return (
+      <View className="flex-1 bg-black">
+        <CameraView
+          style={{ flex: 1 }}
+          barcodeScannerSettings={{
+            barcodeTypes: ['ean13', 'ean8'],
+          }}
+          onBarcodeScanned={({ data }) => {
+            setCurrentBook((p) => ({ ...p, isbn: data }));
+            setShowCamera(false);
+          }}
+        />
+
+        <Pressable
+          onPress={() => setShowCamera(false)}
+          className="absolute left-4 top-10 rounded bg-black/70 px-4 py-2">
+          <Text className="text-white">Chiudi</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
@@ -138,7 +180,7 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
           <Button
             android_ripple={{ foreground: true, color: '#ffffff30' }}
-            onPress={scanISBN}
+            onPress={requestCameraPermission}
             className={'bg-secondary'}>
             <Icon size={'body'} type="MaterialCommunityIcons" name="line-scan" />
             <Text>{'Scansiona'}</Text>
