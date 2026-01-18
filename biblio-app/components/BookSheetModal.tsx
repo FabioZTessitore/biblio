@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Book, useBiblioStore } from '~/store/biblio';
 import { TextFieldRef } from './nativewindui/TextField/types';
 import Toast from 'react-native-toast-message';
@@ -8,8 +9,9 @@ import { Pressable, View } from 'react-native';
 import { Form, FormItem, FormSection } from './nativewindui/Form';
 import { TextField } from './nativewindui/TextField';
 import { Stepper } from './nativewindui/Stepper';
-import { Text } from '~/components/ui';
+import { Icon, Text } from '~/components/ui';
 import { FlipCounter } from '~/components/partials';
+import { Button } from './nativewindui/Button';
 
 const EMPTY_BOOK: Partial<Book> = {
   title: '',
@@ -26,6 +28,8 @@ interface Props {
 }
 
 export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
+  const [permission, requestPermission] = useCameraPermissions();
+
   const { addBook, updateBook, books } = useBiblioStore();
 
   const [currentBook, setCurrentBook] = useState<Partial<Book>>(EMPTY_BOOK);
@@ -63,6 +67,8 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
     setCurrentBook((p) => ({ ...p, available: Math.max(0, (p.available ?? 0) - 1) }));
 
   const add = () => setCurrentBook((p) => ({ ...p, available: (p.available ?? 0) + 1 }));
+
+  const scanISBN = () => {};
 
   return (
     <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
@@ -129,6 +135,14 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
               />
             </FormItem>
           </FormSection>
+
+          <Button
+            android_ripple={{ foreground: true, color: '#ffffff30' }}
+            onPress={scanISBN}
+            className={'bg-secondary'}>
+            <Icon size={'body'} type="MaterialCommunityIcons" name="line-scan" />
+            <Text>{'Scansiona'}</Text>
+          </Button>
         </Form>
       </BottomSheetView>
     </SheetModal>
