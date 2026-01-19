@@ -187,6 +187,7 @@ const OperatorWelcome = () => {
             errorMessage={userAttempt.error}
             value={userAttempt.password}
             materialHideActionIcons={true}
+            autoCapitalize="none"
             rightView={
               <Pressable className="mr-4 justify-center" onPress={() => setHidePass(!hidePass)}>
                 <Icon
