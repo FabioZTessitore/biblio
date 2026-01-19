@@ -182,6 +182,7 @@ const OperatorWelcome = () => {
             secureTextEntry={hidePass}
             error={userAttempt.error}
             value={userAttempt.password}
+            autoCapitalize="none"
             right={
               <Pressable className="mr-4 justify-center" onPress={() => setHidePass(!hidePass)}>
                 <Icon
@@ -222,7 +223,6 @@ const Welcome = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-12"
         contentContainerStyle={{ paddingBottom: insets.bottom }}>
-
         <View className="flex-1 gap-8">
           {!isLibrarian && <MemberWelcome />}
           {isLibrarian && <OperatorWelcome />}
