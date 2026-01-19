@@ -122,7 +122,12 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
           available: 1,
         }));
       } else {
-        console.log('ciaooo');
+        console.error('Errore durante la ricerca del libro con isbn: ', isbn);
+        Toast.show({
+          type: 'error',
+          text1: 'Non è stato possibile trovare il libro con questo ISBN',
+          text2: 'Per favore inseriscilo a mano.',
+        });
       }
     } catch (error) {
       console.error('Errore durante la ricerca del libro:', error);

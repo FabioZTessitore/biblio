@@ -168,6 +168,7 @@ const OperatorWelcome = () => {
             }}
             returnKeyType="next"
             submitBehavior={'submit'}
+            autoCapitalize="none"
           />
         </FormRow>
 
