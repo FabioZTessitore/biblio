@@ -9,6 +9,7 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { Book } from '~/store/biblio';
+import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { colors } = useColorScheme();
@@ -23,6 +24,9 @@ export default function Index() {
     subscribeLoans,
     isLoading,
   } = useBiblioStore();
+
+  const { t } = useTranslation();
+
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters, resetFilters } = useFiltersStore();
@@ -77,7 +81,7 @@ export default function Index() {
                 />
                 <Pressable onPress={resetFilters}>
                   <Text className="text-center" color="primary">
-                    Ripristina
+                    {t('index.resetFilters')}
                   </Text>
                 </Pressable>
               </View>

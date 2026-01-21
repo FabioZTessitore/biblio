@@ -1,0 +1,36 @@
+{
+    "language": "Lingua",
+    "index": {
+        "cancel": "Annulla",
+        "resetFilters": "Ripristina filtri"
+    },
+    "onboarding": {
+        "title": "Benvenuto!"
+    },
+    "settings": {
+        "title": "Impostazioni",
+        "audio": "Audio",
+        "sound": "Suono",
+        "vibration": "Vibrazione",
+        "restorePurchases": "Ripristina gli acquisti",
+        "revokeConsent": "Revoca consenso annunci mirati"
+    },
+    "about": {
+        "title": "Crediti",
+        "developmentConcept": "Sviluppo e Concept",
+        "soundEffects": "Effetti Sonori",
+        "iconDesign": "Design Icone",
+        "version": "Versione",
+        "installed": "Installata",
+        "policy": "Privacy Policy",
+        "linkPolicy": "Link alla Privacy Policy",
+        "license": "Licenza",
+        "copyrightText": "Tutti i diritti riservati.\nLicenza CC BY-NC-ND 4.0",
+        "detailsLicense": "Vedi dettagli licenza"
+    },
+    "errors": {
+        "wifiError": "Errore di rete",
+        "wifiErrorMessage": "Impossibile connettersi al server.\nVerifica la tua connessione internet e riprova.",
+        "retry": "Riprova"
+    }
+}

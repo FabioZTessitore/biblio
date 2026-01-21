@@ -1,23 +1,19 @@
 import '../global.css';
+import '~/lib/i18n';
 import 'expo-dev-client';
-import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
-import { toastConfig } from '~/lib/toastConfig';
-import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-// import * as SecureStore from 'expo-secure-store';
-
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-
+import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-
+import Toast from 'react-native-toast-message';
 import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
+import { toastConfig } from '~/lib/toastConfig';
 import { NAV_THEME } from '~/theme';
-import { useEffect } from 'react';
 import { useUserStore } from '~/store';
-import * as SecureStore from 'expo-secure-store';
 
 export {
   // Catch any errors thrown by the Layout component.

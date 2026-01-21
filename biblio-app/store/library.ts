@@ -5,6 +5,7 @@ import { Book } from './biblio';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export interface TLibraryState {
   library: Book[];
@@ -51,10 +52,11 @@ const libraryMutations = {
 const libraryAction = {
   clearLibrary: () => {
     const { setLibrary } = useLibraryStore.getState();
+    const { t } = useTranslation();
 
     Alert.alert('Attenzione!', 'Vuoi eliminare tutta la libreria?', [
       {
-        text: 'Annulla',
+        text: t('index.cancel'),
         style: 'cancel',
         isPreferred: true,
       },
