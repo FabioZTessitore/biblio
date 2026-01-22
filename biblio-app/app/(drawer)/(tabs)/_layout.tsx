@@ -1,11 +1,11 @@
-import { Alert } from 'react-native';
-import { Tabs, Href, useNavigation } from 'expo-router';
+import { View } from 'react-native';
+import { Tabs, Href, useNavigation, router } from 'expo-router';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import { Text, Icon } from '~/components/ui';
+import { Icon } from '~/components/ui';
 import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
-import { useAuthStore, useFiltersStore, useLibraryStore, useUserStore } from '~/store';
+import { useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
 
 type TabsProps = BottomTabNavigationOptions & {
@@ -67,14 +67,22 @@ export default function TabLayout() {
     },
     headerRight: () => {
       return (
-        <Button
-          onPress={openFiltersModal}
-          variant="plain"
-          size={'none'}
-          className="mr-6 bg-transparent">
-          <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
-          <Text color={'primary'}>Filters</Text>
-        </Button>
+        <View className="mr-6 flex-row gap-4">
+          <Button
+            onPress={openFiltersModal}
+            variant="plain"
+            size={'none'}
+            className="bg-transparent">
+            <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
+          </Button>
+          <Button
+            onPress={() => router.push('/settings')}
+            variant="plain"
+            size={'none'}
+            className="bg-transparent">
+            <Icon color={colors.grey2} type="MaterialCommunityIcons" name="cog-outline" />
+          </Button>
+        </View>
       );
     },
   } as TabsProps;

@@ -48,8 +48,8 @@ export default function Index() {
     };
   }, [membership.schoolId, membership.role]);
 
-  const handlePressMemo = useCallback(
-    (item: Book) => () => {
+  const handlePress = useCallback(
+    (item: Book) => {
       if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
         addToLibrary(item);
       } else {
@@ -57,7 +57,7 @@ export default function Index() {
         setBookEditModal(true);
       }
     },
-    [membership, library]
+    [membership.role, library, addToLibrary, setBookEditModal]
   );
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
@@ -97,7 +97,7 @@ export default function Index() {
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         renderItem={({ item }) => (
-          <BookCard item={item} selected={isSelected(item.id)} onPress={handlePressMemo(item)} />
+          <BookCard item={item} selected={isSelected(item.id)} onPress={() => handlePress(item)} />
         )}
         refreshControl={
           <RefreshControl

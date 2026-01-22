@@ -64,6 +64,18 @@ export default function RootLayout() {
               <Stack screenOptions={SCREEN_OPTIONS}>
                 <Stack.Protected guard={!!membership.schoolId}>
                   <Stack.Screen name="(drawer)" />
+                  <Stack.Screen
+                    name="settings"
+                    options={{
+                      presentation: 'formSheet',
+                      sheetGrabberVisible: true,
+                      sheetAllowedDetents: [0.45, 0.95],
+                      sheetCornerRadius: 16,
+                      contentStyle: {
+                        backgroundColor: 'transparent',
+                      },
+                    }}
+                  />
                 </Stack.Protected>
 
                 <Stack.Protected guard={!membership.schoolId}>
