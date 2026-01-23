@@ -7,10 +7,12 @@ import { Icon, Text, InputField, FormBlock, FormRow, ToggleGroup } from '~/compo
 import { useAuthStore } from '~/store';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { Membership } from '~/store/user';
+import { useTranslation } from 'react-i18next';
 
 const MemberWelcome = () => {
   const { loginAnonymously, isLoading } = useAuthStore();
+
+  const { t } = useTranslation();
 
   const [userAttempt, setUserAttempt] = useState({
     schoolId: process.env.EXPO_PUBLIC_SCHOOL_ID, // TODO: da cambiare in prod, .env (??)
@@ -41,7 +43,7 @@ const MemberWelcome = () => {
   return (
     <View className="flex-1">
       <View className="items-center">
-        <Text variant={'heading'}>Benvenuto!</Text>
+        <Text variant={'heading'}>{t('onboarding.title')}</Text>
 
         <Text weight={'light'} color={'muted'} className="text-center">
           Chiedi in prestito i libri della tua scuola!
@@ -115,6 +117,8 @@ const MemberWelcome = () => {
 const OperatorWelcome = () => {
   const { colors } = useColorScheme();
 
+  const { t } = useTranslation();
+
   const { login, isLoading, error } = useAuthStore();
 
   const [userAttempt, setUserAttempt] = useState({
@@ -145,7 +149,7 @@ const OperatorWelcome = () => {
   return (
     <View className="flex-1">
       <View className="items-center">
-        <Text variant={'heading'}>Benvenuto!</Text>
+        <Text variant={'heading'}>{t('onboarding.title')}</Text>
 
         <Text weight={'light'} color={'muted'} className="text-center">
           Pronto a monitorare i prestiti dei libri?
@@ -168,6 +172,7 @@ const OperatorWelcome = () => {
             }}
             returnKeyType="next"
             submitBehavior={'submit'}
+            autoCapitalize="none"
           />
         </FormRow>
 
@@ -182,6 +187,7 @@ const OperatorWelcome = () => {
             secureTextEntry={hidePass}
             error={userAttempt.error}
             value={userAttempt.password}
+            autoCapitalize="none"
             right={
               <Pressable className="mr-4 justify-center" onPress={() => setHidePass(!hidePass)}>
                 <Icon
@@ -222,7 +228,6 @@ const Welcome = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-12"
         contentContainerStyle={{ paddingBottom: insets.bottom }}>
-
         <View className="flex-1 gap-8">
           {!isLibrarian && <MemberWelcome />}
           {isLibrarian && <OperatorWelcome />}

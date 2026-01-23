@@ -9,6 +9,7 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { Book } from '~/store/biblio';
+import { useTranslation } from 'react-i18next';
 
 export default function Index() {
   const { colors } = useColorScheme();
@@ -23,6 +24,9 @@ export default function Index() {
     subscribeLoans,
     isLoading,
   } = useBiblioStore();
+
+  const { t } = useTranslation();
+
   const { library, addToLibrary } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters, resetFilters } = useFiltersStore();
@@ -44,8 +48,8 @@ export default function Index() {
     };
   }, [membership.schoolId, membership.role]);
 
-  const handlePressMemo = useCallback(
-    (item: Book) => () => {
+  const handlePress = useCallback(
+    (item: Book) => {
       if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
         addToLibrary(item);
       } else {
@@ -53,7 +57,7 @@ export default function Index() {
         setBookEditModal(true);
       }
     },
-    [membership, library]
+    [membership.role, library, addToLibrary, setBookEditModal]
   );
 
   const isSelected = (id: string) => library.some((book) => book.id === id);
@@ -77,7 +81,7 @@ export default function Index() {
                 />
                 <Pressable onPress={resetFilters}>
                   <Text className="text-center" color="primary">
-                    Ripristina
+                    {t('index.resetFilters')}
                   </Text>
                 </Pressable>
               </View>
@@ -93,7 +97,7 @@ export default function Index() {
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         renderItem={({ item }) => (
-          <BookCard item={item} selected={isSelected(item.id)} onPress={handlePressMemo(item)} />
+          <BookCard item={item} selected={isSelected(item.id)} onPress={() => handlePress(item)} />
         )}
         refreshControl={
           <RefreshControl

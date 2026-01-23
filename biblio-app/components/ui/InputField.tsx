@@ -147,7 +147,7 @@ export const InputField = React.forwardRef<TextInput, InputFieldProps>(
             />
           </View>
 
-          {!!text && focused && editable && (
+          {!!text && focused && editable && props.autoComplete !== 'password' && (
             <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(180)}>
               <Pressable onPress={clear} className="pl-2 pr-1 active:opacity-60">
                 <Icon

@@ -1,11 +1,15 @@
-import { useEffect, useId, useRef, useState } from 'react';
-import { Book, useBiblioStore } from '~/store/biblio';
+import { useEffect, useRef, useState } from 'react';
+import { Pressable, View, StyleSheet } from 'react-native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
+import { Book, useBiblioStore } from '~/store/biblio';
 import { SheetModal } from './partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
-import { Pressable, View } from 'react-native';
-import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper } from 'components/ui';
+import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper, Icon } from 'components/ui';
 import { FlipCounter } from '~/components/partials';
+import { Button } from './nativewindui/Button';
+import { searchByIsbn } from '~/lib/googleBooksAPI';
 
 const EMPTY_BOOK: Partial<Book> = {
   title: '',
@@ -23,8 +27,10 @@ interface Props {
 }
 
 export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
-  const { addBook, updateBook, books } = useBiblioStore();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [showCamera, setShowCamera] = useState(false);
 
+  const { addBook, updateBook, books } = useBiblioStore();
   const [currentBook, setCurrentBook] = useState<Partial<Book>>(EMPTY_BOOK);
 
   const authorRef = useRef<any>(null);
@@ -32,7 +38,7 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const isEdit = mode === 'edit';
 
-  // Carica dati solo quando il modal si apre
+  // Carica dati quando il modal si apre
   useEffect(() => {
     if (!visible) return;
 
@@ -89,21 +95,66 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const add = () => setCurrentBook((p) => ({ ...p, quantity: (p.quantity ?? 0) + 1 }));
 
+  // --- Apertura camera ---
+  const requestCamera = async () => {
+    if (!permission?.granted) {
+      const res = await requestPermission();
+      if (!res.granted) {
+        Toast.show({ type: 'error', text1: 'Permesso fotocamera negato' });
+        return;
+      }
+    }
+    setShowCamera(true);
+  };
+
+  const onBarcodeScanned = async (isbn: string) => {
+    if (!isbn) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    try {
+      const book = await searchByIsbn(isbn);
+      if (book) {
+        console.log('Libro trovato: ', book);
+        setCurrentBook((p) => ({
+          ...p,
+          title: book.title,
+          author: book.authors,
+          isbn,
+          available: 1,
+        }));
+      } else {
+        console.error('Errore durante la ricerca del libro con isbn: ', isbn);
+        Toast.show({
+          type: 'error',
+          text1: 'Non è stato possibile trovare il libro con questo ISBN',
+          text2: 'Per favore inseriscilo a mano.',
+        });
+      }
+    } catch (error) {
+      console.error('Errore durante la ricerca del libro:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Errore durante la ricerca del libro',
+        text2: 'Per favore inseriscilo a mano.',
+      });
+    }
+    setShowCamera(false);
+  };
+
   return (
     <SheetModal visible={visible} onClose={onClose} snapPoints={['75%', '95%']}>
       <BottomSheetView className="flex-1 gap-8 p-4">
+        {/* Header */}
         <View className="flex-row items-center justify-between py-2">
-          <Pressable className="px-2" onPress={onClose}>
+          <Pressable onPress={onClose} className="px-2">
             <Text className="text-destructive">Annulla</Text>
           </Pressable>
-
           <Text variant="heading">{isEdit ? 'Modifica libro' : 'Nuovo libro'}</Text>
-
-          <Pressable className="px-2" onPress={onSave}>
+          <Pressable onPress={onSave} className="px-2">
             <Text color="primary">Salva</Text>
           </Pressable>
         </View>
 
+        {/* Form */}
         <FormBlock className="gap-8 px-4 pt-8">
           <FormGroup icon={{ type: 'MaterialCommunityIcons', name: 'book' }} className="gap-6">
             <FormRow>
@@ -161,7 +212,40 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
               </Text>
             )}
           </FormGroup>
+
+          <Button
+            android_ripple={{ foreground: true, color: '#ffffff30' }}
+            onPress={requestCamera}
+            className="bg-secondary">
+            <Icon size="body" type="MaterialCommunityIcons" name="line-scan" />
+            <Text>Scansiona</Text>
+          </Button>
         </FormBlock>
+
+        {/* --- CAMERA OVERLAY --- */}
+        {showCamera && (
+          <View style={StyleSheet.absoluteFill} className="z-50 bg-black">
+            <CameraView
+              style={{ flex: 1 }}
+              barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8'] }}
+              onBarcodeScanned={({ data }) => onBarcodeScanned(data)}
+            />
+
+            <Pressable
+              onPress={() => setShowCamera(false)}
+              style={{
+                position: 'absolute',
+                top: 50,
+                left: 20,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                borderRadius: 8,
+              }}>
+              <Text className="text-white">Chiudi</Text>
+            </Pressable>
+          </View>
+        )}
       </BottomSheetView>
     </SheetModal>
   );
