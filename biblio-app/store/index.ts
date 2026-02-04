@@ -3,7 +3,7 @@ import { useBiblioStore } from './biblio';
 import { useFiltersStore } from './filters';
 import { useUserStore } from './user';
 import { useLibraryStore } from './library';
-import { useLanguageStore } from './language';
+import { useSettingsStore } from './settings';
 
 export {
   useAuthStore,
@@ -11,5 +11,5 @@ export {
   useFiltersStore,
   useUserStore,
   useLibraryStore,
-  useLanguageStore,
+  useSettingsStore,
 };

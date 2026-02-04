@@ -1,18 +1,39 @@
-import { View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon, Text } from '~/components/ui';
 import { BlurView } from 'expo-blur';
 import { PressableScale } from 'pressto';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useTranslation } from 'react-i18next';
 
+import { haptic } from '~/lib/haptics';
+import { useSettingsStore } from '~/store';
+import { Toggle } from '~/components/nativewindui/Toggle';
+
 const Settings = () => {
   const { t } = useTranslation();
+  const { colors } = useColorScheme();
+  const { hapticsEnabled, toggleHaptics } = useSettingsStore();
+
+  const styles = StyleSheet.create({
+    settingCard: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 16,
+      borderRadius: 16,
+      backgroundColor: colors.background,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      alignItems: 'center',
+      borderColor: colors.grey5,
+      borderWidth: 1,
+    },
+  });
 
   return (
     <BlurView
       tint="dark"
       className="flex-1 gap-8 rounded-t-full p-4"
-      blurReductionFactor={2}
+      blurReductionFactor={1}
       intensity={60}
       experimentalBlurMethod="dimezisBlurView">
       <View className="items-center">
@@ -20,25 +41,15 @@ const Settings = () => {
       </View>
 
       <View className="gap-4">
-        {/* <View className="gap-4 rounded-2xl bg-background p-4">
-          <Text variant={'heading'}>Lingua</Text>
-          <PressableScale
-            style={{
-              gap: 16,
-              borderRadius: 16,
-              backgroundColor: colors.background,
-              padding: 16,
-            }}
-            onPress={() => {}}>
-            <Text variant={'heading'}>Italiano</Text>
-          </PressableScale>
-        </View> */}
-        <View className="gap-4 rounded-2xl bg-background p-4">
-          <Text variant={'heading'}>Vibrazione</Text>
-        </View>
-        <View className="gap-4 rounded-2xl bg-background p-4">
-          <Text variant={'heading'}>Notifiche</Text>
-        </View>
+        <PressableScale style={styles.settingCard} onPress={toggleHaptics}>
+          <Text>Vibrazione</Text>
+          <Toggle value={hapticsEnabled} />
+        </PressableScale>
+
+        <PressableScale style={styles.settingCard} onPress={() => {}}>
+          <Text>Notifiche</Text>
+          <Toggle disabled={true} value={false} />
+        </PressableScale>
       </View>
     </BlurView>
   );
