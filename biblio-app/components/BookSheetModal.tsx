@@ -10,6 +10,7 @@ import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper, Icon } from '
 import { FlipCounter } from '~/components/partials';
 import { Button } from './nativewindui/Button';
 import { searchByIsbn } from '~/lib/googleBooksAPI';
+import { haptic } from '~/lib/haptics';
 
 const EMPTY_BOOK: Partial<Book> = {
   title: '',
@@ -139,7 +140,7 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
 
   const onBarcodeScanned = async (isbn: string) => {
     if (!isbn) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptic.success();
     try {
       const book = await searchByIsbn(isbn);
       if (book) {

@@ -1,4 +1,4 @@
-import { useLanguageStore } from '~/store';
+import { useSettingsStore } from '~/store';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import translationIt from '~/locales/it-IT/translation.json';
@@ -11,7 +11,7 @@ const resources = {
 };
 
 const initI18n = async () => {
-  const { initLanguage } = useLanguageStore.getState();
+  const { initLanguage } = useSettingsStore.getState();
 
   await new Promise((resolve) => {
     initLanguage();
@@ -19,7 +19,7 @@ const initI18n = async () => {
   });
 
   console.log('eheheh');
-  const { language } = useLanguageStore.getState();
+  const { language } = useSettingsStore.getState();
 
   i18n.use(initReactI18next).init({
     compatibilityJSON: 'v4',
