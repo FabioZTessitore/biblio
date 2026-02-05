@@ -36,6 +36,10 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
   const authorRef = useRef<any>(null);
   const isbnRef = useRef<any>(null);
 
+  const scanned = useRef(false);
+  const lastIsbn = useRef<string | null>(null);
+  const sameCount = useRef(0);
+
   const isEdit = mode === 'edit';
 
   // Carica dati quando il modal si apre
@@ -104,7 +108,33 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
         return;
       }
     }
+
+    // --- RESET SCANNER ---
+    scanned.current = false;
+    lastIsbn.current = null;
+    sameCount.current = 0;
     setShowCamera(true);
+  };
+
+  const handleCameraScan = ({ data }: { data: string }) => {
+    if (scanned.current) return;
+
+    // filtro base
+    if (!data || ![13, 10].includes(data.length)) return;
+
+    if (data === lastIsbn.current) {
+      sameCount.current += 1;
+    } else {
+      lastIsbn.current = data;
+      sameCount.current = 1;
+    }
+
+    // accetta solo se uguale 2 volte
+    if (sameCount.current >= 4) {
+      scanned.current = true;
+      // reset dei valori per la prossima sessione
+      onBarcodeScanned(data);
+    }
   };
 
   const onBarcodeScanned = async (isbn: string) => {
@@ -228,7 +258,7 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
             <CameraView
               style={{ flex: 1 }}
               barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8'] }}
-              onBarcodeScanned={({ data }) => onBarcodeScanned(data)}
+              onBarcodeScanned={handleCameraScan}
             />
 
             <Pressable
