@@ -103,10 +103,11 @@ export default function TabLayout() {
 
   const ADD_BOOK = {
     ...SCREEN_OPTIONS,
-    title: 'Prenotazioni',
+    title: t('tabs.bookreservations'),
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="hand-extended" active={focused} />
     ),
+    headerLeft: HeaderLeft,
   } as TabsProps;
 
   return (

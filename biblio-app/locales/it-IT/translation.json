@@ -38,7 +38,8 @@
     },
     "tabs": {
         "index_title": "Lista dei libri",
-        "library_title": "Libreria"
+        "library_title": "Libreria",
+        "bookreservations": "Prenotazioni"
     },
     "top_tabs": {
         "shoppingcart": "Carrello",
