@@ -193,7 +193,7 @@ const FiltersSheetModal = () => {
                   }}
                   ListEmptyComponent={
                     <Text className="mt-4 text-center">
-                      La ricerca non produrrà alcun risultato...
+                      La ricerca non ha prodotto alcun risultato...
                     </Text>
                   }
                 />

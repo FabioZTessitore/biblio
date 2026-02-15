@@ -6,7 +6,8 @@
     },
     "onboarding": {
         "title": "Benvenuto!",
-        "title_sub": "Chiedi in prestito i libri della tua scuola!"
+        "title_sub": "Chiedi in prestito i libri della tua scuola!",
+        "biblio_sub": "Pronto a monitorare i prestiti dei libri?"
     },
     "form_user": {
         "firstname": "Nome",
@@ -15,7 +16,13 @@
         "lastname_placeholder": "Inserisci il tuo cognome",
         "class": "Classe",
         "class_placeholder": "Inserisci la tua classe",
-        "submit": "Entra"
+        "submit": "Entra",
+        "email": "Email",
+        "email_placeholder": "Inserisci la tua email",
+        "password": "Password",
+        "password_placeholder": "Inserisci la tua password",
+        "biblio_submit": "Accedi",
+        "logout": "Esci"
     },
     "welcome": {
         "student": "Sei uno studente?",
