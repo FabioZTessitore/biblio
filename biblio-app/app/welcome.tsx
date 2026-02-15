@@ -214,7 +214,7 @@ const OperatorWelcome = () => {
   );
 };
 
-const Welcome = () => {
+export default function Welcome() {
   const insets = useSafeAreaInsets();
 
   const { t } = useTranslation();
@@ -246,6 +246,4 @@ const Welcome = () => {
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
-};
-
-export default Welcome;
+}
