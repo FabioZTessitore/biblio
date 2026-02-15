@@ -1,6 +1,6 @@
 import { View, FlatList, RefreshControl, Pressable } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
-import { FiltersSheetModal, BookSheetModal } from '~/components';
+import { FiltersSheetModal } from '~/components';
 // import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard, EmptyState } from '~/components/partials';
 import { Text } from '~/components/ui';
@@ -10,20 +10,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { Book } from '~/store/biblio';
 import { useTranslation } from 'react-i18next';
 import AddBookBtn from '~/components/staff/AddBookBtn';
+import AddBookModal from '~/components/staff/AddBookModal';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const {
-    books,
-    setBookModal,
-    subscribeBooks,
-    subscribeRequests,
-    setBookEditModal,
-    bookModal,
-    bookEditModal,
-    subscribeLoans,
-    isLoading,
-  } = useBiblioStore();
+  const { books, subscribeBooks, subscribeRequests, setBookEditModal, subscribeLoans, isLoading } =
+    useBiblioStore();
 
   const { t } = useTranslation();
 
@@ -127,18 +119,7 @@ export default function Index() {
 
       <FiltersSheetModal />
 
-      {membership.role === 'staff' && (
-        <>
-          <BookSheetModal mode="add" visible={bookModal} onClose={() => setBookModal(false)} />
-
-          <BookSheetModal
-            mode="edit"
-            visible={bookEditModal}
-            bookId={bookIdToEdit}
-            onClose={() => setBookEditModal(false)}
-          />
-        </>
-      )}
+      {membership.role === 'staff' && <AddBookModal />}
     </View>
   );
 }
