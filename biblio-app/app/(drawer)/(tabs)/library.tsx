@@ -9,11 +9,14 @@ import { convertToRGBA, truncateText } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
+import { useTranslation } from 'react-i18next';
 
 /* ------------------------------------------
    CARD LIBRERIA (usa BaseCard)
 ------------------------------------------- */
 const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void }) => {
+  const { t } = useTranslation();
+
   const { colors } = useColorScheme();
 
   return (
@@ -22,8 +25,8 @@ const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void 
       subtitle={item.author}
       isbn={item.isbn}
       statusColor={item.available ? colors.success : colors.destructive}
-      statusLabel={item.available ? 'Disponibile' : 'Non disponibile'}
-      actionLabel="Rimuovi"
+      statusLabel={item.available ? t('card.available') : t('card.notavailable')}
+      actionLabel={t('card.remove')}
       onPress={onRemove}
     />
   );
@@ -33,6 +36,8 @@ const BookLibraryCard = ({ item, onRemove }: { item: Book; onRemove: () => void 
    CARD RICHIESTE (usa BaseCard)
 ------------------------------------------- */
 const RequestCard = ({ item }: { item: Request }) => {
+  const { t } = useTranslation();
+
   const { colors } = useColorScheme();
   const { books, cancelRequest } = useBiblioStore();
 
@@ -57,7 +62,7 @@ const RequestCard = ({ item }: { item: Request }) => {
       isbn={book.isbn}
       statusColor={color}
       statusLabel={label}
-      actionLabel="Cancella richiesta"
+      actionLabel={t('library.cancel')}
       onPress={() => cancelRequest(item.id)}
     />
   );
@@ -67,12 +72,15 @@ const RequestCard = ({ item }: { item: Request }) => {
    LIBRERIA
 ------------------------------------------- */
 const Library = () => {
+  const { t } = useTranslation();
   const { colors } = useColorScheme();
 
   const { library, removeFromLibrary } = useLibraryStore();
   const { requests, requestLoan, isLoading } = useBiblioStore();
 
-  const [tab, setTab] = useState<'carrello' | 'richieste'>('carrello');
+  const shoppingcart_str = t('top_tabs.shoppingcart');
+  const borrow_str = t('top_tabs.borrow');
+  const [tab, setTab] = useState<shoppingcart_str | borrow_str>(shoppingcart_str);
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -95,18 +103,18 @@ const Library = () => {
   };
 
   const tabConfig = {
-    carrello: {
+    [shoppingcart_str]: {
       data: library,
       emptyIcon: 'library-shelves',
-      emptyTitle: 'Libreria vuota',
+      emptyTitle: t('library.title_null'),
       renderer: ({ item }: { item: Book }) => (
         <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
       ),
     },
-    richieste: {
+    [borrow_str]: {
       data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
-      emptyTitle: 'Nessuna richiesta',
+      emptyTitle: t('borrow.title_null'),
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
     },
   } as any;
@@ -119,10 +127,10 @@ const Library = () => {
         ListHeaderComponent={() => (
           <ToggleGroup
             value={tab}
-            onChange={(value) => setTab(value as 'carrello' | 'richieste')}
+            onChange={(value) => setTab(value as shoppingcart_str | borrow_str)}
             items={[
-              { label: 'Carrello', value: 'carrello' },
-              { label: 'Richieste', value: 'richieste' },
+              { label: shoppingcart_str, value: shoppingcart_str },
+              { label: borrow_str, value: borrow_str },
             ]}
           />
         )}
@@ -133,7 +141,7 @@ const Library = () => {
           <EmptyState
             icon={current.emptyIcon}
             title={current.emptyTitle}
-            subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
+            subtitle={t('library.title_null_sub')}
           />
         )}
         refreshControl={
@@ -162,10 +170,10 @@ const Library = () => {
         pointerEvents="none"
       />
 
-      {tab === 'carrello' && library.length > 0 && (
+      {tab === shoppingcart_str && library.length > 0 && (
         <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
           <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
-            {isLoading ? <ActivityIndicator /> : <Text>Richiedi Prestito</Text>}
+            {isLoading ? <ActivityIndicator /> : <Text>{t('library.borrow')}</Text>}
           </Button>
         </View>
       )}

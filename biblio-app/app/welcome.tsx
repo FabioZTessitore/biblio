@@ -46,7 +46,7 @@ const MemberWelcome = () => {
         <Text variant={'heading'}>{t('onboarding.title')}</Text>
 
         <Text weight={'light'} color={'muted'} className="text-center">
-          Chiedi in prestito i libri della tua scuola!
+          {t('onboarding.title_sub')}
         </Text>
       </View>
 
@@ -60,9 +60,9 @@ const MemberWelcome = () => {
           />
         </FormRow> */}
         <FormRow className="gap-2">
-          <Text>Nome*</Text>
+          <Text>{t('form_user.firstname')}*</Text>
           <InputField
-            placeholder="Inserisci il tuo nome"
+            placeholder={t('form_user.firstname_placeholder')}
             onChangeText={(name) => setUserAttempt({ ...userAttempt, name })}
             maxLength={20}
             error={userAttempt.error}
@@ -75,10 +75,10 @@ const MemberWelcome = () => {
           />
         </FormRow>
         <FormRow className="gap-2">
-          <Text>Cognome*</Text>
+          <Text>{t('form_user.lastname')}*</Text>
           <InputField
             ref={surnameFieldRef}
-            placeholder="Inserisci il tuo cognome"
+            placeholder={t('form_user.lastname_placeholder')}
             maxLength={20}
             onChangeText={(surname) => setUserAttempt({ ...userAttempt, surname })}
             error={userAttempt.error}
@@ -91,10 +91,10 @@ const MemberWelcome = () => {
           />
         </FormRow>
         <FormRow className="gap-2">
-          <Text>Classe*</Text>
+          <Text>{t('form_user.class')}*</Text>
           <InputField
             ref={gradeFieldRef}
-            placeholder="Inserisci la tua classe"
+            placeholder={t('form_user.class_placeholder')}
             maxLength={5}
             onChangeText={(grade) => setUserAttempt({ ...userAttempt, grade })}
             error={userAttempt.error}
@@ -106,7 +106,7 @@ const MemberWelcome = () => {
 
         <View className="mt-6">
           <Button onPress={handleEnter} disabled={isLoading || !!userAttempt.error}>
-            {isLoading ? <ActivityIndicator /> : <Text>Entra</Text>}
+            {isLoading ? <ActivityIndicator /> : <Text>{t('form_user.submit')}</Text>}
           </Button>
         </View>
       </FormBlock>
@@ -217,6 +217,8 @@ const OperatorWelcome = () => {
 const Welcome = () => {
   const insets = useSafeAreaInsets();
 
+  const { t } = useTranslation();
+
   const [isLibrarian, setIsLibrarian] = useState<boolean>(false);
 
   return (
@@ -237,8 +239,8 @@ const Welcome = () => {
           <Pressable
             onPress={() => setIsLibrarian((v) => !v)}
             className="flex-row items-center justify-center gap-1">
-            <Text> {isLibrarian ? 'Sei uno studente?' : 'Sei il bibliotecario?'} </Text>
-            <Text color={'primary'}>Accedi</Text>
+            <Text> {isLibrarian ? t('welcome.student') : t('welcome.biblio')} </Text>
+            <Text color={'primary'}>{t('welcome.submit')}</Text>
           </Pressable>
         </View>
       </KeyboardAwareScrollView>

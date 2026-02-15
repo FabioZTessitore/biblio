@@ -18,7 +18,6 @@ const initI18n = async () => {
     setTimeout(resolve, 0);
   });
 
-  console.log('eheheh');
   const { language } = useSettingsStore.getState();
 
   i18n.use(initReactI18next).init({

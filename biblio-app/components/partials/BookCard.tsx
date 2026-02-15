@@ -6,6 +6,7 @@ import { Button } from '~/components/nativewindui/Button';
 import { useUserStore } from '~/store';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { BookImage } from './BookImage';
+import { useTranslation } from 'react-i18next';
 
 interface BookCardProps {
   item: Book;
@@ -23,10 +24,12 @@ const StaffCTA = ({ onPress }: Partial<BookCardProps>) => (
   </Button>
 );
 
-const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
-  selected ? (
+const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
+  const { t } = useTranslation();
+
+  return selected ? (
     <Button className="bg-transparent">
-      <Text className="text-success">{'Aggiunto'}</Text>
+      <Text className="text-success">{t('card.added')}</Text>
     </Button>
   ) : (
     <Button
@@ -34,11 +37,14 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
       onPress={onPress}
       className={'bg-secondary'}>
       <Icon size={'body'} name="add" />
-      <Text>{'Libreria'}</Text>
+      <Text className="text-xs">{t('card.addtochart')}</Text>
     </Button>
   );
+};
 
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
+  const { t } = useTranslation();
+
   const { membership } = useUserStore();
 
   return (
@@ -81,7 +87,7 @@ const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
               weight={'light'}
               style={{ includeFontPadding: false }}
               className="flex-shrink uppercase">
-              {item.available ? 'Disponibile' : 'Non Disponibile'}
+              {item.available ? t('card.available') : t('card.notavailable')}
             </Text>
           </View>
 

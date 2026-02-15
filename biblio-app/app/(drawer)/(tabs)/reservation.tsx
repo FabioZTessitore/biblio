@@ -254,7 +254,7 @@ const Reservation = () => {
           <EmptyState
             icon={current.emptyIcon}
             title={current.emptyTitle}
-            subtitle="Aggiungi i libri dalla lista dei libri e richiedi il prestito!"
+            subtitle={t('borrow.title_null_sub')}
           />
         )}
         refreshControl={

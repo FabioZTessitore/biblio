@@ -7,6 +7,7 @@ import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import { useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
@@ -33,6 +34,8 @@ const HeaderBin = () => {
 };
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   const navigation = useNavigation();
 
   const { openFiltersModal } = useFiltersStore();
@@ -55,7 +58,7 @@ export default function TabLayout() {
 
   const INDEX_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Lista dei libri',
+    title: t('tabs.index_title'),
     headerTitleStyle: { fontSize: 24 },
     tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
     headerLeft: () => {
@@ -89,7 +92,7 @@ export default function TabLayout() {
 
   const LIBRARY_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Libreria',
+    title: t('tabs.library_title'),
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
