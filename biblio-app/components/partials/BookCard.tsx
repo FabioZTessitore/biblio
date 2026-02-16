@@ -2,7 +2,7 @@ import { View, Image, ImageBackground, ImageSourcePropType } from 'react-native'
 import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/biblio';
 import { Button } from '~/components/nativewindui/Button';
-// import { useColorScheme } from '~/lib/useColorScheme';
+import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { BookImage } from './BookImage';
@@ -26,6 +26,7 @@ const StaffCTA = ({ onPress }: Partial<BookCardProps>) => (
 
 const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
   const { t } = useTranslation();
+  const { colors } = useColorScheme();
 
   return selected ? (
     <Button className="bg-transparent">
@@ -36,8 +37,8 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
       android_ripple={{ foreground: true, color: '#ffffff30' }}
       onPress={onPress}
       className={'bg-secondary'}>
-      <Icon size={'body'} name="add" />
-      <Text className="text-xs">{t('card.addtochart')}</Text>
+      <Icon size={'body'} name="add" color={colors.white} />
+      <Text variant={'label'}>{t('card.addtochart')}</Text>
     </Button>
   );
 };
@@ -84,6 +85,7 @@ const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
               name="circle"
               color={item.available ? '#4ade80' : '#BC2F2F'}></Icon>
             <Text
+              variant={'label'}
               weight={'light'}
               style={{ includeFontPadding: false }}
               className="flex-shrink uppercase">

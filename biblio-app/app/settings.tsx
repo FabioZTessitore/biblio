@@ -11,7 +11,7 @@ import { Toggle } from '~/components/nativewindui/Toggle';
 
 const Settings = () => {
   const { t } = useTranslation();
-  const { colors } = useColorScheme();
+  const { colors, isDarkColorScheme, setColorScheme } = useColorScheme();
   const { hapticsEnabled, toggleHaptics } = useSettingsStore();
 
   const styles = StyleSheet.create({
@@ -31,10 +31,10 @@ const Settings = () => {
 
   return (
     <BlurView
-      tint="dark"
+      tint={isDarkColorScheme ? 'dark' : 'light'}
       className="flex-1 gap-8 rounded-t-full p-4"
       blurReductionFactor={1}
-      intensity={60}
+      intensity={80}
       experimentalBlurMethod="dimezisBlurView">
       <View className="items-center">
         <Text variant={'heading'}>{t('settings.title')}</Text>
@@ -46,10 +46,19 @@ const Settings = () => {
           <Toggle value={hapticsEnabled} />
         </PressableScale>
 
-        <PressableScale style={styles.settingCard} onPress={() => {}}>
+        <PressableScale
+          style={styles.settingCard}
+          onPress={() => {
+            setColorScheme(isDarkColorScheme ? 'light' : 'dark');
+          }}>
+          <Text>Tema scuro</Text>
+          <Toggle value={isDarkColorScheme} />
+        </PressableScale>
+
+        {/* <PressableScale style={styles.settingCard} onPress={() => {}}>
           <Text>Notifiche</Text>
           <Toggle disabled={true} value={false} />
-        </PressableScale>
+        </PressableScale> */}
       </View>
     </BlurView>
   );
