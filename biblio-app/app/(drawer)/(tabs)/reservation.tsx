@@ -11,6 +11,7 @@ import { Button } from '~/components/nativewindui/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Timestamp } from 'firebase/firestore';
 import { cn } from '~/lib/cn';
+import { useTranslation } from 'react-i18next';
 
 const SetDueDate = ({ loanId }: { loanId: string }) => {
   const updateLoan = useBiblioStore((s) => s.updateLoan);
@@ -114,7 +115,7 @@ const LoanCard = ({ item }: { item: Loan }) => {
             <Text>{truncateText(book.title, 20)}</Text>
             <Text variant={'label'}>{`${user.name} ${user.surname} ${user.grade}`}</Text>
             <Text color={'muted'} variant={'label'}>
-              {`Prestato il ${formatDate(item.startDate.toDate())}`}
+              {`Accettato il ${formatDate(item.startDate.toDate())}`}
             </Text>
 
             <SetDueDate loanId={item.id} />
@@ -201,15 +202,23 @@ const RequestCard = ({ item }: { item: Request }) => {
 };
 
 const Reservation = () => {
+  const { t } = useTranslation();
   const { colors } = useColorScheme();
 
   const { requests, loans, isLoading, fetchRequestUsers, fetchLoanUsers } = useBiblioStore();
 
-  const [tab, setTab] = useState<'prestiti' | 'richieste'>('prestiti');
+  const [tab, setTab] = useState<'prestiti' | 'richieste' | 'darestituire'>('prestiti');
+
+  const pendingLoans = loans.filter((loan) => !loan.returnedAt && !loan.dueDate);
+  const darestituireLoans = loans
+    .filter((loan) => loan.dueDate && !loan.returnedAt)
+    .sort((a, b) => {
+      return a.dueDate?.toDate() - b.dueDate?.toDate();
+    });
 
   const tabConfig = {
     prestiti: {
-      data: loans,
+      data: pendingLoans,
       emptyIcon: 'book-clock',
       emptyTitle: 'Nessun prestito in corso',
       renderer: ({ item }: { item: Loan }) => <LoanCard item={item} />,
@@ -219,6 +228,12 @@ const Reservation = () => {
       emptyIcon: 'book-arrow-left',
       emptyTitle: 'Nessuna richiesta',
       renderer: ({ item }: { item: Request }) => <RequestCard item={item} />,
+    },
+    darestituire: {
+      data: darestituireLoans,
+      emptyIcon: 'book-clock',
+      emptyTitle: 'Nessun libro da restituire',
+      renderer: ({ item }: { item: Loan }) => <LoanCard item={item} />,
     },
   } as any;
 
@@ -240,10 +255,11 @@ const Reservation = () => {
         ListHeaderComponent={() => (
           <ToggleGroup
             value={tab}
-            onChange={(value) => setTab(value as 'prestiti' | 'richieste')}
+            onChange={(value) => setTab(value as 'prestiti' | 'richieste' | 'darestituire')}
             items={[
-              { label: 'Prestiti', value: 'prestiti' },
               { label: 'Richieste', value: 'richieste' },
+              { label: 'Prestiti', value: 'prestiti' },
+              { label: 'Da restituire', value: 'darestituire' },
             ]}
           />
         )}
@@ -251,11 +267,7 @@ const Reservation = () => {
         keyExtractor={(item) => item.id}
         renderItem={current.renderer}
         ListEmptyComponent={() => (
-          <EmptyState
-            icon={current.emptyIcon}
-            title={current.emptyTitle}
-            subtitle={t('borrow.title_null_sub')}
-          />
+          <EmptyState icon={current.emptyIcon} title={current.emptyTitle} subtitle="" />
         )}
         refreshControl={
           <RefreshControl

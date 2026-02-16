@@ -14,15 +14,19 @@ interface BookCardProps {
   onPress: () => void;
 }
 
-const StaffCTA = ({ onPress }: Partial<BookCardProps>) => (
-  <Button
-    android_ripple={{ foreground: true, color: '#ffffff30' }}
-    onPress={onPress}
-    className={'bg-secondary'}>
-    <Icon size={'body'} type="MaterialCommunityIcons" name="pencil" />
-    <Text>{'Modifica'}</Text>
-  </Button>
-);
+const StaffCTA = ({ onPress }: Partial<BookCardProps>) => {
+  const { colors } = useColorScheme();
+
+  return (
+    <Button
+      android_ripple={{ foreground: true, color: '#ffffff30' }}
+      onPress={onPress}
+      className={'bg-secondary'}>
+      <Icon size={'body'} type="MaterialCommunityIcons" name="pencil" color={colors.white} />
+      <Text>{'Modifica'}</Text>
+    </Button>
+  );
+};
 
 const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
   const { t } = useTranslation();
@@ -34,11 +38,12 @@ const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
     </Button>
   ) : (
     <Button
+      variant="primary"
       android_ripple={{ foreground: true, color: '#ffffff30' }}
       onPress={onPress}
       className={'bg-secondary'}>
       <Icon size={'body'} name="add" color={colors.white} />
-      <Text variant={'label'}>{t('card.addtochart')}</Text>
+      <Text variant={'label'}>{t('card.addtocart')}</Text>
     </Button>
   );
 };
