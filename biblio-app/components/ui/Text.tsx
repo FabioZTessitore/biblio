@@ -14,7 +14,7 @@ const textVariants = cva('text-foreground', {
       display: 'text-4xl', // 36px
       heading: 'text-2xl', // 24px
       body: 'text-base', // 16px
-      label: 'text-sm', // 14px
+      label: 'text-xs', // 12px
     },
     weight: {
       light: 'font-light',

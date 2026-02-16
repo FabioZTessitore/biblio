@@ -7,9 +7,45 @@ import { TabBarIcon } from '~/components/partials';
 import { Button } from '~/components/nativewindui/Button';
 import { useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
+};
+
+const HeaderLeft = () => {
+  const { colors } = useColorScheme();
+  const navigation = useNavigation();
+
+  const openDrawer = () => {
+    navigation.dispatch(DrawerActions.openDrawer());
+  };
+
+  return (
+    <Button onPress={openDrawer} variant="plain" size={'icon'}>
+      <Icon color={colors.grey2} type="MaterialCommunityIcons" name="menu" />
+    </Button>
+  );
+};
+
+const HeaderRight = () => {
+  const { colors } = useColorScheme();
+  const { openFiltersModal } = useFiltersStore();
+
+  return (
+    <View className="mr-6 flex-row gap-4">
+      <Button onPress={openFiltersModal} variant="plain" size={'none'} className="bg-transparent">
+        <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
+      </Button>
+      <Button
+        onPress={() => router.push('/settings')}
+        variant="plain"
+        size={'none'}
+        className="bg-transparent">
+        <Icon color={colors.grey2} type="MaterialCommunityIcons" name="cog-outline" />
+      </Button>
+    </View>
+  );
 };
 
 const HeaderBin = () => {
@@ -33,16 +69,9 @@ const HeaderBin = () => {
 };
 
 export default function TabLayout() {
-  const navigation = useNavigation();
-
-  const { openFiltersModal } = useFiltersStore();
+  const { t } = useTranslation();
   const { membership } = useUserStore();
-
   const { colors } = useColorScheme();
-
-  const openDrawer = () => {
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
 
   const SCREEN_OPTIONS = {
     headerStyle: {
@@ -55,53 +84,30 @@ export default function TabLayout() {
 
   const INDEX_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Lista dei libri',
+    title: t('tabs.index_title'),
     headerTitleStyle: { fontSize: 24 },
     tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
-    headerLeft: () => {
-      return (
-        <Button onPress={openDrawer} variant="plain" size={'icon'}>
-          <Icon color={colors.grey2} type="MaterialCommunityIcons" name="menu" />
-        </Button>
-      );
-    },
-    headerRight: () => {
-      return (
-        <View className="mr-6 flex-row gap-4">
-          <Button
-            onPress={openFiltersModal}
-            variant="plain"
-            size={'none'}
-            className="bg-transparent">
-            <Icon color={colors.primary} type="MaterialCommunityIcons" name="filter-outline" />
-          </Button>
-          <Button
-            onPress={() => router.push('/settings')}
-            variant="plain"
-            size={'none'}
-            className="bg-transparent">
-            <Icon color={colors.grey2} type="MaterialCommunityIcons" name="cog-outline" />
-          </Button>
-        </View>
-      );
-    },
+    headerLeft: HeaderLeft,
+    headerRight: HeaderRight,
   } as TabsProps;
 
   const LIBRARY_OPTIONS = {
     ...SCREEN_OPTIONS,
-    title: 'Libreria',
+    title: t('tabs.library_title'),
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
     ),
+    headerLeft: HeaderLeft,
     headerRight: HeaderBin,
   } as TabsProps;
 
   const ADD_BOOK = {
     ...SCREEN_OPTIONS,
-    title: 'Prenotazioni',
+    title: t('tabs.bookreservations'),
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="hand-extended" active={focused} />
     ),
+    headerLeft: HeaderLeft,
   } as TabsProps;
 
   return (

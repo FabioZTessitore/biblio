@@ -5,7 +5,55 @@
         "resetFilters": "Ripristina filtri"
     },
     "onboarding": {
-        "title": "Benvenuto!"
+        "title": "Benvenuto!",
+        "title_sub": "Chiedi in prestito i libri della tua scuola!",
+        "biblio_sub": "Pronto a monitorare i prestiti dei libri?"
+    },
+    "form_user": {
+        "firstname": "Nome",
+        "firstname_placeholder": "Inserisci il tuo nome",
+        "lastname": "Cognome",
+        "lastname_placeholder": "Inserisci il tuo cognome",
+        "class": "Classe",
+        "class_placeholder": "Inserisci la tua classe",
+        "submit": "Entra",
+        "email": "Email",
+        "email_placeholder": "Inserisci la tua email",
+        "password": "Password",
+        "password_placeholder": "Inserisci la tua password",
+        "biblio_submit": "Accedi",
+        "logout": "Esci"
+    },
+    "welcome": {
+        "student": "Sei uno studente?",
+        "biblio": "Sei il bibliotecario?",
+        "submit": "Accedi"
+    },
+    "card": {
+        "available": "Disponibile",
+        "notavailable": "Non disponibile",
+        "addtochart": "Aggiungi al carrello",
+        "added": "Aggiunto",
+        "remove": "Rimuovi"
+    },
+    "tabs": {
+        "index_title": "Lista dei libri",
+        "library_title": "Libreria",
+        "bookreservations": "Prenotazioni"
+    },
+    "top_tabs": {
+        "shoppingcart": "Carrello",
+        "borrow": "Richieste"
+    },
+    "library": {
+        "title_null": "Libreria vuota",
+        "title_null_sub": "Aggiungi i libri dalla lista e richiedi un prestito!",
+        "borrow": "Richiedi Prestito",
+        "cancel": "Cancella richiesta"
+    },
+    "borrow": {
+        "title_null": "Nessuna richiesta",
+        "title_null_sub": "Aggiungi i libri dalla lista e richiedi un prestito!"
     },
     "settings": {
         "title": "Impostazioni",

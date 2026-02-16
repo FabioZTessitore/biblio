@@ -1,29 +1,21 @@
 import { View, FlatList, RefreshControl, Pressable } from 'react-native';
 import { useFiltersStore, useLibraryStore, useBiblioStore, useUserStore } from '~/store';
-import { FiltersSheetModal, BookSheetModal } from '~/components';
-import { LinearGradient } from 'expo-linear-gradient';
+import { FiltersSheetModal } from '~/components';
+// import { LinearGradient } from 'expo-linear-gradient';
 import { BookCard, EmptyState } from '~/components/partials';
-import { Button } from '~/components/nativewindui/Button';
-import { Icon, Text } from '~/components/ui';
+import { Text } from '~/components/ui';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA } from '~/lib/utils';
+// import { convertToRGBA } from '~/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { Book } from '~/store/biblio';
 import { useTranslation } from 'react-i18next';
+import AddBookBtn from '~/components/staff/AddBookBtn';
+import AddBookModal from '~/components/staff/AddBookModal';
 
 export default function Index() {
   const { colors } = useColorScheme();
-  const {
-    books,
-    setBookModal,
-    subscribeBooks,
-    subscribeRequests,
-    setBookEditModal,
-    bookModal,
-    bookEditModal,
-    subscribeLoans,
-    isLoading,
-  } = useBiblioStore();
+  const { books, subscribeBooks, subscribeRequests, setBookEditModal, subscribeLoans, isLoading } =
+    useBiblioStore();
 
   const { t } = useTranslation();
 
@@ -65,7 +57,7 @@ export default function Index() {
   const filteredBooks = applyFilters(books, filters);
 
   return (
-    <View className="flex-1 px-4">
+    <View className="relative flex-1 px-4">
       <FlatList
         ListEmptyComponent={() => {
           if (books.length === 0) {
@@ -110,15 +102,9 @@ export default function Index() {
         }
       />
 
-      {membership.role === 'staff' && (
-        <View className="absolute bottom-0 right-2 z-10 h-20">
-          <Button className="rounded-2xl p-4" size={'none'} onPress={() => setBookModal(true)}>
-            <Icon name="add" />
-          </Button>
-        </View>
-      )}
+      {membership.role === 'staff' && <AddBookBtn />}
 
-      <LinearGradient
+      {/* <LinearGradient
         colors={[colors.background, convertToRGBA(colors.background, 0)]}
         style={{
           position: 'absolute',
@@ -129,21 +115,11 @@ export default function Index() {
           zIndex: 10,
         }}
         pointerEvents="none"
-      />
+      /> */}
 
       <FiltersSheetModal />
-      {membership.role === 'staff' && (
-        <>
-          <BookSheetModal mode="add" visible={bookModal} onClose={() => setBookModal(false)} />
 
-          <BookSheetModal
-            mode="edit"
-            visible={bookEditModal}
-            bookId={bookIdToEdit}
-            onClose={() => setBookEditModal(false)}
-          />
-        </>
-      )}
+      {membership.role === 'staff' && <AddBookModal />}
     </View>
   );
 }

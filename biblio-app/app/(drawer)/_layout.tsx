@@ -1,8 +1,11 @@
 import { Drawer } from 'expo-router/drawer';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   const { colors } = useColorScheme();
 
   const { user } = useUserStore();
@@ -15,7 +18,7 @@ export default function TabLayout() {
         <Drawer.Screen
           name="logout"
           options={{
-            title: 'Logout',
+            title: t('form_user.logout'),
             headerShown: true,
             headerStyle: {
               backgroundColor: colors.background,

@@ -4,11 +4,11 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
 import { Book, useBiblioStore } from '~/store/biblio';
-import { SheetModal } from './partials';
+import { SheetModal } from '../partials';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Text, FormBlock, FormRow, FormGroup, InputField, Stepper, Icon } from 'components/ui';
 import { FlipCounter } from '~/components/partials';
-import { Button } from './nativewindui/Button';
+import { Button } from '../nativewindui/Button';
 import { searchByIsbn } from '~/lib/googleBooksAPI';
 import { haptic } from '~/lib/haptics';
 

@@ -2,10 +2,11 @@ import { View, Image, ImageBackground, ImageSourcePropType } from 'react-native'
 import { Text, Icon } from '~/components/ui';
 import { Book } from '~/store/biblio';
 import { Button } from '~/components/nativewindui/Button';
-// import { useColorScheme } from '~/lib/useColorScheme';
+import { useColorScheme } from '~/lib/useColorScheme';
 import { useUserStore } from '~/store';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { BookImage } from './BookImage';
+import { useTranslation } from 'react-i18next';
 
 interface BookCardProps {
   item: Book;
@@ -23,22 +24,28 @@ const StaffCTA = ({ onPress }: Partial<BookCardProps>) => (
   </Button>
 );
 
-const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) =>
-  selected ? (
+const UserCTA = ({ selected, onPress }: Partial<BookCardProps>) => {
+  const { t } = useTranslation();
+  const { colors } = useColorScheme();
+
+  return selected ? (
     <Button className="bg-transparent">
-      <Text className="text-success">{'Aggiunto'}</Text>
+      <Text className="text-success">{t('card.added')}</Text>
     </Button>
   ) : (
     <Button
       android_ripple={{ foreground: true, color: '#ffffff30' }}
       onPress={onPress}
       className={'bg-secondary'}>
-      <Icon size={'body'} name="add" />
-      <Text>{'Libreria'}</Text>
+      <Icon size={'body'} name="add" color={colors.white} />
+      <Text variant={'label'}>{t('card.addtochart')}</Text>
     </Button>
   );
+};
 
 const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
+  const { t } = useTranslation();
+
   const { membership } = useUserStore();
 
   return (
@@ -78,10 +85,11 @@ const BookCard = memo(({ item, selected, onPress }: BookCardProps) => {
               name="circle"
               color={item.available ? '#4ade80' : '#BC2F2F'}></Icon>
             <Text
+              variant={'label'}
               weight={'light'}
               style={{ includeFontPadding: false }}
               className="flex-shrink uppercase">
-              {item.available ? 'Disponibile' : 'Non Disponibile'}
+              {item.available ? t('card.available') : t('card.notavailable')}
             </Text>
           </View>
 
