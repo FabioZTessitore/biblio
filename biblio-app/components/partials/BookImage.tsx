@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Image, ImageBackground, ImageSourcePropType, ImageProps, View } from 'react-native';
+import { useColorScheme } from '~/lib/useColorScheme';
 
 interface BookImageProps extends Omit<ImageProps, 'source'> {
   isbn?: string;
@@ -16,6 +17,8 @@ const BookImage = ({
   style,
   ...props
 }: BookImageProps) => {
+  const { isDarkColorScheme } = useColorScheme();
+
   const [imageError, setImageError] = useState(false);
 
   const imageSource: ImageSourcePropType = useMemo(
@@ -56,7 +59,9 @@ const BookImage = ({
         imageClassName="rounded-2xl"
         imageStyle={style} // mantiene borderRadius
       >
-        <View style={[style, { backgroundColor: overlayColor }]} className="rounded-2xl">
+        <View
+          style={[style, { backgroundColor: isDarkColorScheme ? overlayColor : '#fefefeaf' }]}
+          className="rounded-2xl">
           {ImageContent}
         </View>
       </ImageBackground>

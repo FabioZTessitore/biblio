@@ -32,7 +32,7 @@
     "card": {
         "available": "Disponibile",
         "notavailable": "Non disponibile",
-        "addtochart": "Aggiungi al carrello",
+        "addtocart": "Aggiungi",
         "added": "Aggiunto",
         "remove": "Rimuovi"
     },
