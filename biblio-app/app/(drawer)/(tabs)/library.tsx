@@ -78,9 +78,9 @@ const Library = () => {
   const { library, removeFromLibrary } = useLibraryStore();
   const { requests, requestLoan, isLoading } = useBiblioStore();
 
-  const shoppingcart_str = t('top_tabs.shoppingcart');
-  const borrow_str = t('top_tabs.borrow');
-  const [tab, setTab] = useState<shoppingcart_str | borrow_str>(shoppingcart_str);
+  const shoppingCartStr = t('top_tabs.shoppingcart');
+  const borrowStr = t('top_tabs.borrow');
+  const [tab, setTab] = useState<string>(shoppingCartStr);
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {
@@ -103,7 +103,7 @@ const Library = () => {
   };
 
   const tabConfig = {
-    [shoppingcart_str]: {
+    [shoppingCartStr]: {
       data: library,
       emptyIcon: 'library-shelves',
       emptyTitle: t('library.title_null'),
@@ -111,7 +111,7 @@ const Library = () => {
         <BookLibraryCard item={item} onRemove={() => removeFromLibrary(item.id)} />
       ),
     },
-    [borrow_str]: {
+    [borrowStr]: {
       data: requests.sort((a, b) => order[a.status] - order[b.status]),
       emptyIcon: 'book-arrow-left',
       emptyTitle: t('borrow.title_null'),
@@ -127,10 +127,10 @@ const Library = () => {
         ListHeaderComponent={() => (
           <ToggleGroup
             value={tab}
-            onChange={(value) => setTab(value as shoppingcart_str | borrow_str)}
+            onChange={(value) => setTab(value)}
             items={[
-              { label: shoppingcart_str, value: shoppingcart_str },
-              { label: borrow_str, value: borrow_str },
+              { label: shoppingCartStr, value: shoppingCartStr },
+              { label: borrowStr, value: borrowStr },
             ]}
           />
         )}
@@ -170,7 +170,7 @@ const Library = () => {
         pointerEvents="none"
       />
 
-      {tab === shoppingcart_str && library.length > 0 && (
+      {tab === shoppingCartStr && library.length > 0 && (
         <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
           <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
             {isLoading ? <ActivityIndicator /> : <Text>{t('library.borrow')}</Text>}

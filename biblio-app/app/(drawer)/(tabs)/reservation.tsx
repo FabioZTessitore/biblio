@@ -213,7 +213,7 @@ const Reservation = () => {
   const darestituireLoans = loans
     .filter((loan) => loan.dueDate && !loan.returnedAt)
     .sort((a, b) => {
-      return a.dueDate?.toDate() - b.dueDate?.toDate();
+      return a.dueDate!.toDate().getTime() - b.dueDate!.toDate().getTime();
     });
 
   const tabConfig = {
