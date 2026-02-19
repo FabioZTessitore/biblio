@@ -63,7 +63,7 @@ export default function RootLayout() {
             <NavThemeProvider value={NAV_THEME[colorScheme]}>
               <Stack screenOptions={SCREEN_OPTIONS}>
                 <Stack.Protected guard={!!membership.schoolId}>
-                  <Stack.Screen name="(drawer)" />
+                  <Stack.Screen name="(tabs)" />
                   <Stack.Screen
                     name="settings"
                     options={{

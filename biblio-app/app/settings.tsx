@@ -6,12 +6,13 @@ import { useColorScheme } from '~/lib/useColorScheme';
 import { useTranslation } from 'react-i18next';
 
 import { haptic } from '~/lib/haptics';
-import { useSettingsStore } from '~/store';
+import { useAuthStore, useSettingsStore } from '~/store';
 import { Toggle } from '~/components/nativewindui/Toggle';
 
 const Settings = () => {
   const { t } = useTranslation();
-  const { colors, isDarkColorScheme, setColorScheme } = useColorScheme();
+  const { uid, logout } = useAuthStore();
+  const { colors, isDarkColorScheme, toggleColorScheme } = useColorScheme();
   const { hapticsEnabled, toggleHaptics } = useSettingsStore();
 
   const styles = StyleSheet.create({
@@ -40,25 +41,28 @@ const Settings = () => {
         <Text variant={'heading'}>{t('settings.title')}</Text>
       </View>
 
-      <View className="gap-4">
-        <PressableScale style={styles.settingCard} onPress={toggleHaptics}>
-          <Text>Vibrazione</Text>
-          <Toggle value={hapticsEnabled} />
-        </PressableScale>
+      <View className="gap-10">
+        <View className="gap-4">
+          <PressableScale style={styles.settingCard} onPress={toggleHaptics}>
+            <Text>Vibrazione</Text>
+            <Toggle value={hapticsEnabled} />
+          </PressableScale>
 
-        <PressableScale
-          style={styles.settingCard}
-          onPress={() => {
-            setColorScheme(isDarkColorScheme ? 'light' : 'dark');
-          }}>
-          <Text>Tema scuro</Text>
-          <Toggle value={isDarkColorScheme} />
-        </PressableScale>
+          <PressableScale style={styles.settingCard} onPress={toggleColorScheme}>
+            <Text>Tema scuro</Text>
+            <Toggle value={isDarkColorScheme} />
+          </PressableScale>
 
-        {/* <PressableScale style={styles.settingCard} onPress={() => {}}>
+          {/* <PressableScale style={styles.settingCard} onPress={() => {}}>
           <Text>Notifiche</Text>
           <Toggle disabled={true} value={false} />
-        </PressableScale> */}
+          </PressableScale> */}
+        </View>
+        <PressableScale style={styles.settingCard} onPress={logout}>
+          <View className="flex-1 items-center">
+            <Text className="text-destructive">Esci</Text>
+          </View>
+        </PressableScale>
       </View>
     </BlurView>
   );
