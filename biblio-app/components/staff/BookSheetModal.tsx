@@ -53,7 +53,7 @@ export function BookSheetModal({ mode, visible, bookId, onClose }: Props) {
     } else {
       setCurrentBook(EMPTY_BOOK);
     }
-  }, [visible]);
+  }, [visible, isEdit, bookId, books]);
 
   const onSave = () => {
     if (!currentBook.title || !currentBook.author || !currentBook.isbn) {

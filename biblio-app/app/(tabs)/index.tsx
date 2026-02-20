@@ -11,6 +11,8 @@ import { Book } from '~/store/biblio';
 import { useTranslation } from 'react-i18next';
 import AddBookBtn from '~/components/staff/AddBookBtn';
 import AddBookModal from '~/components/staff/AddBookModal';
+import { LinearGradient } from 'expo-linear-gradient';
+import { convertToRGBA } from '~/lib/utils';
 
 export default function Index() {
   const { colors } = useColorScheme();
@@ -19,7 +21,7 @@ export default function Index() {
 
   const { t } = useTranslation();
 
-  const { library, addToLibrary } = useLibraryStore();
+  const { library, addToLibrary, setNotify } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters, resetFilters } = useFiltersStore();
 
@@ -44,6 +46,7 @@ export default function Index() {
     (item: Book) => {
       if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
         addToLibrary(item);
+        setNotify(true);
       } else {
         setBookIdToEdit(item.id);
         setBookEditModal(true);
@@ -104,7 +107,7 @@ export default function Index() {
 
       {membership.role === 'staff' && <AddBookBtn />}
 
-      {/* <LinearGradient
+      <LinearGradient
         colors={[colors.background, convertToRGBA(colors.background, 0)]}
         style={{
           position: 'absolute',
@@ -115,11 +118,14 @@ export default function Index() {
           zIndex: 10,
         }}
         pointerEvents="none"
-      /> */}
+      />
 
+      {/* ----- Modals -----  */}
       <FiltersSheetModal />
 
-      {membership.role === 'staff' && <AddBookModal />}
+      {membership.role === 'staff' && (
+        <AddBookModal bookIdToEdit={bookIdToEdit} setBookToEdit={setBookIdToEdit} />
+      )}
     </View>
   );
 }

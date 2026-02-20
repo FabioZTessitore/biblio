@@ -8,24 +8,10 @@ import { Button } from '~/components/nativewindui/Button';
 import { useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '~/components/ui/Badge';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
-};
-
-const HeaderLeft = () => {
-  const { colors } = useColorScheme();
-  const navigation = useNavigation();
-
-  const openDrawer = () => {
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
-
-  return (
-    <Button onPress={openDrawer} variant="plain" size={'icon'}>
-      <Icon color={colors.grey2} type="MaterialCommunityIcons" name="menu" />
-    </Button>
-  );
 };
 
 const HeaderRight = () => {
@@ -72,6 +58,7 @@ export default function TabLayout() {
   const { t } = useTranslation();
   const { membership } = useUserStore();
   const { colors } = useColorScheme();
+  const { notify } = useLibraryStore();
 
   const SCREEN_OPTIONS = {
     headerStyle: {
@@ -85,9 +72,7 @@ export default function TabLayout() {
   const INDEX_OPTIONS = {
     ...SCREEN_OPTIONS,
     title: t('tabs.index_title'),
-    headerTitleStyle: { fontSize: 24 },
     tabBarIcon: ({ focused, size }) => <TabBarIcon name="book" active={focused} />,
-    headerLeft: HeaderLeft,
     headerRight: HeaderRight,
   } as TabsProps;
 
@@ -95,9 +80,11 @@ export default function TabLayout() {
     ...SCREEN_OPTIONS,
     title: t('tabs.library_title'),
     tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
+      <View>
+        {notify && <Badge />}
+        <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
+      </View>
     ),
-    headerLeft: HeaderLeft,
     headerRight: HeaderBin,
   } as TabsProps;
 
@@ -107,7 +94,6 @@ export default function TabLayout() {
     tabBarIcon: ({ focused, size }) => (
       <TabBarIcon type="MaterialCommunityIcons" name="hand-extended" active={focused} />
     ),
-    headerLeft: HeaderLeft,
   } as TabsProps;
 
   return (

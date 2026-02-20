@@ -3,8 +3,9 @@ import { auth, db } from '~/lib/firebase';
 import { Membership, User, useUserStore } from './user';
 import { collection, doc, getDoc, query, Timestamp, updateDoc, where } from 'firebase/firestore';
 import { signInAnonymously, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { Alert } from 'react-native';
 
-const schoolId = process.env.EXPO_PUBLIC_SCHOOL_ID
+const schoolId = process.env.EXPO_PUBLIC_SCHOOL_ID ?? '';
 
 export interface TAuthState {
   uid: string;
@@ -93,19 +94,36 @@ const authAction = {
 
   logout: async () => {
     const { setError } = useAuthStore.getState();
-    const { setMembership } = useUserStore.getState();
+    const { membership, setMembership } = useUserStore.getState();
+
+    const resetMembership = () => {
+      setMembership({
+        role: 'user',
+        schoolId: '',
+        createdAt: null,
+      });
+    };
 
     try {
-      await signOut(auth);
+      if (membership.role === 'user') {
+        Alert.alert('Attenzione', "Se esci, perderai l'accesso alle tue richieste di prestito.", [
+          { text: 'Annulla', style: 'cancel' },
+          {
+            text: 'Esci',
+            style: 'destructive',
+            onPress: async () => {
+              await signOut(auth);
+              resetMembership();
+            },
+          },
+        ]);
+      } else {
+        await signOut(auth);
+        resetMembership();
+      }
     } catch (error: any) {
       setError(error.message || 'Si è verificato un errore durante il logout.');
     }
-
-    setMembership({
-      role: 'user',
-      schoolId: '',
-      createdAt: null,
-    });
   },
 
   loginAnonymously: async (name, surname, grade) => {

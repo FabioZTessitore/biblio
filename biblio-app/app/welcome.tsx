@@ -165,6 +165,7 @@ const OperatorWelcome = () => {
             maxLength={50}
             inputMode="email"
             autoComplete="email"
+            keyboardType="email-address"
             error={userAttempt.error}
             value={userAttempt.email}
             onSubmitEditing={() => {

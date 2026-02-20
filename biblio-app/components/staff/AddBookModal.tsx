@@ -1,10 +1,19 @@
 import { BookSheetModal } from './BookSheetModal';
-import { useState } from 'react';
 import { useBiblioStore } from '~/store';
 
-export default function AddBookModal() {
+export default function AddBookModal({
+  bookIdToEdit,
+  setBookToEdit,
+}: {
+  bookIdToEdit: string;
+  setBookToEdit: (id: string) => void;
+}) {
   const { bookModal, setBookModal, bookEditModal, setBookEditModal } = useBiblioStore();
-  const [bookIdToEdit, setBookIdToEdit] = useState('');
+
+  const closeEditModal = () => {
+    setBookEditModal(false);
+    setBookToEdit('');
+  };
 
   return (
     <>
@@ -14,7 +23,7 @@ export default function AddBookModal() {
         mode="edit"
         visible={bookEditModal}
         bookId={bookIdToEdit}
-        onClose={() => setBookEditModal(false)}
+        onClose={closeEditModal}
       />
     </>
   );
