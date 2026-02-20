@@ -21,7 +21,7 @@ export default function Index() {
 
   const { t } = useTranslation();
 
-  const { library, addToLibrary } = useLibraryStore();
+  const { library, addToLibrary, setNotify } = useLibraryStore();
   const { membership } = useUserStore();
   const { filters, applyFilters, resetFilters } = useFiltersStore();
 
@@ -46,6 +46,7 @@ export default function Index() {
     (item: Book) => {
       if (membership.role === 'user' && !library.some((b) => b.id === item.id)) {
         addToLibrary(item);
+        setNotify(true);
       } else {
         setBookIdToEdit(item.id);
         setBookEditModal(true);

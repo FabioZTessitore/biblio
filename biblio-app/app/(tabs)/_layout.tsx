@@ -8,6 +8,7 @@ import { Button } from '~/components/nativewindui/Button';
 import { useFiltersStore, useLibraryStore, useUserStore } from '~/store';
 import { DrawerActions } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '~/components/ui/Badge';
 
 type TabsProps = BottomTabNavigationOptions & {
   href?: Href | null;
@@ -57,6 +58,7 @@ export default function TabLayout() {
   const { t } = useTranslation();
   const { membership } = useUserStore();
   const { colors } = useColorScheme();
+  const { notify } = useLibraryStore();
 
   const SCREEN_OPTIONS = {
     headerStyle: {
@@ -78,7 +80,10 @@ export default function TabLayout() {
     ...SCREEN_OPTIONS,
     title: t('tabs.library_title'),
     tabBarIcon: ({ focused, size }) => (
-      <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
+      <View>
+        {notify && <Badge />}
+        <TabBarIcon type="MaterialCommunityIcons" name="library-shelves" active={focused} />
+      </View>
     ),
     headerRight: HeaderBin,
   } as TabsProps;

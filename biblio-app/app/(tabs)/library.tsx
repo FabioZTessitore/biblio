@@ -5,11 +5,13 @@ import { Book, Request, useBiblioStore } from '~/store/biblio';
 import { useLibraryStore } from '~/store';
 import { Button } from '~/components/nativewindui/Button';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { convertToRGBA, truncateText } from '~/lib/utils';
+import { convertToRGBA } from '~/lib/utils';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator } from '~/components/nativewindui/ActivityIndicator';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from 'expo-router';
+import { BlurView } from 'expo-blur';
 
 /* ------------------------------------------
    CARD LIBRERIA (usa BaseCard)
@@ -75,12 +77,19 @@ const Library = () => {
   const { t } = useTranslation();
   const { colors } = useColorScheme();
 
-  const { library, removeFromLibrary } = useLibraryStore();
+  const { library, removeFromLibrary, setNotify } = useLibraryStore();
   const { requests, requestLoan, isLoading } = useBiblioStore();
 
   const shoppingCartStr = t('top_tabs.shoppingcart');
   const borrowStr = t('top_tabs.borrow');
   const [tab, setTab] = useState<string>(shoppingCartStr);
+
+  useFocusEffect(
+    useCallback(() => {
+      setNotify(false);
+      return () => {};
+    }, [])
+  );
 
   const loanRequest = () => {
     if (library.some((book) => !book.available)) {

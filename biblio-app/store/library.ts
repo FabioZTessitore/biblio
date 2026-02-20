@@ -9,10 +9,12 @@ import { useTranslation } from 'react-i18next';
 
 export interface TLibraryState {
   library: Book[];
+  notify: boolean;
 }
 
 export interface TLibraryMutations {
   setLibrary: (library: Book[]) => void;
+  setNotify: (notify: boolean) => void;
 
   addToLibrary: (book: Book) => void;
   removeFromLibrary: (bookId: string) => void;
@@ -29,6 +31,7 @@ export type TLibraryStore = TLibraryState & TLibraryMutations & TLibraryAction;
 // ##########################################################################
 const libraryState = {
   library: [],
+  notify: false,
 } satisfies TLibraryState;
 
 // ##########################################################################
@@ -36,6 +39,7 @@ const libraryState = {
 // ##########################################################################
 const libraryMutations = {
   setLibrary: (library): void => useLibraryStore.setState({ library }),
+  setNotify: (notify): void => useLibraryStore.setState({ notify }),
 
   addToLibrary: (book) =>
     useLibraryStore.setState((state: TLibraryState) => ({ library: [...state.library, book] })),
