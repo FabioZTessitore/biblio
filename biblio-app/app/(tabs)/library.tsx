@@ -180,11 +180,16 @@ const Library = () => {
       />
 
       {tab === shoppingCartStr && library.length > 0 && (
-        <View className="absolute bottom-0 left-0 right-0 bg-transparent/60 p-6">
+        // TODO: chanage color transparent for light
+        <BlurView
+          blurReductionFactor={1}
+          intensity={1}
+          experimentalBlurMethod="dimezisBlurView"
+          className="absolute bottom-0 left-0 right-0 p-6">
           <Button disabled={isLoading} className="py-4" onPress={loanRequest}>
             {isLoading ? <ActivityIndicator /> : <Text>{t('library.borrow')}</Text>}
           </Button>
-        </View>
+        </BlurView>
       )}
     </View>
   );
