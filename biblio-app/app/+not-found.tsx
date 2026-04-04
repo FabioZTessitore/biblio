@@ -1,4 +1,5 @@
 import { Link, Stack } from 'expo-router';
+
 import { Text, View } from 'react-native';
 
 export default function NotFoundScreen() {
@@ -7,7 +8,7 @@ export default function NotFoundScreen() {
       <Stack.Screen options={{ title: 'Oops!' }} />
       <View className={styles.container}>
         <Text className={styles.title}>{'Questa pagina non esiste.'}</Text>
-        <Link href="/(drawer)/(tabs)/home" className={styles.link}>
+        <Link href="/home" className={styles.link}>
           <Text className={styles.linkText}>Torna alla pagina iniziale!</Text>
         </Link>
       </View>

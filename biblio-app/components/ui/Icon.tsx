@@ -1,27 +1,23 @@
-import React from 'react';
+import React from "react";
 import {
   AntDesign,
   Entypo,
   Feather,
   FontAwesome,
   FontAwesome5,
+  FontAwesome6,
   Ionicons,
   MaterialIcons,
   MaterialCommunityIcons,
-} from '@expo/vector-icons';
-import { useColorScheme } from '~/lib/useColorScheme';
-import { TouchableOpacity, Linking } from 'react-native';
-
-export type IconType = keyof typeof ICON_TYPES;
-
-export interface IconProps<T extends IconType = 'MaterialIcons'> {
-  name: React.ComponentProps<(typeof ICON_TYPES)[T]>['name'];
-  type?: T;
-  size?: 'display' | 'heading' | 'body' | 'label' | number;
-  color?: string;
-  link?: string;
-  className?: string;
-}
+  Octicons,
+  EvilIcons,
+  Fontisto,
+  Foundation,
+  SimpleLineIcons,
+  Zocial,
+} from "@expo/vector-icons";
+import { TouchableOpacity, Linking } from "react-native";
+import { useAppTheme, AppColors, typography } from "@/theme";
 
 const ICON_TYPES = {
   AntDesign,
@@ -29,63 +25,70 @@ const ICON_TYPES = {
   Feather,
   FontAwesome,
   FontAwesome5,
+  FontAwesome6,
   Ionicons,
   MaterialIcons,
   MaterialCommunityIcons,
+  Octicons,
+  EvilIcons,
+  Fontisto,
+  Foundation,
+  SimpleLineIcons,
+  Zocial,
 };
 
-function parseSize(size: 'display' | 'heading' | 'body' | 'label' | number) {
-  switch (size) {
-    case 'display':
-      return 36; // 36px
-    case 'heading':
-      return 24; // 24px
-    case 'body':
-      return 16; // 16px
-    case 'label':
-      return 14; // 14px
-    default:
-      return size;
-  }
+export type IconType = keyof typeof ICON_TYPES;
+type ColorName = keyof AppColors;
+
+const sizeMap: Record<keyof typeof typography.scale, number> = {
+  display: typography.scale.display.fontSize,
+  heading: typography.scale.heading.fontSize,
+  body: typography.scale.body.fontSize,
+  label: typography.scale.label.fontSize,
+  caption: typography.scale.caption.fontSize,
+};
+
+export interface IconProps<T extends IconType = "MaterialIcons"> {
+  name: React.ComponentProps<(typeof ICON_TYPES)[T]>["name"];
+  type?: T;
+  size?: keyof typeof sizeMap;
+  color?: ColorName;
+  link?: string;
+  className?: string;
 }
 
-export const Icon = <T extends IconType = 'MaterialIcons'>({
+export const Icon = <T extends IconType = "MaterialIcons">({
   name,
-  type = 'MaterialIcons' as T,
-  size = 'heading',
-  color,
+  type = "MaterialIcons" as T,
+  size = "heading",
+  color = "foreground",
   link,
   className,
 }: IconProps<T>) => {
-  const { colors } = useColorScheme();
-  const IconComponent = ICON_TYPES[type];
+  const { colors } = useAppTheme();
 
-  if (!IconComponent) {
-    console.warn(`Tipo di icona "${type}" non trovato. Usando "MaterialIcons" di default.`);
-    return (
-      <MaterialIcons
-        name={name}
-        className={className}
-        size={parseSize(size)}
-        color={color ?? colors.foreground}
-      />
-    );
-  }
-
-  const handlePress = () => {
-    if (link) {
-      Linking.openURL(link);
-    }
-  };
+  const IconComponent = (ICON_TYPES[type] ??
+    MaterialIcons) as React.ComponentType<{
+    name: any;
+    size?: number;
+    color?: string;
+    className?: string;
+  }>;
 
   const icon = (
     <IconComponent
       name={name}
+      size={sizeMap[size]}
+      color={colors[color]}
       className={className}
-      size={parseSize(size)}
-      color={color ?? colors.foreground}
     />
   );
 
-  return link ? <TouchableOpacity onPress={handlePress}>{icon}</TouchableOpacity> : icon;
+  return link ? (
+    <TouchableOpacity onPress={() => Linking.openURL(link)}>
+      {icon}
+    </TouchableOpacity>
+  ) : (
+    icon
+  );
 };

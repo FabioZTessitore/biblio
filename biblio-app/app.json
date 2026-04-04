@@ -1,19 +1,60 @@
 {
   "expo": {
-    "name": "biblio-app",
+    "name": "Biblio App",
     "slug": "biblio-app",
     "version": "1.0.0",
-    "scheme": "biblio-app",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "expo55app",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+      // "icon": "./assets/expo.icon"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        // "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true,
+      "package": "com.fzt.biblioapp"
+    },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
-      "expo-web-browser",
-      "expo-font",
-      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "android": {
+            "image": "./assets/images/splash-icon.png",
+            "imageWidth": 76
+          }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Inter-Regular.ttf",
+            "./assets/fonts/Inter-Medium.ttf",
+            "./assets/fonts/Inter-SemiBold.ttf",
+            "./assets/fonts/Inter-Bold.ttf"
+          ]
+        }
+      ],
       [
         "expo-camera",
         {
@@ -24,27 +65,9 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "tsconfigPaths": true
-    },
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "reactCompiler": true
     },
     "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.fzt.biblioapp"
-    },
     "extra": {
       "router": {},
       "eas": {

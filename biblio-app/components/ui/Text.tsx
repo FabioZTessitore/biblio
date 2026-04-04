@@ -1,72 +1,36 @@
-// import { Inter_300Light, Inter_500Medium, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import { VariantProps, cva } from 'class-variance-authority';
-import { cssInterop } from 'nativewind';
-import * as React from 'react';
-import { UITextView } from 'react-native-uitextview';
-import { cn } from '~/lib/cn';
-import { useColorScheme } from '~/lib/useColorScheme';
+import { Text as RNText, TextProps as RNTextProps } from "react-native";
+import { typography, useAppTheme, AppColors } from "@/theme";
 
-cssInterop(UITextView, { className: 'style' });
+type Variant = keyof typeof typography.scale;
+type Weight = keyof typeof typography.family;
+type ColorName = keyof AppColors;
 
-const textVariants = cva('text-foreground', {
-  variants: {
-    variant: {
-      display: 'text-4xl', // 36px
-      heading: 'text-2xl', // 24px
-      body: 'text-base', // 16px
-      label: 'text-xs', // 12px
-    },
-    weight: {
-      light: 'font-light',
-      medium: 'font-medium',
-      bold: 'font-bold',
-    },
-    color: {
-      foreground: 'text-foreground',
-      primary: 'text-primary',
-      secondary: 'text-secondary',
-      muted: 'text-muted',
-    },
-  },
-  defaultVariants: {
-    variant: 'body',
-    weight: 'medium',
-    color: 'foreground',
-  },
-});
+export interface TextProps extends RNTextProps {
+  variant?: Variant;
+  weight?: Weight;
+  color?: ColorName;
+}
 
-const TextClassContext = React.createContext<string | undefined>(undefined);
-
-function Text({
-  className,
-  variant,
-  weight,
-  color,
+export const Text = ({
+  variant = "body",
+  weight = "regular",
+  color = "foreground",
+  style,
   ...props
-}: React.ComponentPropsWithoutRef<typeof UITextView> & VariantProps<typeof textVariants>) {
-  const textClassName = React.useContext(TextClassContext);
-
-  // const [fontsLoaded] = useFonts({
-  //   Inter_300Light,
-  //   Inter_500Medium,
-  //   Inter_700Bold,
-  // });
-
-  // if (!fontsLoaded) return null;
-
-  // const fontMap = {
-  //   light: 'Inter_300Light',
-  //   medium: 'Inter_500Medium',
-  //   bold: 'Inter_700Bold',
-  // } as const;
+}: TextProps) => {
+  const { colors } = useAppTheme();
 
   return (
-    <UITextView
-      // style={{ fontFamily: fontMap[weight ?? 'medium'] }}
-      className={cn(textVariants({ variant, weight, color }), textClassName, className)}
+    <RNText
+      style={[
+        typography.scale[variant],
+        {
+          fontFamily: typography.family[weight],
+          color: colors[color],
+        },
+        style,
+      ]}
       {...props}
     />
   );
-}
-
-export { Text, TextClassContext, textVariants };
+};
