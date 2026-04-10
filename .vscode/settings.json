@@ -9,5 +9,8 @@
   "editor.detectIndentation": true,
   "[markdown]": {
     "editor.defaultFormatter": "vscode.markdown-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   }
 }

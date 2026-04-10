@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextInput, View, Text, TextInputProps } from "react-native";
+import { TextInput, View, Text, TextInputProps, TextStyle } from "react-native";
 import { tokens, typography, useAppTheme } from "@/theme";
 
 type Variant = "default" | "title" | "description";
@@ -22,8 +22,6 @@ interface TextFieldProps extends TextInputProps {
   variant?: Variant;
   maxLength?: number;
 }
-
-import { TextStyle } from "react-native";
 
 type VariantConfig = {
   input: TextStyle;
@@ -83,7 +81,7 @@ export function TextField({
   const borderColor = isFocused ? colors.primary : colors.border;
 
   return (
-    <View style={{ gap: 6 }}>
+    <View style={{ gap: 4 }}>
       <TextInput
         {...props}
         multiline={config.multiline}
